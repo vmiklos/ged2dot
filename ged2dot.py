@@ -50,6 +50,15 @@ class Individual:
                 picture = "placeholder-m.png"
             else:
                 picture = "placeholder-f.png"
+
+        try:
+            from PIL import Image
+            i = Image.open(picture)
+            if i.size != (100, 100):
+                print "// warning, picture of %s has custom (not 100x100 px) size." % self.getFullName()
+        except ImportError:
+            pass
+
         # TODO make this configurable
         format = """<<table border="0" cellborder="0"><tr><td><img src="%s"/></td></tr><tr><td>%s<br/>%s<br/>%s-%s</td></tr></table>>"""
         if Individual.anonMode:
