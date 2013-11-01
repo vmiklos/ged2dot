@@ -16,6 +16,7 @@ import os
 
 class Individual:
     considerAgeDead = 120 # TODO make this configurable
+    anonMode = True # TODO make this configurable
     """An individual is our basic building block, can be part of multiple families (usually two)."""
     def __init__(self):
         self.id = None
@@ -34,7 +35,9 @@ class Individual:
         return "id: %s, sex: %s, forename: %s, surname: %s: famc: %s, fams: %s, birt: %s, deat: %s" % (self.id, self.sex, self.forename, self.surname, self.famc, self.fams, self.birt, self.deat)
 
     def getFullName(self):
-        return "%s\\n%s\\n%s-%s" % (self.surname, self.forename, self.birt, self.deat) # TODO make this configurable
+        """Full name of the individual. Only used as comments in the output
+        file to ease debugging."""
+        return "%s %s" % (self.forename, self.surname)
 
     def getLabel(self):
         # TODO make it possible to completely avoid images
