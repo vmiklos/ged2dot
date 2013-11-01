@@ -76,7 +76,7 @@ class Individual:
         return {'M': 'blue', 'F': 'pink'}[self.sex]
 
     def getNode(self):
-        return Node(self.id, '[ shape = box, label = %s, color = %s ]' % (self.getLabel(), self.getColor()))
+        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))
 
     def setBirt(self, birt):
         if not len(birt):
