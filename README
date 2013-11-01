@@ -1,4 +1,4 @@
-= ged2dot
+= ged2dot, a GEDCOM to Graphviz converter
 
 == What's the problem the tool solves?
 
