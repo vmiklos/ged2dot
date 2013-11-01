@@ -497,10 +497,10 @@ class GedcomImport:
 
                 if rest.startswith("@") and rest.endswith("INDI"):
                     self.indi = Individual()
-                    self.indi.id = rest.split(' ')[0].strip('@') # TODO for fams/famc we do this better
+                    self.indi.id = rest[1:-6]
                 elif rest.startswith("@") and rest.endswith("FAM"):
                     self.family = Family(self.model)
-                    self.family.id = rest.split(' ')[0].strip('@') # TODO same here
+                    self.family.id = rest[1:-5]
 
             elif level == 1:
                 if self.inBirt:
