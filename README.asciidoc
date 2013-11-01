@@ -13,8 +13,11 @@ single individual (what you can easily do with random family editor software).
 
 Currently it allows to show a ancestors of a family (both husband and wife),
 and you can set how many generations do you want to see, and also for how many
-generations you want to include sibling families as well -- but it can be
-easily extended to support other scenarios as well.
+generations you want to include sibling families as well:
+
+image::screenshot.png[]
+
+(But the tool can be easily extended to support other scenarios as well.)
 
 Icons are from
 http://www.wpzoom.com/wpzoom/new-freebie-wpzoom-developer-icon-set-154-free-icons/[WPZOOM],
