@@ -16,7 +16,7 @@ import os
 
 class Individual:
     considerAgeDead = 120 # TODO make this configurable
-    anonMode = True # TODO make this configurable
+    anonMode = False # TODO make this configurable
     """An individual is our basic building block, can be part of multiple families (usually two)."""
     def __init__(self):
         self.id = None
@@ -43,7 +43,7 @@ class Individual:
         # TODO make it possible to completely avoid images
         # TODO make the path configurable
         path = "pictures/%s %s %s.jpg" % (self.forename, self.surname, self.birt)
-        if os.path.exists(path):
+        if os.path.exists(path) and not Individual.anonMode:
             picture = path
         else:
             if self.sex == "M":
@@ -52,7 +52,16 @@ class Individual:
                 picture = "placeholder-f.png"
         # TODO make this configurable
         format = """<<table border="0" cellborder="0"><tr><td><img src="%s"/></td></tr><tr><td>%s<br/>%s<br/>%s-%s</td></tr></table>>"""
-        return format % (picture, self.surname, self.forename, self.birt, self.deat)
+        if Individual.anonMode:
+            birt = self.birt
+            if len(birt) > 1:
+                birt = "YYYY"
+            deat = self.deat
+            if len(deat) > 1:
+                deat = "YYYY"
+            return format % (picture, self.id[0], self.id[1:], birt, deat)
+        else:
+            return format % (picture, self.surname, self.forename, self.birt, self.deat)
 
     def getColor(self):
         return {'M': 'blue', 'F': 'pink'}[self.sex]
