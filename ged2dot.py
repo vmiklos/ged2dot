@@ -8,21 +8,21 @@
 import sys
 sys = reload(sys)
 sys.setdefaultencoding("utf-8")
-
 import time
 import os
+
 
 # Model
 
 class Individual:
-    considerAgeDead = 120 # TODO make this configurable
-    anonMode = False # TODO make this configurable
+    considerAgeDead = 120  # TODO make this configurable
+    anonMode = False  # TODO make this configurable
     """An individual is our basic building block, can be part of multiple families (usually two)."""
     def __init__(self):
         self.id = None
         self.sex = None
-        self.forename = None # John
-        self.surname = None # Smith
+        self.forename = None  # John
+        self.surname = None  # Smith
         self.famc = None
         self.fams = None
         self.birt = ""
@@ -77,6 +77,7 @@ class Individual:
             if not len(self.deat):
                 self.deat = "?"
 
+
 class Family:
     """Family has exactly one wife and husb, 0..* children."""
     def __init__(self, model):
@@ -108,17 +109,18 @@ class Family:
             return 0
         self.chil.sort(compareChildren)
 
+
 class Model:
     def __init__(self):
-        self.individuals = [] # List of all individuals.
-        self.families = [] # List of all families.
+        self.individuals = []  # List of all individuals.
+        self.families = []  # List of all families.
 
     def getIndividual(self, id):
         for i in self.individuals:
             if i.id == id:
                 return i
 
-    def getFamily(self, id, familySet = None):
+    def getFamily(self, id, familySet=None):
         if not familySet:
             familySet = self.families
         for i in familySet:
@@ -128,7 +130,7 @@ class Model:
     def load(self, name):
         inf = open(name)
         GedcomImport(inf, self).load()
-    
+
     def save(self):
         """Save is done by calcularing and rendering the layout on the output."""
         layout = Layout(self)
@@ -140,11 +142,11 @@ class Model:
 
 class Edge:
     # TODO make this configurable
-    invisibleRed = False # Invisible edges: red for debugging or really invisible?
+    invisibleRed = False  # Invisible edges: red for debugging or really invisible?
     # TODO make this configurable
-    visibleDirected = False # Visible edges: show direction?
+    visibleDirected = False  # Visible edges: show direction?
     """A graph edge."""
-    def __init__(self, fro, to, invisible = False, comment = None):
+    def __init__(self, fro, to, invisible=False, comment=None):
         self.fro = fro
         self.to = to
         self.rest = ""
@@ -162,6 +164,7 @@ class Edge:
     def render(self):
         print "%s -> %s %s" % (self.fro, self.to, self.rest)
 
+
 class Node:
     """A graph node."""
     def __init__(self, id, rest):
@@ -171,9 +174,9 @@ class Node:
     def render(self):
         print "%s %s" % (self.id, self.rest)
 
+
 class Subgraph:
     """A subgraph in the layout, contains edges and nodes.
-    
     The special start node is not part of the elements list and it is at the
     begining.  The special end node is the separator between elements what are
     in the subgraph and what are outside of it."""
@@ -224,6 +227,7 @@ class Subgraph:
                     return (family.husb, count)
             count += 1
 
+
 class Marriage:
     """Kind of a fake node, produced from a family."""
     def __init__(self, family):
@@ -238,15 +242,16 @@ class Marriage:
         wife = model.getIndividual(self.family.wife).getFullName()
         return Node(self.getName(), "[ shape = point ] // %s, %s" % (husb, wife))
 
+
 class Layout:
     """Generates the graphviz digraph, contains subgraphs."""
     def __init__(self, model):
         self.model = model
         self.subgraphs = []
-        self.filteredFamilies = [] # List of families, which are directly interesting for us.
+        self.filteredFamilies = []  # List of families, which are directly interesting for us.
         # TODO make these configurable
-        self.maxDepth = 3 # Number of ancestor generations to show.
-        self.maxSiblingDepth = 1 # Number of ancestor generations, where also sibling families are shown.
+        self.maxDepth = 3  # Number of ancestor generations to show.
+        self.maxSiblingDepth = 1  # Number of ancestor generations, where also sibling families are shown.
 
     def append(self, subgraph):
         self.subgraphs.append(subgraph)
@@ -266,7 +271,7 @@ class Layout:
     def __filterFamilies(self):
         """Iterate over all families, find out directly interesting and sibling
         families. Populates filteredFamilies, returns sibling ones."""
-        familyRoot = "F8" # TODO make this configurable
+        familyRoot = "F8"  # TODO make this configurable
 
         self.filteredFamilies = [self.model.getFamily(familyRoot)]
 
@@ -324,21 +329,21 @@ class Layout:
             husb = self.model.getIndividual(family.husb)
             subgraph.append(husb.getNode())
             if prevWife and not self.model.getIndividual(prevWife).hasOrderDep:
-                subgraph.append(Edge(prevWife, family.husb, invisible = True))
+                subgraph.append(Edge(prevWife, family.husb, invisible=True))
             wife = self.model.getIndividual(family.wife)
             subgraph.append(wife.getNode())
             prevWife = family.wife
             marriage = Marriage(family)
             subgraph.append(marriage.getNode())
-            subgraph.append(Edge(family.husb, marriage.getName(), comment = self.model.getIndividual(family.husb).getFullName()))
-            subgraph.append(Edge(marriage.getName(), family.wife, comment = self.model.getIndividual(family.wife).getFullName()))
+            subgraph.append(Edge(family.husb, marriage.getName(), comment=self.model.getIndividual(family.husb).getFullName()))
+            subgraph.append(Edge(marriage.getName(), family.wife, comment=self.model.getIndividual(family.wife).getFullName()))
             for child in family.chil:
                 pendingChildNodes.append(self.model.getIndividual(child).getNode())
                 if prevChil:
-                    pendingChildNodes.append(Edge(prevChil, child, invisible = True))
+                    pendingChildNodes.append(Edge(prevChil, child, invisible=True))
                     self.model.getIndividual(prevChil).hasOrderDep = True
                 prevChil = child
-                pendingChildrenDeps.append(Edge("%sConnect" % child, child, comment = self.model.getIndividual(child).getFullName()))
+                pendingChildrenDeps.append(Edge("%sConnect" % child, child, comment=self.model.getIndividual(child).getFullName()))
         subgraph.end()
         for i in pendingChildrenDeps:
             subgraph.append(i)
@@ -364,20 +369,20 @@ class Layout:
                 else:
                     subgraph.append(Node("%sConnect" % child, "[ shape = point ]"))
 
-            middle = (len(children) / 2 )
+            middle = (len(children) / 2)
             count = 0
             for child in children:
                 if count < middle:
-                    subgraph.append(Edge("%sConnect" % child, "%sConnect" % children[middle], comment = self.model.getIndividual(child).getFullName()))
+                    subgraph.append(Edge("%sConnect" % child, "%sConnect" % children[middle], comment=self.model.getIndividual(child).getFullName()))
                 elif count == middle:
                     if self.model.getIndividual(child):
-                        pendingDeps.append(Edge(marriage.getName(), "%sConnect" % child, comment = self.model.getIndividual(child).getFullName()))
+                        pendingDeps.append(Edge(marriage.getName(), "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
                     else:
                         pendingDeps.append(Edge(marriage.getName(), "%sConnect" % child))
                 elif count > middle:
-                    subgraph.append(Edge("%sConnect" % children[middle], "%sConnect" % child, comment = self.model.getIndividual(child).getFullName()))
+                    subgraph.append(Edge("%sConnect" % children[middle], "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
                 if prevChild:
-                    subgraph.append(Edge("%sConnect" % prevChild, "%sConnect" % child, invisible = True))
+                    subgraph.append(Edge("%sConnect" % prevChild, "%sConnect" % child, invisible=True))
                     prevChild = None
                 count += 1
             if len(children):
@@ -412,8 +417,8 @@ class Layout:
         marriage = Marriage(family)
         subgraph.elements.insert(existingPos, marriage.getNode())
 
-        subgraph.append(Edge(family.husb, marriage.getName(), comment = self.model.getIndividual(family.husb).getFullName()))
-        subgraph.append(Edge(marriage.getName(), family.wife, comment = self.model.getIndividual(family.wife).getFullName()))
+        subgraph.append(Edge(family.husb, marriage.getName(), comment=self.model.getIndividual(family.husb).getFullName()))
+        subgraph.append(Edge(marriage.getName(), family.wife, comment=self.model.getIndividual(family.wife).getFullName()))
 
     def __addSiblingChildren(self, family):
         """Add children from a sibling family to the layout."""
@@ -444,7 +449,7 @@ class Layout:
         prevChild = lastChild
         for c in children:
             if not prevChild in children:
-                subgraphConnect.prepend(Edge("%sConnect" % prevChild, "%sConnect" % c, invisible = True))
+                subgraphConnect.prepend(Edge("%sConnect" % prevChild, "%sConnect" % c, invisible=True))
             else:
                 subgraphConnect.prepend(Edge("%sConnect" % prevChild, "%sConnect" % c))
             subgraphConnect.prepend(Node("%sConnect" % c, "[ shape = point ]"))
@@ -454,7 +459,7 @@ class Layout:
         subgraphChild = self.getSubgraph("Depth%s" % (depth - 1))
         prevChild = lastChild
         for c in family.chil:
-            subgraphChild.prepend(Edge(prevChild, c, invisible = True))
+            subgraphChild.prepend(Edge(prevChild, c, invisible=True))
             subgraphChild.prepend(self.model.getIndividual(c).getNode())
             subgraphChild.append(Edge("%sConnect" % c, c))
             prevChild = c
@@ -466,7 +471,7 @@ class Layout:
 
         siblingFamilies = self.__filterFamilies()
 
-        pendingChildNodes = [] # Children from generation N are nodes in the N+1th generation.
+        pendingChildNodes = []  # Children from generation N are nodes in the N+1th generation.
         for depth in reversed(range(self.maxDepth + 1)):
             # Draw two subgraphs for each generation. The first contains the real nodes.
             pendingChildNodes = self.__buildSubgraph(depth, pendingChildNodes)
@@ -480,6 +485,7 @@ class Layout:
             # Any children to take care of?
             if len(f.chil):
                 self.__addSiblingChildren(f)
+
 
 # Input filter
 
@@ -553,9 +559,10 @@ class GedcomImport:
                     elif self.inDeat:
                         self.indi.deat = year
 
+
 def main():
     model = Model()
-    model.load("test.ged") # TODO make this configurable
+    model.load("test.ged")  # TODO make this configurable
     model.save()
 
 if __name__ == "__main__":
