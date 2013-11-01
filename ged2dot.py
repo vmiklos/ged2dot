@@ -9,7 +9,6 @@ import sys
 sys = reload(sys)
 sys.setdefaultencoding("utf-8")
 
-import xml.sax
 import time
 import os
 
