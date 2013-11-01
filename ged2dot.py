@@ -496,7 +496,7 @@ class Layout:
                 self.__addSiblingChildren(f)
 
 
-# Input filter
+# Import filter
 
 class GedcomImport:
     """Builds the model from GEDCOM."""
