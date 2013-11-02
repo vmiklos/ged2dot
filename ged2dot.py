@@ -40,8 +40,11 @@ class Individual:
         return "%s %s" % (self.forename, self.surname)
 
     def getLabel(self):
-        # TODO make the path configurable
-        path = "pictures/%s %s %s.jpg" % (self.forename, self.surname, self.birt)
+        path = self.model.config.imageFormat % {
+            'forename': self.forename,
+            'surname': self.surname,
+            'birt': self.birt
+        }
         if os.path.exists(path) and not self.model.config.anonMode:
             picture = path
         else:
@@ -588,12 +591,13 @@ class GedcomImport:
 
 class Config:
     def __init__(self):
-        self.parser = ConfigParser.ConfigParser()
+        self.parser = ConfigParser.RawConfigParser()
         self.parser.read("ged2dotrc")  # TODO make this configurable
         self.input = self.get('input')
         self.considerAgeDead = int(self.get('considerAgeDead'))
         self.anonMode = self.get('anonMode') == "True"
         self.images = self.get('images') == "True"
+        self.imageFormat = self.get('imageFormat')
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]

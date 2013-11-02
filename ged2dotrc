@@ -7,3 +7,6 @@ considerAgeDead = 120
 anonMode = False
 # Should the output contain images?
 images = True
+# If images is True: format of the image paths.
+# Possible variables: %(forename)s, %(surname)s and %(birt)s.
+imageFormat = images/%(forename)s %(surname)s %(birt)s.jpg
