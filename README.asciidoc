@@ -11,8 +11,8 @@ single individual (what you can easily do with random family editor software).
 
 == Scenarios
 
-Currently it allows to show a ancestors of a family (both husband and wife),
-and you can set how many generations do you want to see, and also for how many
+Currently it allows to show ancestors of a family (both husband and wife), and
+you can set how many generations do you want to see, and also for how many
 generations you want to include sibling families as well:
 
 image::screenshot.png[]
