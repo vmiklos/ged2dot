@@ -16,10 +16,10 @@ import ConfigParser
 # Model
 
 class Individual:
-    considerAgeDead = 120  # TODO make this configurable
     anonMode = False  # TODO make this configurable
     """An individual is our basic building block, can be part of multiple families (usually two)."""
-    def __init__(self):
+    def __init__(self, model):
+        self.model = model
         self.id = None
         self.sex = None
         self.forename = None  # John
@@ -83,7 +83,7 @@ class Individual:
         if not len(birt):
             return
         self.birt = birt
-        if time.localtime().tm_year - int(birt) > Individual.considerAgeDead:
+        if time.localtime().tm_year - int(birt) > self.model.config.considerAgeDead:
             if not len(self.deat):
                 self.deat = "?"
 
@@ -121,7 +121,8 @@ class Family:
 
 
 class Model:
-    def __init__(self):
+    def __init__(self, config):
+        self.config = config
         self.individuals = []  # List of all individuals.
         self.families = []  # List of all families.
 
@@ -524,7 +525,7 @@ class GedcomImport:
                     self.family = None
 
                 if rest.startswith("@") and rest.endswith("INDI"):
-                    self.indi = Individual()
+                    self.indi = Individual(self.model)
                     self.indi.id = rest[1:-6]
                 elif rest.startswith("@") and rest.endswith("FAM"):
                     self.family = Family(self.model)
@@ -577,6 +578,7 @@ class Config:
         self.parser = ConfigParser.ConfigParser()
         self.parser.read("ged2dotrc")  # TODO make this configurable
         self.input = self.get('input')
+        self.considerAgeDead = int(self.get('considerAgeDead'))
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
@@ -584,7 +586,7 @@ class Config:
 
 def main():
     config = Config()
-    model = Model()
+    model = Model(config)
     model.load(config.input)
     model.save()
 
