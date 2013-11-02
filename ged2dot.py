@@ -60,7 +60,7 @@ class Individual:
             pass
 
         # TODO make this configurable
-        format = """<<table border="0" cellborder="0"><tr><td><img src="%s"/></td></tr><tr><td>%s<br/>%s<br/>%s-%s</td></tr></table>>"""
+        format = """<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>"""
         if self.model.config.anonMode:
             birt = self.birt
             if len(birt) > 1:
@@ -68,9 +68,21 @@ class Individual:
             deat = self.deat
             if len(deat) > 1:
                 deat = "YYYY"
-            return format % (picture, self.id[0], self.id[1:], birt, deat)
+            return format % {
+                'picture': picture,
+                'surname': self.id[0],
+                'forename': self.id[1:],
+                'birt': birt,
+                'deat': deat
+            }
         else:
-            return format % (picture, self.surname, self.forename, self.birt, self.deat)
+            return format % {
+                'picture': picture,
+                'surname': self.surname,
+                'forename': self.forename,
+                'birt': self.birt,
+                'deat': self.deat
+            }
 
     def getColor(self):
         return {'M': 'blue', 'F': 'pink'}[self.sex]
