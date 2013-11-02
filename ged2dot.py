@@ -16,7 +16,6 @@ import ConfigParser
 # Model
 
 class Individual:
-    anonMode = False  # TODO make this configurable
     """An individual is our basic building block, can be part of multiple families (usually two)."""
     def __init__(self, model):
         self.model = model
@@ -44,7 +43,7 @@ class Individual:
         # TODO make it possible to completely avoid images
         # TODO make the path configurable
         path = "pictures/%s %s %s.jpg" % (self.forename, self.surname, self.birt)
-        if os.path.exists(path) and not Individual.anonMode:
+        if os.path.exists(path) and not self.model.config.anonMode:
             picture = path
         else:
             if self.sex == "M":
@@ -62,7 +61,7 @@ class Individual:
 
         # TODO make this configurable
         format = """<<table border="0" cellborder="0"><tr><td><img src="%s"/></td></tr><tr><td>%s<br/>%s<br/>%s-%s</td></tr></table>>"""
-        if Individual.anonMode:
+        if self.model.config.anonMode:
             birt = self.birt
             if len(birt) > 1:
                 birt = "YYYY"
@@ -579,6 +578,7 @@ class Config:
         self.parser.read("ged2dotrc")  # TODO make this configurable
         self.input = self.get('input')
         self.considerAgeDead = int(self.get('considerAgeDead'))
+        self.anonMode = self.get('anonMode') == "True"
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
