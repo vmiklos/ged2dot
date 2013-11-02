@@ -10,6 +10,7 @@ sys = reload(sys)
 sys.setdefaultencoding("utf-8")
 import time
 import os
+import ConfigParser
 
 
 # Model
@@ -569,9 +570,22 @@ class GedcomImport:
                         self.indi.deat = year
 
 
+# Configuration handling
+
+class Config:
+    def __init__(self):
+        self.parser = ConfigParser.ConfigParser()
+        self.parser.read("ged2dotrc")  # TODO make this configurable
+        self.input = self.get('input')
+
+    def get(self, what):
+        return self.parser.get('ged2dot', what).split('#')[0]
+
+
 def main():
+    config = Config()
     model = Model()
-    model.load("test.ged")  # TODO make this configurable
+    model.load(config.input)
     model.save()
 
 if __name__ == "__main__":
