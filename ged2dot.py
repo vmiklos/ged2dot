@@ -40,7 +40,6 @@ class Individual:
         return "%s %s" % (self.forename, self.surname)
 
     def getLabel(self):
-        # TODO make it possible to completely avoid images
         # TODO make the path configurable
         path = "pictures/%s %s %s.jpg" % (self.forename, self.surname, self.birt)
         if os.path.exists(path) and not self.model.config.anonMode:
@@ -59,8 +58,11 @@ class Individual:
         except ImportError:
             pass
 
-        # TODO make this configurable
-        format = """<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>"""
+        # TODO make these configurable
+        if self.model.config.images:
+            format = """<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>"""
+        else:
+            format = "\"%(surname)s\\n%(forename)s\\n%(birt)s-%(deat)s\""
         if self.model.config.anonMode:
             birt = self.birt
             if len(birt) > 1:
@@ -591,6 +593,7 @@ class Config:
         self.input = self.get('input')
         self.considerAgeDead = int(self.get('considerAgeDead'))
         self.anonMode = self.get('anonMode') == "True"
+        self.images = self.get('images') == "True"
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
