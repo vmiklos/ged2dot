@@ -277,8 +277,6 @@ class Layout:
         self.model = model
         self.subgraphs = []
         self.filteredFamilies = []  # List of families, which are directly interesting for us.
-        # TODO make this configurable
-        self.maxSiblingFamilyDepth = 1  # Number of anchester generations, where also sibling families are shown.
 
     def append(self, subgraph):
         self.subgraphs.append(subgraph)
@@ -454,7 +452,7 @@ class Layout:
         """Add children from a sibling family to the layout."""
         depth = family.depth
 
-        if depth > self.maxSiblingFamilyDepth:
+        if depth > self.model.config.layoutMaxSiblingFamilyDepth:
             return
 
         subgraph = self.getSubgraph("Depth%s" % depth)
@@ -611,6 +609,7 @@ class Config:
         self.edgeVisibleDirected = self.get('edgeVisibleDirected') == "True"
         self.layoutMaxDepth = int(self.get('layoutMaxDepth'))
         self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth'))
+        self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth'))
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
