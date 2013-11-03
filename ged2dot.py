@@ -278,7 +278,6 @@ class Layout:
         self.subgraphs = []
         self.filteredFamilies = []  # List of families, which are directly interesting for us.
         # TODO make these configurable
-        self.maxDepth = 3  # Number of ancestor generations to show.
         self.maxSiblingDepth = 2  # Number of ancestor generations, where also sibling spouses are shown.
         self.maxSiblingFamilyDepth = 1  # Number of anchester generations, where also sibling families are shown.
 
@@ -312,7 +311,7 @@ class Layout:
         # List of families, which are interesting for us, as A is in the
         # family, B is in filteredFamilies, and A is a sibling of B.
         siblingFamilies = []
-        while depth < self.maxDepth:
+        while depth < self.model.config.layoutMaxDepth:
             nextPendings = []
             for pending in pendings:
                 husbFamily = self.model.getFamily(self.model.getIndividual(pending.husb).famc)
@@ -508,7 +507,7 @@ class Layout:
         siblingFamilies = self.__filterFamilies()
 
         pendingChildNodes = []  # Children from generation N are nodes in the N+1th generation.
-        for depth in reversed(range(self.maxDepth + 1)):
+        for depth in reversed(range(self.model.config.layoutMaxDepth + 1)):
             # Draw two subgraphs for each generation. The first contains the real nodes.
             pendingChildNodes = self.__buildSubgraph(depth, pendingChildNodes)
             # The other contains the connector nodes.
@@ -611,6 +610,7 @@ class Config:
         self.nodeLabelPlain = self.get('nodeLabelPlain')
         self.edgeInvisibleRed = self.get('edgeInvisibleRed') == "True"
         self.edgeVisibleDirected = self.get('edgeVisibleDirected') == "True"
+        self.layoutMaxDepth = int(self.get('layoutMaxDepth'))
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
