@@ -189,10 +189,12 @@ class Edge:
 
 class Node:
     """A graph node."""
-    def __init__(self, id, rest="", point=False, comment=None):
+    def __init__(self, id, rest="", point=False, visiblePoint=False, comment=None):
         self.id = id
         self.rest = rest
         if point:
+            self.rest += "[ shape = point, width = 0 ]"
+        elif visiblePoint:
             self.rest += "[ shape = point ]"
         if comment:
             self.rest += " // %s" % comment
@@ -266,7 +268,7 @@ class Marriage:
         model = self.family.model
         husb = model.getIndividual(self.family.husb).getFullName()
         wife = model.getIndividual(self.family.wife).getFullName()
-        return Node(self.getName(), point=True, comment="%s, %s" % (husb, wife))
+        return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))
 
 
 class Layout:
