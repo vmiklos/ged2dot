@@ -61,10 +61,10 @@ class Individual:
         except ImportError:
             pass
 
-        # TODO make these configurable
         if self.model.config.images:
-            format = """<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>"""
+            format = self.model.config.nodeLabelImage
         else:
+            # TODO make this configurable
             format = "\"%(surname)s\\n%(forename)s\\n%(birt)s-%(deat)s\""
         if self.model.config.anonMode:
             birt = self.birt
@@ -603,6 +603,7 @@ class Config:
         self.anonMode = self.get('anonMode') == "True"
         self.images = self.get('images') == "True"
         self.imageFormat = self.get('imageFormat')
+        self.nodeLabelImage = self.get('nodeLabelImage')
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
