@@ -277,8 +277,7 @@ class Layout:
         self.model = model
         self.subgraphs = []
         self.filteredFamilies = []  # List of families, which are directly interesting for us.
-        # TODO make these configurable
-        self.maxSiblingDepth = 2  # Number of ancestor generations, where also sibling spouses are shown.
+        # TODO make this configurable
         self.maxSiblingFamilyDepth = 1  # Number of anchester generations, where also sibling families are shown.
 
     def append(self, subgraph):
@@ -324,7 +323,7 @@ class Layout:
                 nextPendings.append(wifeFamily)
 
                 # Also collect children's family.
-                if depth < self.maxSiblingDepth + 1:
+                if depth < self.model.config.layoutMaxSiblingDepth + 1:
                     # +1, because children are in the previous generation.
                     for chil in husbFamily.chil + wifeFamily.chil:
                         chilFamily = self.model.getFamily(self.model.getIndividual(chil).fams)
@@ -611,6 +610,7 @@ class Config:
         self.edgeInvisibleRed = self.get('edgeInvisibleRed') == "True"
         self.edgeVisibleDirected = self.get('edgeVisibleDirected') == "True"
         self.layoutMaxDepth = int(self.get('layoutMaxDepth'))
+        self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth'))
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]

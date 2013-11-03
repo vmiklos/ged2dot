@@ -22,3 +22,5 @@ edgeInvisibleRed = False
 edgeVisibleDirected = False
 # Number of ancestor generations to show.
 layoutMaxDepth = 3
+# Number of ancestor generations, where also sibling spouses are shown.
+layoutMaxSiblingDepth = 2
