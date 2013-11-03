@@ -168,16 +168,14 @@ class Model:
 
 class Edge:
     # TODO make this configurable
-    invisibleRed = False  # Invisible edges: red for debugging or really invisible?
-    # TODO make this configurable
     visibleDirected = False  # Visible edges: show direction?
     """A graph edge."""
-    def __init__(self, fro, to, invisible=False, comment=None):
+    def __init__(self, model, fro, to, invisible=False, comment=None):
         self.fro = fro
         self.to = to
         self.rest = ""
         if invisible:
-            if Edge.invisibleRed:
+            if model.config.edgeInvisibleRed:
                 self.rest += "[ color = red ]"
             else:
                 self.rest += "[ style = invis ]"
@@ -296,7 +294,7 @@ class Layout:
                 return s
 
     def makeEdge(self, fro, to, invisible=False, comment=None):
-        return Edge(fro, to, invisible=invisible, comment=comment)
+        return Edge(self.model, fro, to, invisible=invisible, comment=comment)
 
     def __filterFamilies(self):
         """Iterate over all families, find out directly interesting and sibling
@@ -607,6 +605,7 @@ class Config:
         self.imageFormat = self.get('imageFormat')
         self.nodeLabelImage = self.get('nodeLabelImage')
         self.nodeLabelPlain = self.get('nodeLabelPlain')
+        self.edgeInvisibleRed = self.get('edgeInvisibleRed') == "True"
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]

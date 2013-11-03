@@ -16,3 +16,5 @@ nodeLabelImage = <<table border="0" cellborder="0"><tr><td><img src="%(picture)s
 # If images is False: label text of nodes.
 # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
 nodeLabelPlain = "%(surname)s\n%(forename)s\n%(birt)s-%(deat)s"
+# Invisible edges: red for debugging or really invisible?
+edgeInvisibleRed = False
