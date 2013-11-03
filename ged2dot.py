@@ -189,9 +189,13 @@ class Edge:
 
 class Node:
     """A graph node."""
-    def __init__(self, id, rest):
+    def __init__(self, id, rest="", point=False, comment=None):
         self.id = id
         self.rest = rest
+        if point:
+            self.rest += "[ shape = point ]"
+        if comment:
+            self.rest += " // %s" % comment
 
     def render(self):
         print "%s %s" % (self.id, self.rest)
@@ -262,7 +266,7 @@ class Marriage:
         model = self.family.model
         husb = model.getIndividual(self.family.husb).getFullName()
         wife = model.getIndividual(self.family.wife).getFullName()
-        return Node(self.getName(), "[ shape = point ] // %s, %s" % (husb, wife))
+        return Node(self.getName(), point=True, comment="%s, %s" % (husb, wife))
 
 
 class Layout:
@@ -391,9 +395,9 @@ class Layout:
                 children.insert(half, marriage.getName())
             for child in children:
                 if self.model.getIndividual(child):
-                    subgraph.append(Node("%sConnect" % child, "[ shape = point ] // %s" % self.model.getIndividual(child).getFullName()))
+                    subgraph.append(Node("%sConnect" % child, point=True, comment=self.model.getIndividual(child).getFullName()))
                 else:
-                    subgraph.append(Node("%sConnect" % child, "[ shape = point ]"))
+                    subgraph.append(Node("%sConnect" % child, point=True))
 
             middle = (len(children) / 2)
             count = 0
@@ -466,7 +470,7 @@ class Layout:
         subgraphConnect = self.getSubgraph("Depth%sConnects" % depth)
 
         marriage = Marriage(family)
-        subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), "[ shape = point ]"))
+        subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))
         subgraphConnect.append(self.makeEdge(marriage.getName(), "%sConnect" % marriage.getName()))
 
         children = family.chil[:]
@@ -482,7 +486,7 @@ class Layout:
                 subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c, invisible=True))
             else:
                 subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c))
-            subgraphConnect.prepend(Node("%sConnect" % c, "[ shape = point ]"))
+            subgraphConnect.prepend(Node("%sConnect" % c, point=True))
             prevChild = c
 
         # Then, add the real nodes.
