@@ -278,7 +278,8 @@ class Layout:
         self.filteredFamilies = []  # List of families, which are directly interesting for us.
         # TODO make these configurable
         self.maxDepth = 3  # Number of ancestor generations to show.
-        self.maxSiblingDepth = 1  # Number of ancestor generations, where also sibling families are shown.
+        self.maxSiblingDepth = 2  # Number of ancestor generations, where also sibling spouses are shown.
+        self.maxSiblingFamilyDepth = 1  # Number of anchester generations, where also sibling families are shown.
 
     def append(self, subgraph):
         self.subgraphs.append(subgraph)
@@ -450,6 +451,10 @@ class Layout:
     def __addSiblingChildren(self, family):
         """Add children from a sibling family to the layout."""
         depth = family.depth
+
+        if depth > self.maxSiblingFamilyDepth:
+            return
+
         subgraph = self.getSubgraph("Depth%s" % depth)
         lastChild = None
         for e in subgraph.elements:
