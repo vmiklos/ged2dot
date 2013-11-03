@@ -295,6 +295,9 @@ class Layout:
             if s.name == id:
                 return s
 
+    def makeEdge(self, fro, to, invisible=False, comment=None):
+        return Edge(fro, to, invisible=invisible, comment=comment)
+
     def __filterFamilies(self):
         """Iterate over all families, find out directly interesting and sibling
         families. Populates filteredFamilies, returns sibling ones."""
@@ -356,21 +359,21 @@ class Layout:
             husb = self.model.getIndividual(family.husb)
             subgraph.append(husb.getNode())
             if prevWife and not self.model.getIndividual(prevWife).hasOrderDep:
-                subgraph.append(Edge(prevWife, family.husb, invisible=True))
+                subgraph.append(self.makeEdge(prevWife, family.husb, invisible=True))
             wife = self.model.getIndividual(family.wife)
             subgraph.append(wife.getNode())
             prevWife = family.wife
             marriage = Marriage(family)
             subgraph.append(marriage.getNode())
-            subgraph.append(Edge(family.husb, marriage.getName(), comment=self.model.getIndividual(family.husb).getFullName()))
-            subgraph.append(Edge(marriage.getName(), family.wife, comment=self.model.getIndividual(family.wife).getFullName()))
+            subgraph.append(self.makeEdge(family.husb, marriage.getName(), comment=self.model.getIndividual(family.husb).getFullName()))
+            subgraph.append(self.makeEdge(marriage.getName(), family.wife, comment=self.model.getIndividual(family.wife).getFullName()))
             for child in family.chil:
                 pendingChildNodes.append(self.model.getIndividual(child).getNode())
                 if prevChil:
-                    pendingChildNodes.append(Edge(prevChil, child, invisible=True))
+                    pendingChildNodes.append(self.makeEdge(prevChil, child, invisible=True))
                     self.model.getIndividual(prevChil).hasOrderDep = True
                 prevChil = child
-                pendingChildrenDeps.append(Edge("%sConnect" % child, child, comment=self.model.getIndividual(child).getFullName()))
+                pendingChildrenDeps.append(self.makeEdge("%sConnect" % child, child, comment=self.model.getIndividual(child).getFullName()))
         subgraph.end()
         for i in pendingChildrenDeps:
             subgraph.append(i)
@@ -400,16 +403,16 @@ class Layout:
             count = 0
             for child in children:
                 if count < middle:
-                    subgraph.append(Edge("%sConnect" % child, "%sConnect" % children[middle], comment=self.model.getIndividual(child).getFullName()))
+                    subgraph.append(self.makeEdge("%sConnect" % child, "%sConnect" % children[middle], comment=self.model.getIndividual(child).getFullName()))
                 elif count == middle:
                     if self.model.getIndividual(child):
-                        pendingDeps.append(Edge(marriage.getName(), "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
+                        pendingDeps.append(self.makeEdge(marriage.getName(), "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
                     else:
-                        pendingDeps.append(Edge(marriage.getName(), "%sConnect" % child))
+                        pendingDeps.append(self.makeEdge(marriage.getName(), "%sConnect" % child))
                 elif count > middle:
-                    subgraph.append(Edge("%sConnect" % children[middle], "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
+                    subgraph.append(self.makeEdge("%sConnect" % children[middle], "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
                 if prevChild:
-                    subgraph.append(Edge("%sConnect" % prevChild, "%sConnect" % child, invisible=True))
+                    subgraph.append(self.makeEdge("%sConnect" % prevChild, "%sConnect" % child, invisible=True))
                     prevChild = None
                 count += 1
             if len(children):
@@ -444,8 +447,8 @@ class Layout:
         marriage = Marriage(family)
         subgraph.elements.insert(existingPos, marriage.getNode())
 
-        subgraph.append(Edge(family.husb, marriage.getName(), comment=self.model.getIndividual(family.husb).getFullName()))
-        subgraph.append(Edge(marriage.getName(), family.wife, comment=self.model.getIndividual(family.wife).getFullName()))
+        subgraph.append(self.makeEdge(family.husb, marriage.getName(), comment=self.model.getIndividual(family.husb).getFullName()))
+        subgraph.append(self.makeEdge(marriage.getName(), family.wife, comment=self.model.getIndividual(family.wife).getFullName()))
 
     def __addSiblingChildren(self, family):
         """Add children from a sibling family to the layout."""
@@ -468,7 +471,7 @@ class Layout:
 
         marriage = Marriage(family)
         subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), "[ shape = point ]"))
-        subgraphConnect.append(Edge(marriage.getName(), "%sConnect" % marriage.getName()))
+        subgraphConnect.append(self.makeEdge(marriage.getName(), "%sConnect" % marriage.getName()))
 
         children = family.chil[:]
         if not len(children) % 2 == 1:
@@ -480,9 +483,9 @@ class Layout:
         prevChild = lastChild
         for c in children:
             if not prevChild in children:
-                subgraphConnect.prepend(Edge("%sConnect" % prevChild, "%sConnect" % c, invisible=True))
+                subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c, invisible=True))
             else:
-                subgraphConnect.prepend(Edge("%sConnect" % prevChild, "%sConnect" % c))
+                subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c))
             subgraphConnect.prepend(Node("%sConnect" % c, "[ shape = point ]"))
             prevChild = c
 
@@ -490,9 +493,9 @@ class Layout:
         subgraphChild = self.getSubgraph("Depth%s" % (depth - 1))
         prevChild = lastChild
         for c in family.chil:
-            subgraphChild.prepend(Edge(prevChild, c, invisible=True))
+            subgraphChild.prepend(self.makeEdge(prevChild, c, invisible=True))
             subgraphChild.prepend(self.model.getIndividual(c).getNode())
-            subgraphChild.append(Edge("%sConnect" % c, c))
+            subgraphChild.append(self.makeEdge("%sConnect" % c, c))
             prevChild = c
 
     def calc(self):
