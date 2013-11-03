@@ -64,8 +64,7 @@ class Individual:
         if self.model.config.images:
             format = self.model.config.nodeLabelImage
         else:
-            # TODO make this configurable
-            format = "\"%(surname)s\\n%(forename)s\\n%(birt)s-%(deat)s\""
+            format = self.model.config.nodeLabelPlain
         if self.model.config.anonMode:
             birt = self.birt
             if len(birt) > 1:
@@ -604,6 +603,7 @@ class Config:
         self.images = self.get('images') == "True"
         self.imageFormat = self.get('imageFormat')
         self.nodeLabelImage = self.get('nodeLabelImage')
+        self.nodeLabelPlain = self.get('nodeLabelPlain')
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
