@@ -18,3 +18,5 @@ nodeLabelImage = <<table border="0" cellborder="0"><tr><td><img src="%(picture)s
 nodeLabelPlain = "%(surname)s\n%(forename)s\n%(birt)s-%(deat)s"
 # Invisible edges: red for debugging or really invisible?
 edgeInvisibleRed = False
+# Visible edges: show direction for debugging?
+edgeVisibleDirected = False

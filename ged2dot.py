@@ -167,8 +167,6 @@ class Model:
 # Layout (view)
 
 class Edge:
-    # TODO make this configurable
-    visibleDirected = False  # Visible edges: show direction?
     """A graph edge."""
     def __init__(self, model, fro, to, invisible=False, comment=None):
         self.fro = fro
@@ -180,7 +178,7 @@ class Edge:
             else:
                 self.rest += "[ style = invis ]"
         else:
-            if not Edge.visibleDirected:
+            if not model.config.edgeVisibleDirected:
                 self.rest += "[ arrowhead = none ]"
         if comment:
             self.rest += "// %s" % comment
@@ -606,6 +604,7 @@ class Config:
         self.nodeLabelImage = self.get('nodeLabelImage')
         self.nodeLabelPlain = self.get('nodeLabelPlain')
         self.edgeInvisibleRed = self.get('edgeInvisibleRed') == "True"
+        self.edgeVisibleDirected = self.get('edgeVisibleDirected') == "True"
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
