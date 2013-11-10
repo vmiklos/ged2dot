@@ -255,6 +255,10 @@ class Subgraph:
                     return (family.husb, count)
             count += 1
 
+    def getPrevOf(self, individual):
+        for e in self.elements:
+            if e.__class__ == Edge and e.to == individual:
+                return e.fro
 
 class Marriage:
     """Kind of a fake node, produced from a family."""
@@ -456,13 +460,8 @@ class Layout:
             return
 
         subgraph = self.getSubgraph("Depth%s" % depth)
-        lastChild = None
-        for e in subgraph.elements:
-            # Let's assume for now that placing the children on the right side of the subgraph is a good idea.
-            if e.__class__ == Edge and e.to == family.husb:
-                prevParent = self.model.getIndividual(e.fro)
-                lastChild = self.model.getFamily(prevParent.fams).chil[-1]
-                break
+        prevParent = self.model.getIndividual(subgraph.getPrevOf(family.husb))
+        lastChild = self.model.getFamily(prevParent.fams).chil[-1]
 
         # First, add connect nodes and their deps.
         subgraphConnect = self.getSubgraph("Depth%sConnects" % depth)
