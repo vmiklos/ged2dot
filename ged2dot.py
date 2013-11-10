@@ -316,19 +316,18 @@ class Layout:
         while depth < self.model.config.layoutMaxDepth:
             nextPendings = []
             for pending in pendings:
-                husbFamily = self.model.getFamily(self.model.getIndividual(pending.husb).famc)
-                husbFamily.depth = depth + 1
-                self.filteredFamilies.append(husbFamily)
-                nextPendings.append(husbFamily)
-                wifeFamily = self.model.getFamily(self.model.getIndividual(pending.wife).famc)
-                wifeFamily.depth = depth + 1
-                self.filteredFamilies.append(wifeFamily)
-                nextPendings.append(wifeFamily)
+                children = []
+                for indi in ('husb', 'wife'):
+                    indiFamily = self.model.getFamily(self.model.getIndividual(getattr(pending, indi)).famc)
+                    indiFamily.depth = depth + 1
+                    self.filteredFamilies.append(indiFamily)
+                    nextPendings.append(indiFamily)
+                    children += indiFamily.chil
 
                 # Also collect children's family.
                 if depth < self.model.config.layoutMaxSiblingDepth + 1:
                     # +1, because children are in the previous generation.
-                    for chil in husbFamily.chil + wifeFamily.chil:
+                    for chil in children:
                         chilFamily = self.model.getFamily(self.model.getIndividual(chil).fams)
                         if not chilFamily or self.model.getFamily(chilFamily.id, self.filteredFamilies):
                             continue
