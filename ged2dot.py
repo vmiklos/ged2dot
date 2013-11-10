@@ -256,9 +256,11 @@ class Subgraph:
             count += 1
 
     def getPrevOf(self, individual):
+        """The passed individual follows the returned ID in this subgraph."""
         for e in self.elements:
             if e.__class__ == Edge and e.to == individual:
                 return e.fro
+
 
 class Marriage:
     """Kind of a fake node, produced from a family."""
