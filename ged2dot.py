@@ -303,12 +303,11 @@ class Layout:
     def __filterFamilies(self):
         """Iterate over all families, find out directly interesting and sibling
         families. Populates filteredFamilies, returns sibling ones."""
-        familyRoot = "F8"  # TODO make this configurable
 
-        self.filteredFamilies = [self.model.getFamily(familyRoot)]
+        self.filteredFamilies = [self.model.getFamily(self.model.config.rootFamily)]
 
         depth = 0
-        pendings = [self.model.getFamily(familyRoot)]
+        pendings = [self.model.getFamily(self.model.config.rootFamily)]
         # List of families, which are interesting for us, as A is in the
         # family, B is in filteredFamilies, and A is a sibling of B.
         siblingFamilies = []
@@ -609,6 +608,7 @@ class Config:
         self.layoutMaxDepth = int(self.get('layoutMaxDepth'))
         self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth'))
         self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth'))
+        self.rootFamily = self.get('rootFamily')
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]

@@ -1,6 +1,8 @@
 [ged2dot]
 # Input GEDCOM file.
 input = test.ged
+# Root family.
+rootFamily = F8
 # Consider someone dead at this age: put a question mark if death date is missing.
 considerAgeDead = 120
 # Anonymous mode: avoid any kind of sensitive data in the output.
