@@ -1,16 +1,14 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-import sys
-sys = reload(sys)
-sys.setdefaultencoding("utf-8")
 import time
 import os
-import ConfigParser
+import configparser
+from functools import cmp_to_key
 
 
 # Model
@@ -57,7 +55,7 @@ class Individual:
             from PIL import Image
             i = Image.open(picture)
             if i.size != (100, 100):
-                print "// warning, picture of %s has custom (not 100x100 px) size." % self.getFullName()
+                print("// warning, picture of %s has custom (not 100x100 px) size." % self.getFullName())
         except ImportError:
             pass
 
@@ -132,7 +130,7 @@ class Family:
             if yObj.sex == "F" and yObj.fams and self.model.getFamily(yObj.fams, filteredFamilies):
                 return 1
             return 0
-        self.chil.sort(compareChildren)
+        self.chil.sort(key=cmp_to_key(compareChildren))
 
 
 class Model:
@@ -184,7 +182,7 @@ class Edge:
             self.rest += "// %s" % comment
 
     def render(self):
-        print "%s -> %s %s" % (self.fro, self.to, self.rest)
+        print("%s -> %s %s" % (self.fro, self.to, self.rest))
 
 
 class Node:
@@ -200,7 +198,7 @@ class Node:
             self.rest += " // %s" % comment
 
     def render(self):
-        print "%s %s" % (self.id, self.rest)
+        print("%s %s" % (self.id, self.rest))
 
 
 class Subgraph:
@@ -215,13 +213,13 @@ class Subgraph:
             self.name = name
 
         def render(self):
-            print "subgraph %s {" % self.name
-            print "rank = same"
+            print("subgraph %s {" % self.name)
+            print("rank = same")
 
     class End:
         """Special end node that acts like a node/edge."""
         def render(self):
-            print "}"
+            print("}")
 
     def __init__(self, name):
         self.name = name
@@ -241,7 +239,7 @@ class Subgraph:
         self.start.render()
         for i in self.elements:
             i.render()
-        print ""
+        print("")
 
     def findFamily(self, family):
         """Find the wife or husb or a family in this subgraph.
@@ -288,11 +286,11 @@ class Layout:
         self.subgraphs.append(subgraph)
 
     def render(self):
-        print "digraph {"
-        print "splines = ortho"
+        print("digraph {")
+        print("splines = ortho")
         for i in self.subgraphs:
             i.render()
-        print "}"
+        print("}")
 
     def getSubgraph(self, id):
         for s in self.subgraphs:
@@ -357,7 +355,7 @@ class Layout:
         pendingChildrenDeps = []
         prevWife = None
         prevChil = None
-        for family in filter(lambda f: f.depth == depth, self.filteredFamilies):
+        for family in [f for f in self.filteredFamilies if f.depth == depth]:
             husb = self.model.getIndividual(family.husb)
             subgraph.append(husb.getNode())
             if prevWife and not self.model.getIndividual(prevWife).hasOrderDep:
@@ -387,13 +385,13 @@ class Layout:
         subgraph = Subgraph("Depth%sConnects" % depth)
         pendingDeps = []
         prevChild = None
-        for family in filter(lambda f: f.depth == depth, self.filteredFamilies):
+        for family in [f for f in self.filteredFamilies if f.depth == depth]:
             marriage = Marriage(family)
             children = family.chil[:]
             if not (len(children) % 2 == 1 or len(children) == 0):
                 # If there is no middle child, then insert a fake node here, so
                 # marriage can connect to that one.
-                half = len(children) / 2
+                half = int(len(children) / 2)
                 children.insert(half, marriage.getName())
             for child in children:
                 if self.model.getIndividual(child):
@@ -401,7 +399,7 @@ class Layout:
                 else:
                     subgraph.append(Node("%sConnect" % child, point=True))
 
-            middle = (len(children) / 2)
+            middle = int(len(children) / 2)
             count = 0
             for child in children:
                 if count < middle:
@@ -474,7 +472,7 @@ class Layout:
         if not len(children) % 2 == 1:
             # If there is no middle child, then insert a fake node here, so
             # marriage can connect to that one.
-            half = len(children) / 2
+            half = int(len(children) / 2)
             children.insert(half, marriage.getName())
 
         prevChild = lastChild
@@ -503,7 +501,7 @@ class Layout:
         siblingFamilies = self.__filterFamilies()
 
         pendingChildNodes = []  # Children from generation N are nodes in the N+1th generation.
-        for depth in reversed(range(self.model.config.layoutMaxDepth + 1)):
+        for depth in reversed(list(range(self.model.config.layoutMaxDepth + 1))):
             # Draw two subgraphs for each generation. The first contains the real nodes.
             pendingChildNodes = self.__buildSubgraph(depth, pendingChildNodes)
             # The other contains the connector nodes.
@@ -599,7 +597,7 @@ class GedcomImport:
 
 class Config:
     def __init__(self):
-        self.parser = ConfigParser.RawConfigParser()
+        self.parser = configparser.RawConfigParser()
         self.parser.read("ged2dotrc")  # TODO make this configurable
         self.input = self.get('input')
         self.considerAgeDead = int(self.get('considerAgeDead'))
