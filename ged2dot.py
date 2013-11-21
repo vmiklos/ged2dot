@@ -545,8 +545,10 @@ class GedcomImport:
                     self.family = None
 
                 if rest.startswith("@") and rest.endswith("INDI"):
-                    self.indi = Individual(self.model)
-                    self.indi.id = rest[1:-6]
+                    id = rest[1:-6]
+                    if not id in self.model.config.indiBlacklist:
+                        self.indi = Individual(self.model)
+                        self.indi.id = rest[1:-6]
                 elif rest.startswith("@") and rest.endswith("FAM"):
                     self.family = Family(self.model)
                     self.family.id = rest[1:-5]
@@ -580,7 +582,9 @@ class GedcomImport:
                 elif rest.startswith("WIFE") and self.family:
                     self.family.wife = rest[6:-1]
                 elif rest.startswith("CHIL") and self.family:
-                    self.family.chil.append(rest[6:-1])
+                    id = rest[6:-1]
+                    if not id in self.model.config.indiBlacklist:
+                        self.family.chil.append(rest[6:-1])
 
             elif level == 2:
                 if rest.startswith("DATE") and self.indi:
@@ -610,6 +614,7 @@ class Config:
         self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth'))
         self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth'))
         self.rootFamily = self.get('rootFamily')
+        self.indiBlacklist = self.get('indiBlacklist').split(', ')
 
     def get(self, what):
         return self.parser.get('ged2dot', what).split('#')[0]
