@@ -405,14 +405,14 @@ class Layout:
             count = 0
             for child in children:
                 if count < middle:
-                    subgraph.append(self.makeEdge("%sConnect" % child, "%sConnect" % children[middle], comment=self.model.getIndividual(child).getFullName()))
+                    subgraph.append(self.makeEdge("%sConnect" % child, "%sConnect" % children[count + 1], comment=self.model.getIndividual(child).getFullName()))
                 elif count == middle:
                     if self.model.getIndividual(child):
                         pendingDeps.append(self.makeEdge(marriage.getName(), "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
                     else:
                         pendingDeps.append(self.makeEdge(marriage.getName(), "%sConnect" % child))
                 elif count > middle:
-                    subgraph.append(self.makeEdge("%sConnect" % children[middle], "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
+                    subgraph.append(self.makeEdge("%sConnect" % children[count - 1], "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
                 if prevChild:
                     subgraph.append(self.makeEdge("%sConnect" % prevChild, "%sConnect" % child, invisible=True))
                     prevChild = None
