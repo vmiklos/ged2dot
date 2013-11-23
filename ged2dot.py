@@ -235,8 +235,9 @@ class Subgraph:
         def render(self):
             print("}")
 
-    def __init__(self, name):
+    def __init__(self, name, model):
         self.name = name
+        self.model = model
         self.elements = []
         self.start = Subgraph.Start(name)
 
@@ -270,8 +271,8 @@ class Subgraph:
     def getPrevOf(self, individual):
         """The passed individual follows the returned ID in this subgraph."""
         for e in self.elements:
-            if e.__class__ == Edge and e.to == individual:
-                return e.fro
+            if e.__class__ == Edge and e.to == individual.id:
+                return self.model.getIndividual(e.fro)
 
 
 class Marriage:
@@ -361,7 +362,7 @@ class Layout:
         2) Pending children from the previous generation.
 
         Returns pending children for the next subgraph."""
-        subgraph = Subgraph("Depth%s" % depth)
+        subgraph = Subgraph("Depth%s" % depth, self.model)
         for child in pendingChildNodes:
             subgraph.append(child)
         pendingChildNodes = []
@@ -396,7 +397,7 @@ class Layout:
 
     def __buildConnectorSubgraph(self, depth):
         """Does the same as __buildSubgraph(), but deals with connector nodes."""
-        subgraph = Subgraph("Depth%sConnects" % depth)
+        subgraph = Subgraph("Depth%sConnects" % depth, self.model)
         pendingDeps = []
         prevChild = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
@@ -473,7 +474,7 @@ class Layout:
             return
 
         subgraph = self.getSubgraph("Depth%s" % depth)
-        prevParent = self.model.getIndividual(subgraph.getPrevOf(family.husb.id))
+        prevParent = subgraph.getPrevOf(family.husb)
         lastChild = prevParent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
