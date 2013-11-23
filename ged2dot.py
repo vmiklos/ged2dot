@@ -443,23 +443,21 @@ class Layout:
         existingIndi, existingPos = subgraph.findFamily(family)
         newIndi = None
         if family.wife and existingIndi == family.wife.id:
-            if family.husb:
-                newIndi = family.husb.id
+            newIndi = family.husb
         else:
-            if family.wife:
-                newIndi = family.wife.id
+            newIndi = family.wife
         if not newIndi:
             # No spouse, probably has children. Ignore for now.
             return
         found = False
         for e in subgraph.elements:
             if existingIndi == family.wife.id and e.__class__ == Edge and e.to == existingIndi:
-                e.to = newIndi
+                e.to = newIndi.id
             elif existingIndi == family.husb.id and e.__class__ == Edge and e.fro == existingIndi:
-                e.fro = newIndi
+                e.fro = newIndi.id
             found = True
         assert found
-        subgraph.elements.insert(existingPos, self.model.getIndividual(newIndi).getNode())
+        subgraph.elements.insert(existingPos, newIndi.getNode())
 
         marriage = Marriage(family)
         subgraph.elements.insert(existingPos, marriage.getNode())
