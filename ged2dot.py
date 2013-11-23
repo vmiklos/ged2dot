@@ -32,6 +32,11 @@ class Individual:
     def __str__(self):
         return "id: %s, sex: %s, forename: %s, surname: %s: famc: %s, fams: %s, birt: %s, deat: %s" % (self.id, self.sex, self.forename, self.surname, self.famc, self.fams, self.birt, self.deat)
 
+    def resolve(self):
+        """Replaces family reference strings with references to objects."""
+        self.famc = self.model.getFamily(self.famc)
+        self.fams = self.model.getFamily(self.fams)
+
     def getFullName(self):
         """Full name of the individual. Only used as comments in the output
         file to ease debugging."""
@@ -121,13 +126,13 @@ class Family:
             # order, ignore birth date.
             xObj = self.model.getIndividual(x)
             yObj = self.model.getIndividual(y)
-            if xObj.sex == "M" and xObj.fams and self.model.getFamily(xObj.fams, filteredFamilies):
+            if xObj.sex == "M" and xObj.fams and self.model.getFamily(xObj.fams.id, filteredFamilies):
                 return 1
-            if yObj.sex == "M" and yObj.fams and self.model.getFamily(yObj.fams, filteredFamilies):
+            if yObj.sex == "M" and yObj.fams and self.model.getFamily(yObj.fams.id, filteredFamilies):
                 return -1
-            if xObj.sex == "F" and xObj.fams and self.model.getFamily(xObj.fams, filteredFamilies):
+            if xObj.sex == "F" and xObj.fams and self.model.getFamily(xObj.fams.id, filteredFamilies):
                 return -1
-            if yObj.sex == "F" and yObj.fams and self.model.getFamily(yObj.fams, filteredFamilies):
+            if yObj.sex == "F" and yObj.fams and self.model.getFamily(yObj.fams.id, filteredFamilies):
                 return 1
             return 0
         self.chil.sort(key=cmp_to_key(compareChildren))
@@ -154,6 +159,8 @@ class Model:
     def load(self, name):
         inf = open(name)
         GedcomImport(inf, self).load()
+        for i in self.individuals:
+            i.resolve()
 
     def save(self):
         """Save is done by calcularing and rendering the layout on the output."""
@@ -316,7 +323,7 @@ class Layout:
             for pending in pendings:
                 children = []
                 for indi in ('husb', 'wife'):
-                    indiFamily = self.model.getFamily(self.model.getIndividual(getattr(pending, indi)).famc)
+                    indiFamily = self.model.getIndividual(getattr(pending, indi)).famc
                     indiFamily.depth = depth + 1
                     self.filteredFamilies.append(indiFamily)
                     nextPendings.append(indiFamily)
@@ -326,7 +333,7 @@ class Layout:
                 if depth < self.model.config.layoutMaxSiblingDepth + 1:
                     # +1, because children are in the previous generation.
                     for chil in children:
-                        chilFamily = self.model.getFamily(self.model.getIndividual(chil).fams)
+                        chilFamily = self.model.getIndividual(chil).fams
                         if not chilFamily or self.model.getFamily(chilFamily.id, self.filteredFamilies):
                             continue
                         chilFamily.depth = depth
@@ -459,7 +466,7 @@ class Layout:
 
         subgraph = self.getSubgraph("Depth%s" % depth)
         prevParent = self.model.getIndividual(subgraph.getPrevOf(family.husb))
-        lastChild = self.model.getFamily(prevParent.fams).chil[-1]
+        lastChild = prevParent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
         subgraphConnect = self.getSubgraph("Depth%sConnects" % depth)
