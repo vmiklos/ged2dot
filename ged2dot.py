@@ -119,6 +119,11 @@ class Family:
     def __str__(self):
         return "id: %s, husb: %s, wife: %s, chil: %s, depth: %s" % (self.id, self.husb, self.wife, self.chil, self.depth)
 
+    def resolve(self):
+        """Replaces individual reference strings with references to objects."""
+        self.husb = self.model.getIndividual(self.husb)
+        self.wife = self.model.getIndividual(self.wife)
+
     def sortChildren(self, filteredFamilies):
         """Sort children, based on filtered families of the layout."""
         def compareChildren(x, y):
@@ -160,6 +165,8 @@ class Model:
         inf = open(name)
         GedcomImport(inf, self).load()
         for i in self.individuals:
+            i.resolve()
+        for i in self.families:
             i.resolve()
 
     def save(self):
@@ -254,10 +261,10 @@ class Subgraph:
         count = 0
         for e in self.elements:
             if e.__class__ == Node:
-                if e.id == family.wife:
-                    return (family.wife, count)
-                elif e.id == family.husb:
-                    return (family.husb, count)
+                if family.wife and e.id == family.wife.id:
+                    return (family.wife.id, count)
+                elif family.husb and e.id == family.husb.id:
+                    return (family.husb.id, count)
             count += 1
 
     def getPrevOf(self, individual):
@@ -273,12 +280,12 @@ class Marriage:
         self.family = family
 
     def getName(self):
-        return "%sAnd%s" % (self.family.husb, self.family.wife)
+        return "%sAnd%s" % (self.family.husb.id, self.family.wife.id)
 
     def getNode(self):
         model = self.family.model
-        husb = model.getIndividual(self.family.husb).getFullName()
-        wife = model.getIndividual(self.family.wife).getFullName()
+        husb = self.family.husb.getFullName()
+        wife = self.family.wife.getFullName()
         return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))
 
 
@@ -323,7 +330,7 @@ class Layout:
             for pending in pendings:
                 children = []
                 for indi in ('husb', 'wife'):
-                    indiFamily = self.model.getIndividual(getattr(pending, indi)).famc
+                    indiFamily = getattr(pending, indi).famc
                     indiFamily.depth = depth + 1
                     self.filteredFamilies.append(indiFamily)
                     nextPendings.append(indiFamily)
@@ -363,17 +370,17 @@ class Layout:
         prevWife = None
         prevChil = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
-            husb = self.model.getIndividual(family.husb)
+            husb = family.husb
             subgraph.append(husb.getNode())
             if prevWife and not self.model.getIndividual(prevWife).hasOrderDep:
-                subgraph.append(self.makeEdge(prevWife, family.husb, invisible=True))
-            wife = self.model.getIndividual(family.wife)
+                subgraph.append(self.makeEdge(prevWife, family.husb.id, invisible=True))
+            wife = family.wife
             subgraph.append(wife.getNode())
-            prevWife = family.wife
+            prevWife = family.wife.id
             marriage = Marriage(family)
             subgraph.append(marriage.getNode())
-            subgraph.append(self.makeEdge(family.husb, marriage.getName(), comment=self.model.getIndividual(family.husb).getFullName()))
-            subgraph.append(self.makeEdge(marriage.getName(), family.wife, comment=self.model.getIndividual(family.wife).getFullName()))
+            subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
+            subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
             for child in family.chil:
                 pendingChildNodes.append(self.model.getIndividual(child).getNode())
                 if prevChil:
@@ -434,18 +441,21 @@ class Layout:
         depth = family.depth
         subgraph = self.getSubgraph("Depth%s" % depth)
         existingIndi, existingPos = subgraph.findFamily(family)
-        if existingIndi == family.wife:
-            newIndi = family.husb
+        newIndi = None
+        if family.wife and existingIndi == family.wife.id:
+            if family.husb:
+                newIndi = family.husb.id
         else:
-            newIndi = family.wife
+            if family.wife:
+                newIndi = family.wife.id
         if not newIndi:
             # No spouse, probably has children. Ignore for now.
             return
         found = False
         for e in subgraph.elements:
-            if existingIndi == family.wife and e.__class__ == Edge and e.to == existingIndi:
+            if existingIndi == family.wife.id and e.__class__ == Edge and e.to == existingIndi:
                 e.to = newIndi
-            elif existingIndi == family.husb and e.__class__ == Edge and e.fro == existingIndi:
+            elif existingIndi == family.husb.id and e.__class__ == Edge and e.fro == existingIndi:
                 e.fro = newIndi
             found = True
         assert found
@@ -454,8 +464,8 @@ class Layout:
         marriage = Marriage(family)
         subgraph.elements.insert(existingPos, marriage.getNode())
 
-        subgraph.append(self.makeEdge(family.husb, marriage.getName(), comment=self.model.getIndividual(family.husb).getFullName()))
-        subgraph.append(self.makeEdge(marriage.getName(), family.wife, comment=self.model.getIndividual(family.wife).getFullName()))
+        subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
+        subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
 
     def __addSiblingChildren(self, family):
         """Add children from a sibling family to the layout."""
@@ -465,7 +475,7 @@ class Layout:
             return
 
         subgraph = self.getSubgraph("Depth%s" % depth)
-        prevParent = self.model.getIndividual(subgraph.getPrevOf(family.husb))
+        prevParent = self.model.getIndividual(subgraph.getPrevOf(family.husb.id))
         lastChild = prevParent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
