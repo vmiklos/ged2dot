@@ -6,4 +6,4 @@ test.dot: test.ged ged2dot.py ged2dotrc Makefile
 
 check:
 	cd test && ./test.py
-	pep8 --ignore=E501 ged2dot.py
+	pep8 --ignore=E501 ged2dot.py test/test.py

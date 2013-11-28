@@ -5,11 +5,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-import sys
-sys.path.append(sys.path[0]+"/..")
-import ged2dot
-import unittest
 import os
+import sys
+import unittest
+sys.path.append(os.path.join(sys.path[0], ".."))
+import ged2dot
+
 
 class Test(unittest.TestCase):
     def convert(self, name):
