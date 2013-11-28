@@ -612,9 +612,9 @@ class GedcomImport:
 # Configuration handling
 
 class Config:
-    def __init__(self):
+    def __init__(self, path="ged2dotrc"):  # TODO make this configurable
         self.parser = configparser.RawConfigParser()
-        self.parser.read("ged2dotrc")  # TODO make this configurable
+        self.parser.read(path)
         self.input = self.get('input')
         self.considerAgeDead = int(self.get('considerAgeDead'))
         self.anonMode = self.get('anonMode') == "True"
