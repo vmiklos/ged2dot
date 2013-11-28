@@ -164,6 +164,7 @@ class Model:
     def load(self, name):
         inf = open(name)
         GedcomImport(inf, self).load()
+        inf.close()
         for i in self.individuals:
             i.resolve()
         for i in self.families:
