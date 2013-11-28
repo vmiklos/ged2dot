@@ -30,6 +30,9 @@ class Test(unittest.TestCase):
     def test_hello(self):
         self.convert('hello')
 
+    def test_noyeardate(self):
+        self.convert('noyeardate')
+
 if __name__ == '__main__':
     unittest.main()
 

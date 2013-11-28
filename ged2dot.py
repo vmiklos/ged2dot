@@ -101,9 +101,12 @@ class Individual:
         if not len(birt):
             return
         self.birt = birt
-        if time.localtime().tm_year - int(birt) > self.model.config.considerAgeDead:
-            if not len(self.deat):
-                self.deat = "?"
+        try:
+            if time.localtime().tm_year - int(birt) > self.model.config.considerAgeDead:
+                if not len(self.deat):
+                    self.deat = "?"
+        except ValueError:
+            pass
 
 
 class Family:

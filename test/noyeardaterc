@@ -1,0 +1,15 @@
+[ged2dot]
+input = noyeardate.ged
+rootFamily = F1
+considerAgeDead = 120
+anonMode = False
+images = True
+imageFormat = images/%(forename)s %(surname)s %(birt)s.jpg
+nodeLabelImage = <<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>
+nodeLabelPlain = "%(surname)s\n%(forename)s\n%(birt)s-%(deat)s"
+edgeInvisibleRed = False
+edgeVisibleDirected = False
+layoutMaxDepth = 0
+layoutMaxSiblingDepth = 0
+layoutMaxSiblingFamilyDepth = 0
+indiBlacklist =
