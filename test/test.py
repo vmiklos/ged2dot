@@ -34,6 +34,10 @@ class Test(unittest.TestCase):
     def test_noyeardate(self):
         self.convert('noyeardate')
 
+    def test_nohusb(self):
+        # This tests if placeholder nodes are created for missing husbands.
+        self.convert('nohusb')
+
 if __name__ == '__main__':
     unittest.main()
 
