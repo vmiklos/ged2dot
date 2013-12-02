@@ -159,6 +159,17 @@ class Family:
             self.husb.surname = ""
         return self.husb
 
+    def getWife(self):
+        """Same as getHusb(), but for wifes."""
+        if not self.wife:
+            self.wife = Individual(self.model)
+            self.wife.id = "PH%d" % Family.phCount
+            Family.phCount += 1
+            self.wife.sex = 'F'
+            self.wife.forename = "?"
+            self.wife.surname = ""
+        return self.wife
+
 
 class Model:
     def __init__(self, config):
@@ -299,12 +310,12 @@ class Marriage:
         self.family = family
 
     def getName(self):
-        return "%sAnd%s" % (self.family.getHusb().id, self.family.wife.id)
+        return "%sAnd%s" % (self.family.getHusb().id, self.family.getWife().id)
 
     def getNode(self):
         model = self.family.model
         husb = self.family.getHusb().getFullName()
-        wife = self.family.wife.getFullName()
+        wife = self.family.getWife().getFullName()
         return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))
 
 
@@ -391,15 +402,15 @@ class Layout:
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
             husb = family.getHusb()
             subgraph.append(husb.getNode())
-            if prevWife and not self.model.getIndividual(prevWife).hasOrderDep:
+            if prevWife and not (self.model.getIndividual(prevWife) and self.model.getIndividual(prevWife).hasOrderDep):
                 subgraph.append(self.makeEdge(prevWife, family.husb.id, invisible=True))
-            wife = family.wife
+            wife = family.getWife()
             subgraph.append(wife.getNode())
             prevWife = family.wife.id
             marriage = Marriage(family)
             subgraph.append(marriage.getNode())
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
-            subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
+            subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
             for child in family.chil:
                 pendingChildNodes.append(self.model.getIndividual(child).getNode())
                 if prevChil:

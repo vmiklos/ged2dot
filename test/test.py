@@ -38,6 +38,10 @@ class Test(unittest.TestCase):
         # This tests if placeholder nodes are created for missing husbands.
         self.convert('nohusb')
 
+    def test_nowife(self):
+        # This tests if placeholder nodes are created for missing wifes.
+        self.convert('nowife')
+
 if __name__ == '__main__':
     unittest.main()
 
