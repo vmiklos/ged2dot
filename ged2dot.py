@@ -402,11 +402,11 @@ class Layout:
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
             husb = family.getHusb()
             subgraph.append(husb.getNode())
-            if prevWife and not (self.model.getIndividual(prevWife) and self.model.getIndividual(prevWife).hasOrderDep):
-                subgraph.append(self.makeEdge(prevWife, family.husb.id, invisible=True))
+            if prevWife and not prevWife.hasOrderDep:
+                subgraph.append(self.makeEdge(prevWife.id, family.husb.id, invisible=True))
             wife = family.getWife()
             subgraph.append(wife.getNode())
-            prevWife = family.wife.id
+            prevWife = family.wife
             marriage = Marriage(family)
             subgraph.append(marriage.getNode())
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
