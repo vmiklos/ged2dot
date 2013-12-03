@@ -157,6 +157,7 @@ class Family:
             self.husb.sex = 'M'
             self.husb.forename = "?"
             self.husb.surname = ""
+            self.model.individuals.append(self.husb)
         return self.husb
 
     def getWife(self):
@@ -168,6 +169,7 @@ class Family:
             self.wife.sex = 'F'
             self.wife.forename = "?"
             self.wife.surname = ""
+            self.model.individuals.append(self.wife)
         return self.wife
 
 
