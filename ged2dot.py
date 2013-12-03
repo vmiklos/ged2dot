@@ -27,7 +27,6 @@ class Individual:
         self.deat = ""
         # Horizontal order is ensured by order deps. Any order dep starting from this node?
         # Set to true on first addition, so that we can avoid redundant deps.
-        self.hasOrderDep = False
 
     def __str__(self):
         return "id: %s, sex: %s, forename: %s, surname: %s: famc: %s, fams: %s, birt: %s, deat: %s" % (self.id, self.sex, self.forename, self.surname, self.famc, self.fams, self.birt, self.deat)
@@ -405,7 +404,7 @@ class Layout:
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
             husb = family.getHusb()
             subgraph.append(husb.getNode())
-            if prevWife and not prevWife.hasOrderDep:
+            if prevWife:
                 subgraph.append(self.makeEdge(prevWife.id, family.husb.id, invisible=True))
             wife = family.getWife()
             subgraph.append(wife.getNode())
@@ -418,7 +417,6 @@ class Layout:
                 pendingChildNodes.append(self.model.getIndividual(child).getNode())
                 if prevChil:
                     pendingChildNodes.append(self.makeEdge(prevChil, child, invisible=True))
-                    self.model.getIndividual(prevChil).hasOrderDep = True
                 prevChil = child
                 pendingChildrenDeps.append(self.makeEdge("%sConnect" % child, child, comment=self.model.getIndividual(child).getFullName()))
         subgraph.end()
