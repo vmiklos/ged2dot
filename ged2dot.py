@@ -363,10 +363,11 @@ class Layout:
                 children = []
                 for indi in ('husb', 'wife'):
                     indiFamily = getattr(pending, indi).famc
-                    indiFamily.depth = depth + 1
-                    self.filteredFamilies.append(indiFamily)
-                    nextPendings.append(indiFamily)
-                    children += indiFamily.chil
+                    if indiFamily:
+                        indiFamily.depth = depth + 1
+                        self.filteredFamilies.append(indiFamily)
+                        nextPendings.append(indiFamily)
+                        children += indiFamily.chil
 
                 # Also collect children's family.
                 if depth < self.model.config.layoutMaxSiblingDepth + 1:

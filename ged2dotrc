@@ -23,7 +23,7 @@ edgeInvisibleRed = False
 # Visible edges: show direction for debugging?
 edgeVisibleDirected = False
 # Number of ancestor generations to show.
-layoutMaxDepth = 4
+layoutMaxDepth = 5
 # Number of ancestor generations, where also sibling spouses are shown.
 layoutMaxSiblingDepth = 2
 # Number of anchester generations, where also sibling families are shown.
