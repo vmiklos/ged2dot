@@ -14,7 +14,7 @@ import ged2dot
 
 class Test(unittest.TestCase):
     def convert(self, name):
-        config = ged2dot.Config("%src" % name)
+        config = ged2dot.Config(["%src" % name])
         model = ged2dot.Model(config)
         model.load(config.input)
         try:

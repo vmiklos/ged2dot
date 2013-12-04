@@ -7,6 +7,7 @@
 
 import time
 import os
+import sys
 import configparser
 from functools import cmp_to_key
 
@@ -642,7 +643,10 @@ class GedcomImport:
 # Configuration handling
 
 class Config:
-    def __init__(self, path="ged2dotrc"):  # TODO make this configurable
+    def __init__(self, args):
+        path = "ged2dotrc"
+        if len(args):
+            path = args[0]
         self.parser = configparser.RawConfigParser()
         self.parser.read(path)
         self.input = self.get('input')
@@ -665,7 +669,7 @@ class Config:
 
 
 def main():
-    config = Config()
+    config = Config(sys.argv[1:])
     model = Model(config)
     model.load(config.input)
     model.save()
