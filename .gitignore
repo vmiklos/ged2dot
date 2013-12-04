@@ -1,0 +1,5 @@
+# .dot files are typically count as generated ones in this repo
+*.dot
+*.png
+__pycache__
+images
