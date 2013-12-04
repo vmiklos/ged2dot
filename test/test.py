@@ -42,6 +42,10 @@ class Test(unittest.TestCase):
         # This tests if placeholder nodes are created for missing wifes.
         self.convert('nowife')
 
+    def test_screenshot(self):
+        # This is the demo input from the README, make sure it works.
+        self.convert('screenshot')
+
 if __name__ == '__main__':
     unittest.main()
 

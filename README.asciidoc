@@ -15,7 +15,7 @@ Currently it allows to show ancestors of a family (both husband and wife), and
 you can set how many generations do you want to see, and also for how many
 generations you want to include sibling families as well:
 
-image::screenshot.png[]
+image::test/screenshot.png[]
 
 (But the tool can be easily extended to support other scenarios as well.)
 
