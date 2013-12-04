@@ -7,3 +7,12 @@ test.dot: test.ged ged2dot.py ged2dotrc Makefile
 check:
 	cd test && ./test.py
 	pep8 --ignore=E501 ged2dot.py test/test.py
+
+# In case ged2dotrc or test.dot is missing, create a copy based on the
+# screenshot sample.
+
+test.ged :| test/screenshot.ged
+	cat test/screenshot.ged > test.ged
+
+ged2dotrc :| test/screenshotrc
+	sed 's/screenshot.ged/test.ged/' test/screenshotrc > ged2dotrc
