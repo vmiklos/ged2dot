@@ -12,6 +12,12 @@ import configparser
 from functools import cmp_to_key
 
 
+# Exceptions
+
+class NoSuchFamilyException(Exception):
+    pass
+
+
 # Model
 
 class Individual:
@@ -353,6 +359,8 @@ class Layout:
         self.filteredFamilies = [self.model.getFamily(self.model.config.rootFamily)]
 
         depth = 0
+        if not self.model.getFamily(self.model.config.rootFamily):
+            raise NoSuchFamilyException("Can't find family '%s' in the input file." % self.model.config.rootFamily)
         pendings = [self.model.getFamily(self.model.config.rootFamily)]
         # List of families, which are interesting for us, as A is in the
         # family, B is in filteredFamilies, and A is a sibling of B.
