@@ -1,7 +1,6 @@
 [ged2dot]
 input = noyeardate.ged
 rootFamily = F1
-images = True
 layoutMaxDepth = 0
 layoutMaxSiblingDepth = 0
 layoutMaxSiblingFamilyDepth = 0

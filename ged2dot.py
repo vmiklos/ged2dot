@@ -662,7 +662,8 @@ class Config:
         self.considerAgeDead = int(self.get('considerAgeDead', '120'))
         # Anonymous mode: avoid any kind of sensitive data in the output.
         self.anonMode = self.get('anonMode', 'False') == "True"
-        self.images = self.get('images') == "True"
+        # Should the output contain images?
+        self.images = self.get('images', 'True') == "True"
         # If images is True: format of the image paths.
         # Possible variables: %(forename)s, %(surname)s and %(birt)s.
         self.imageFormat = self.get('imageFormat', 'images/%(forename)s %(surname)s %(birt)s.jpg')

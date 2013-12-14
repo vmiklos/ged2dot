@@ -3,8 +3,6 @@
 input = nowife.ged
 # Root family.
 rootFamily = F3
-# Should the output contain images?
-images = True
 # Number of ancestor generations to show.
 layoutMaxDepth = 1
 # Number of ancestor generations, where also sibling spouses are shown.
