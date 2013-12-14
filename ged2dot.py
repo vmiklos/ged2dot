@@ -664,7 +664,9 @@ class Config:
         self.images = self.get('images') == "True"
         self.imageFormat = self.get('imageFormat')
         self.nodeLabelImage = self.get('nodeLabelImage')
-        self.nodeLabelPlain = self.get('nodeLabelPlain')
+        # If images is False: label text of nodes.
+        # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
+        self.nodeLabelPlain = self.get('nodeLabelPlain', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"')
         # Invisible edges: red for debugging or really invisible?
         self.edgeInvisibleRed = self.get('edgeInvisibleRed', 'False') == "True"
         # Visible edges: show direction for debugging?

@@ -13,9 +13,6 @@ imageFormat = images/%(forename)s %(surname)s %(birt)s.jpg
 # If images is True: label text of nodes.
 # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
 nodeLabelImage = <<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>
-# If images is False: label text of nodes.
-# Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
-nodeLabelPlain = "%(forename)s\n%(surname)s\n%(birt)s-%(deat)s"
 # Number of ancestor generations to show.
 layoutMaxDepth = 3
 # Number of ancestor generations, where also sibling spouses are shown.
