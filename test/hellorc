@@ -2,5 +2,4 @@
 input = hello.ged
 rootFamily = F1
 layoutMaxDepth = 0
-layoutMaxSiblingDepth = 0
 layoutMaxSiblingFamilyDepth = 0

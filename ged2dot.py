@@ -678,7 +678,9 @@ class Config:
         # Visible edges: show direction for debugging?
         self.edgeVisibleDirected = self.get('edgeVisibleDirected', 'False') == "True"
         self.layoutMaxDepth = int(self.get('layoutMaxDepth'))
-        self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth'))
+        # Number of ancestor generations, where also sibling spouses are shown.
+        # Default: same as layoutMaxDepth
+        self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth', str(self.layoutMaxDepth)))
         self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth'))
         self.rootFamily = self.get('rootFamily')
         # Comma-sepated list of individual ID's to hide from the output for debugging.
