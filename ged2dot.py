@@ -681,7 +681,9 @@ class Config:
         # Number of ancestor generations, where also sibling spouses are shown.
         # Default: same as layoutMaxDepth
         self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth', str(self.layoutMaxDepth)))
-        self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth'))
+        # Number of anchester generations, where also sibling families are shown.
+        # It's 1 by default, as values >= 2 causes edges to overlap each other in general.
+        self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth', '1'))
         self.rootFamily = self.get('rootFamily')
         # Comma-sepated list of individual ID's to hide from the output for debugging.
         # Example: "P526, P525"

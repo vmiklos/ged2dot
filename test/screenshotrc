@@ -5,5 +5,3 @@ input = screenshot.ged
 rootFamily = F1
 # Number of ancestor generations to show.
 layoutMaxDepth = 3
-# Number of anchester generations, where also sibling families are shown.
-layoutMaxSiblingFamilyDepth = 1
