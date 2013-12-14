@@ -1,7 +1,6 @@
 [ged2dot]
 input = noyeardate.ged
 rootFamily = F1
-considerAgeDead = 120
 anonMode = False
 images = True
 imageFormat = images/%(forename)s %(surname)s %(birt)s.jpg

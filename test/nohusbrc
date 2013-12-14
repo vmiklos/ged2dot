@@ -3,8 +3,6 @@
 input = nohusb.ged
 # Root family.
 rootFamily = F3
-# Consider someone dead at this age: put a question mark if death date is missing.
-considerAgeDead = 120
 # Anonymous mode: avoid any kind of sensitive data in the output.
 anonMode = False
 # Should the output contain images?

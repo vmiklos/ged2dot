@@ -658,7 +658,8 @@ class Config:
         self.parser = configparser.RawConfigParser()
         self.parser.read(path)
         self.input = self.get('input')
-        self.considerAgeDead = int(self.get('considerAgeDead'))
+        # Consider someone dead at this age: put a question mark if death date is missing.
+        self.considerAgeDead = int(self.get('considerAgeDead', '120'))
         self.anonMode = self.get('anonMode') == "True"
         self.images = self.get('images') == "True"
         self.imageFormat = self.get('imageFormat')
