@@ -670,10 +670,12 @@ class Config:
         self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth'))
         self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth'))
         self.rootFamily = self.get('rootFamily')
-        self.indiBlacklist = self.get('indiBlacklist').split(', ')
+        # Comma-sepated list of individual ID's to hide from the output for debugging.
+        # Example: "P526, P525"
+        self.indiBlacklist = self.get('indiBlacklist', '').split(', ')
 
-    def get(self, what):
-        return self.parser.get('ged2dot', what).split('#')[0]
+    def get(self, what, fallback=configparser._UNSET):
+        return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
 
 
 def main():

@@ -12,4 +12,3 @@ edgeVisibleDirected = False
 layoutMaxDepth = 0
 layoutMaxSiblingDepth = 0
 layoutMaxSiblingFamilyDepth = 0
-indiBlacklist =
