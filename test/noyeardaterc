@@ -3,7 +3,6 @@ input = noyeardate.ged
 rootFamily = F1
 anonMode = False
 images = True
-imageFormat = images/%(forename)s %(surname)s %(birt)s.jpg
 layoutMaxDepth = 0
 layoutMaxSiblingDepth = 0
 layoutMaxSiblingFamilyDepth = 0

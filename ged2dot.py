@@ -662,7 +662,9 @@ class Config:
         self.considerAgeDead = int(self.get('considerAgeDead', '120'))
         self.anonMode = self.get('anonMode') == "True"
         self.images = self.get('images') == "True"
-        self.imageFormat = self.get('imageFormat')
+        # If images is True: format of the image paths.
+        # Possible variables: %(forename)s, %(surname)s and %(birt)s.
+        self.imageFormat = self.get('imageFormat', 'images/%(forename)s %(surname)s %(birt)s.jpg')
         # If images is True: label text of nodes.
         # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
         self.nodeLabelImage = self.get('nodeLabelImage', '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>')
