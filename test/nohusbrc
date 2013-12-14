@@ -1,9 +1,5 @@
 [ged2dot]
-# Input GEDCOM file.
 input = nohusb.ged
-# Root family.
 rootFamily = F3
-# Number of ancestor generations to show.
 layoutMaxDepth = 1
-# Number of anchester generations, where also sibling families are shown.
 layoutMaxSiblingFamilyDepth = 1
