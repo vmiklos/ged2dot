@@ -665,7 +665,8 @@ class Config:
         self.nodeLabelImage = self.get('nodeLabelImage')
         self.nodeLabelPlain = self.get('nodeLabelPlain')
         self.edgeInvisibleRed = self.get('edgeInvisibleRed') == "True"
-        self.edgeVisibleDirected = self.get('edgeVisibleDirected') == "True"
+        # Visible edges: show direction for debugging?
+        self.edgeVisibleDirected = self.get('edgeVisibleDirected', 'False') == "True"
         self.layoutMaxDepth = int(self.get('layoutMaxDepth'))
         self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth'))
         self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth'))

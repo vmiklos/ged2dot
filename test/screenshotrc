@@ -20,8 +20,6 @@ nodeLabelImage = <<table border="0" cellborder="0"><tr><td><img src="%(picture)s
 nodeLabelPlain = "%(forename)s\n%(surname)s\n%(birt)s-%(deat)s"
 # Invisible edges: red for debugging or really invisible?
 edgeInvisibleRed = False
-# Visible edges: show direction for debugging?
-edgeVisibleDirected = False
 # Number of ancestor generations to show.
 layoutMaxDepth = 3
 # Number of ancestor generations, where also sibling spouses are shown.
