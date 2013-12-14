@@ -1,7 +1,6 @@
 [ged2dot]
 input = hello.ged
 rootFamily = F1
-anonMode = False
 images = True
 layoutMaxDepth = 0
 layoutMaxSiblingDepth = 0

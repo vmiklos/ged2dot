@@ -660,7 +660,8 @@ class Config:
         self.input = self.get('input')
         # Consider someone dead at this age: put a question mark if death date is missing.
         self.considerAgeDead = int(self.get('considerAgeDead', '120'))
-        self.anonMode = self.get('anonMode') == "True"
+        # Anonymous mode: avoid any kind of sensitive data in the output.
+        self.anonMode = self.get('anonMode', 'False') == "True"
         self.images = self.get('images') == "True"
         # If images is True: format of the image paths.
         # Possible variables: %(forename)s, %(surname)s and %(birt)s.

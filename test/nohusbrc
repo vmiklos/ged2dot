@@ -3,8 +3,6 @@
 input = nohusb.ged
 # Root family.
 rootFamily = F3
-# Anonymous mode: avoid any kind of sensitive data in the output.
-anonMode = False
 # Should the output contain images?
 images = True
 # Number of ancestor generations to show.
