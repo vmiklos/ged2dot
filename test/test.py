@@ -13,8 +13,11 @@ import ged2dot
 
 
 class Test(unittest.TestCase):
-    def convert(self, name):
-        config = ged2dot.Config(["%src" % name])
+    def convert(self, name, configDict={}):
+        if len(configDict):
+            config = ged2dot.Config([], configDict)
+        else:
+            config = ged2dot.Config(["%src" % name])
         model = ged2dot.Model(config)
         model.load(config.input)
         try:
@@ -29,21 +32,50 @@ class Test(unittest.TestCase):
         sock.close()
 
     def test_hello(self):
-        self.convert('hello')
+        configDict = {
+            'ged2dot': {
+                'input': 'hello.ged',
+                'rootFamily': 'F1',
+                'layoutMaxDepth': '0'
+            }
+        }
+        self.convert('hello', configDict)
 
     def test_noyeardate(self):
-        self.convert('noyeardate')
+        configDict = {
+            'ged2dot': {
+                'input': 'noyeardate.ged',
+                'rootFamily': 'F1',
+                'layoutMaxDepth': '0'
+            }
+        }
+        self.convert('noyeardate', configDict)
 
     def test_nohusb(self):
         # This tests if placeholder nodes are created for missing husbands.
-        self.convert('nohusb')
+        configDict = {
+            'ged2dot': {
+                'input': 'nohusb.ged',
+                'rootFamily': 'F3',
+                'layoutMaxDepth': '1'
+            }
+        }
+        self.convert('nohusb', configDict)
 
     def test_nowife(self):
         # This tests if placeholder nodes are created for missing wifes.
-        self.convert('nowife')
+        configDict = {
+            'ged2dot': {
+                'input': 'nowife.ged',
+                'rootFamily': 'F3',
+                'layoutMaxDepth': '1'
+            }
+        }
+        self.convert('nowife', configDict)
 
     def test_screenshot(self):
         # This is the demo input from the README, make sure it works.
+        # Also, this time use a config file path, to test that as well.
         self.convert('screenshot')
 
 if __name__ == '__main__':

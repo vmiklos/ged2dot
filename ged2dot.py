@@ -651,12 +651,16 @@ class GedcomImport:
 # Configuration handling
 
 class Config:
-    def __init__(self, args):
+    def __init__(self, args, configDict={}):
         path = "ged2dotrc"
+
         if len(args):
             path = args[0]
         self.parser = configparser.RawConfigParser()
-        self.parser.read(path)
+        if len(configDict):
+            self.parser.read_dict(configDict)
+        else:
+            self.parser.read(path)
         self.input = self.get('input')
         # Consider someone dead at this age: put a question mark if death date is missing.
         self.considerAgeDead = int(self.get('considerAgeDead', '120'))
