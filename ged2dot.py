@@ -664,7 +664,8 @@ class Config:
         self.imageFormat = self.get('imageFormat')
         self.nodeLabelImage = self.get('nodeLabelImage')
         self.nodeLabelPlain = self.get('nodeLabelPlain')
-        self.edgeInvisibleRed = self.get('edgeInvisibleRed') == "True"
+        # Invisible edges: red for debugging or really invisible?
+        self.edgeInvisibleRed = self.get('edgeInvisibleRed', 'False') == "True"
         # Visible edges: show direction for debugging?
         self.edgeVisibleDirected = self.get('edgeVisibleDirected', 'False') == "True"
         self.layoutMaxDepth = int(self.get('layoutMaxDepth'))
