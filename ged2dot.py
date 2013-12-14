@@ -663,7 +663,9 @@ class Config:
         self.anonMode = self.get('anonMode') == "True"
         self.images = self.get('images') == "True"
         self.imageFormat = self.get('imageFormat')
-        self.nodeLabelImage = self.get('nodeLabelImage')
+        # If images is True: label text of nodes.
+        # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
+        self.nodeLabelImage = self.get('nodeLabelImage', '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>')
         # If images is False: label text of nodes.
         # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
         self.nodeLabelPlain = self.get('nodeLabelPlain', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"')
