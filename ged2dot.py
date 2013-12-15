@@ -21,6 +21,7 @@ class NoSuchFamilyException(Exception):
 # Model
 
 class Individual:
+    placeholderDir = os.path.dirname(os.path.realpath(__file__))
     """An individual is our basic building block, can be part of multiple families (usually two)."""
     def __init__(self, model):
         self.model = model
@@ -57,10 +58,7 @@ class Individual:
         if os.path.exists(path) and not self.model.config.anonMode:
             picture = path
         else:
-            if self.sex == "M":
-                picture = "placeholder-m.png"
-            else:
-                picture = "placeholder-f.png"
+            picture = os.path.join(Individual.placeholderDir, "placeholder-%s.png" % self.sex.lower())
 
         try:
             from PIL import Image
