@@ -25,10 +25,7 @@ class Test(unittest.TestCase):
         except OSError:
             pass
         sock = open("%s.dot" % name, "w")
-        saved = sys.stdout
-        sys.stdout = sock
-        model.save()
-        sys.stdout = saved
+        model.save(sock)
         sock.close()
 
     def test_hello(self):

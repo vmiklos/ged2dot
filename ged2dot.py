@@ -48,7 +48,7 @@ class Individual:
         file to ease debugging."""
         return "%s %s" % (self.forename, self.surname)
 
-    def getLabel(self):
+    def getLabel(self, out):
         path = self.model.config.imageFormat % {
             'forename': self.forename,
             'surname': self.surname,
@@ -66,7 +66,7 @@ class Individual:
             from PIL import Image
             i = Image.open(picture)
             if i.size != (100, 100):
-                print("// warning, picture of %s has custom (not 100x100 px) size." % self.getFullName())
+                out.write("// warning, picture of %s has custom (not 100x100 px) size." % self.getFullName())
         except ImportError:
             pass
 
@@ -100,8 +100,8 @@ class Individual:
     def getColor(self):
         return {'M': 'blue', 'F': 'pink'}[self.sex]
 
-    def getNode(self):
-        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))
+    def getNode(self, out):
+        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(out), self.getColor()))
 
     def setBirt(self, birt):
         if not len(birt):
@@ -206,9 +206,11 @@ class Model:
         for i in self.families:
             i.resolve()
 
-    def save(self):
+    def save(self, out):
         """Save is done by calcularing and rendering the layout on the output."""
-        layout = Layout(self)
+        if not out:
+            out = sys.stdout
+        layout = Layout(self, out)
         layout.calc()
         layout.render()
 
@@ -232,8 +234,8 @@ class Edge:
         if comment:
             self.rest += "// %s" % comment
 
-    def render(self):
-        print("%s -> %s %s" % (self.fro, self.to, self.rest))
+    def render(self, out):
+        out.write("%s -> %s %s\n" % (self.fro, self.to, self.rest))
 
 
 class Node:
@@ -248,8 +250,8 @@ class Node:
         if comment:
             self.rest += " // %s" % comment
 
-    def render(self):
-        print("%s %s" % (self.id, self.rest))
+    def render(self, out):
+        out.write("%s %s\n" % (self.id, self.rest))
 
 
 class Subgraph:
@@ -263,14 +265,14 @@ class Subgraph:
         def __init__(self, name):
             self.name = name
 
-        def render(self):
-            print("subgraph %s {" % self.name)
-            print("rank = same")
+        def render(self, out):
+            out.write("subgraph %s {\n" % self.name)
+            out.write("rank = same\n")
 
     class End:
         """Special end node that acts like a node/edge."""
-        def render(self):
-            print("}")
+        def render(self, out):
+            out.write("}\n")
 
     def __init__(self, name, model):
         self.name = name
@@ -287,11 +289,11 @@ class Subgraph:
     def end(self):
         self.append(Subgraph.End())
 
-    def render(self):
-        self.start.render()
+    def render(self, out):
+        self.start.render(out)
         for i in self.elements:
-            i.render()
-        print("")
+            i.render(out)
+        out.write("\n")
 
     def findFamily(self, family):
         """Find the wife or husb or a family in this subgraph.
@@ -320,7 +322,7 @@ class Marriage:
     def getName(self):
         return "%sAnd%s" % (self.family.getHusb().id, self.family.getWife().id)
 
-    def getNode(self):
+    def getNode(self, out):
         model = self.family.model
         husb = self.family.getHusb().getFullName()
         wife = self.family.getWife().getFullName()
@@ -329,8 +331,9 @@ class Marriage:
 
 class Layout:
     """Generates the graphviz digraph, contains subgraphs."""
-    def __init__(self, model):
+    def __init__(self, model, out):
         self.model = model
+        self.out = out
         self.subgraphs = []
         self.filteredFamilies = []  # List of families, which are directly interesting for us.
 
@@ -338,11 +341,11 @@ class Layout:
         self.subgraphs.append(subgraph)
 
     def render(self):
-        print("digraph {")
-        print("splines = ortho")
+        self.out.write("digraph {\n")
+        self.out.write("splines = ortho\n")
         for i in self.subgraphs:
-            i.render()
-        print("}")
+            i.render(self.out)
+        self.out.write("}\n")
 
     def getSubgraph(self, id):
         for s in self.subgraphs:
@@ -412,18 +415,18 @@ class Layout:
         prevChil = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
             husb = family.getHusb()
-            subgraph.append(husb.getNode())
+            subgraph.append(husb.getNode(self.out))
             if prevWife:
                 subgraph.append(self.makeEdge(prevWife.id, family.husb.id, invisible=True))
             wife = family.getWife()
-            subgraph.append(wife.getNode())
+            subgraph.append(wife.getNode(self.out))
             prevWife = family.wife
             marriage = Marriage(family)
-            subgraph.append(marriage.getNode())
+            subgraph.append(marriage.getNode(self.out))
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
             subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
             for child in family.chil:
-                pendingChildNodes.append(self.model.getIndividual(child).getNode())
+                pendingChildNodes.append(self.model.getIndividual(child).getNode(self.out))
                 if prevChil:
                     pendingChildNodes.append(self.makeEdge(prevChil, child, invisible=True))
                 prevChil = child
@@ -497,10 +500,10 @@ class Layout:
                 e.fro = newIndi.id
             found = True
         assert found
-        subgraph.elements.insert(existingPos, newIndi.getNode())
+        subgraph.elements.insert(existingPos, newIndi.getNode(self.out))
 
         marriage = Marriage(family)
-        subgraph.elements.insert(existingPos, marriage.getNode())
+        subgraph.elements.insert(existingPos, marriage.getNode(self.out))
 
         subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
         subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
@@ -544,7 +547,7 @@ class Layout:
         prevChild = lastChild
         for c in family.chil:
             subgraphChild.prepend(self.makeEdge(prevChild, c, invisible=True))
-            subgraphChild.prepend(self.model.getIndividual(c).getNode())
+            subgraphChild.prepend(self.model.getIndividual(c).getNode(self.out))
             subgraphChild.append(self.makeEdge("%sConnect" % c, c))
             prevChild = c
 
@@ -701,7 +704,7 @@ def main():
     config = Config(sys.argv[1:])
     model = Model(config)
     model.load(config.input)
-    model.save()
+    model.save(sys.stdout)
 
 if __name__ == "__main__":
     main()
