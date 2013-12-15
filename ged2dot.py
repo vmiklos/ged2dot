@@ -654,13 +654,20 @@ class GedcomImport:
 # Configuration handling
 
 class Config:
-    def __init__(self, args, configDict={}):
-        path = "ged2dotrc"
+    def __init__(self, configDict):
+        path = None
 
-        if len(args):
-            path = args[0]
+        if type(configDict) == list:
+            args = configDict
+            if len(args):
+                path = args[0]
+            else:
+                path = "ged2dotrc"
+        else:
+            args = []
+
         self.parser = configparser.RawConfigParser()
-        if len(configDict):
+        if not path:
             self.parser.read_dict(configDict)
         else:
             self.parser.read(path)

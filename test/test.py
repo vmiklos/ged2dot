@@ -15,7 +15,7 @@ import ged2dot
 class Test(unittest.TestCase):
     def convert(self, name, configDict={}):
         if len(configDict):
-            config = ged2dot.Config([], configDict)
+            config = ged2dot.Config(configDict)
         else:
             config = ged2dot.Config(["%src" % name])
         model = ged2dot.Model(config)
