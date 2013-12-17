@@ -32,8 +32,7 @@ class Test(unittest.TestCase):
         configDict = {
             'ged2dot': {
                 'input': 'hello.ged',
-                'rootFamily': 'F1',
-                'layoutMaxDepth': '0'
+                'rootFamily': 'F1'
             }
         }
         self.convert('hello', configDict)
@@ -42,8 +41,7 @@ class Test(unittest.TestCase):
         configDict = {
             'ged2dot': {
                 'input': 'noyeardate.ged',
-                'rootFamily': 'F1',
-                'layoutMaxDepth': '0'
+                'rootFamily': 'F1'
             }
         }
         self.convert('noyeardate', configDict)
@@ -53,8 +51,7 @@ class Test(unittest.TestCase):
         configDict = {
             'ged2dot': {
                 'input': 'nohusb.ged',
-                'rootFamily': 'F3',
-                'layoutMaxDepth': '1'
+                'rootFamily': 'F3'
             }
         }
         self.convert('nohusb', configDict)
@@ -64,8 +61,7 @@ class Test(unittest.TestCase):
         configDict = {
             'ged2dot': {
                 'input': 'nowife.ged',
-                'rootFamily': 'F3',
-                'layoutMaxDepth': '1'
+                'rootFamily': 'F3'
             }
         }
         self.convert('nowife', configDict)

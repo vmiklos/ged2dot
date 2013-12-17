@@ -3,5 +3,3 @@
 input = screenshot.ged
 # Root family.
 rootFamily = F1
-# Number of ancestor generations to show.
-layoutMaxDepth = 3

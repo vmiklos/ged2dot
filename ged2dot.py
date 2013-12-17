@@ -371,12 +371,13 @@ class Layout:
             for pending in pendings:
                 children = []
                 for indi in ('husb', 'wife'):
-                    indiFamily = getattr(pending, indi).famc
-                    if indiFamily:
-                        indiFamily.depth = depth + 1
-                        self.filteredFamilies.append(indiFamily)
-                        nextPendings.append(indiFamily)
-                        children += indiFamily.chil
+                    if getattr(pending, indi):
+                        indiFamily = getattr(pending, indi).famc
+                        if indiFamily:
+                            indiFamily.depth = depth + 1
+                            self.filteredFamilies.append(indiFamily)
+                            nextPendings.append(indiFamily)
+                            children += indiFamily.chil
 
                 # Also collect children's family.
                 if depth < self.model.config.layoutMaxSiblingDepth + 1:
@@ -689,7 +690,8 @@ class Config:
         self.edgeInvisibleRed = self.get('edgeInvisibleRed', 'False') == "True"
         # Visible edges: show direction for debugging?
         self.edgeVisibleDirected = self.get('edgeVisibleDirected', 'False') == "True"
-        self.layoutMaxDepth = int(self.get('layoutMaxDepth'))
+        # Number of ancestor generations to show.
+        self.layoutMaxDepth = int(self.get('layoutMaxDepth', '5'))
         # Number of ancestor generations, where also sibling spouses are shown.
         # Default: same as layoutMaxDepth
         self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth', str(self.layoutMaxDepth)))
