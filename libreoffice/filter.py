@@ -22,7 +22,7 @@ import inlineize
 
 
 class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection):
-    name = "GEDCOM"
+    type = "draw_GEDCOM"
 
     def __init__(self, context):
         self.context = context
@@ -110,8 +110,8 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
         try:
             dict = self.__toDict(args)
             if self.__detect(dict["InputStream"]):
-                dict["TypeName"] = GedcomImport.name
-                return GedcomImport.name, self.__toTuple(dict)
+                dict["TypeName"] = GedcomImport.type
+                return GedcomImport.type, self.__toTuple(dict)
         except:
             traceback.print_exc(file=sys.stderr)
         return ""

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+<oor:component-data oor:name="Filter" oor:package="org.openoffice.TypeDetection" xmlns:oor="http://openoffice.org/2001/registry">
+  <node oor:name="Filters">
+    <node oor:name="GEDCOM" oor:op="replace">
+      <prop oor:name="Type">
+        <value>draw_GEDCOM</value>
+      </prop>
+      <prop oor:name="DocumentService">
+        <value>com.sun.star.drawing.DrawingDocument</value>
+      </prop>
+      <prop oor:name="FilterService">
+        <value>hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter</value>
+      </prop>
+      <prop oor:name="Flags">
+        <value>IMPORT ALIEN USESOPTIONS 3RDPARTYFILTER PREFERRED</value>
+      </prop>
+    </node>
+  </node>
+</oor:component-data>
+<!-- vim: shiftwidth=2 softtabstop=2 expandtab:
+-->
