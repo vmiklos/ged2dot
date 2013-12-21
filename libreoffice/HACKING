@@ -1,0 +1,28 @@
+= Hacking the GEDCOM import filter
+
+== Editing the source code
+
+The source code is written in Python, so use whatever editor you're comfortable
+with to edit it. Modefiles for VIM are included, patches welcome to add Emacs
+ones.
+
+== Testing your changes
+
+It is recommended that you do not install the development version of the
+extension to your system profile, as sooner or later you will screw it up,
+loosing your "production" settings.
+
+Instead, set up the official binaries in a separate dir, and create a dedicated profile as documented here:
+
+http://wiki.documentfoundation.org/Installing_in_parallel#Step_4_-_Optional.2C_but_Recommended_when_Testing:_Changing_the_User_Profile_location
+
+Then you can use something like:
+
+----
+make -s install UNOPKG_PREFIX=$HOME/git/libreoffice/lo42/opt/libreoffice4.2/program/
+----
+
+To package and install your changes in a few seconds, with a single
+command. (It is recommended that you kill soffice.bin before install.)
+
+// vim: ft=asciidoc
