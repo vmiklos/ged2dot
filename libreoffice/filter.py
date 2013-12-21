@@ -23,6 +23,7 @@ import inlineize
 
 class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection):
     name = "GEDCOM"
+
     def __init__(self, context):
         self.context = context
 
