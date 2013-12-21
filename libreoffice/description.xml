@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+<description xmlns="http://openoffice.org/extensions/description/2006" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <identifier value="hu.vmiklos.libreoffice.Draw.GedcomImportFilter"/>
+  <display-name>
+    <name>LibreOffice Draw GEDCOM import filter.</name>
+  </display-name>
+  <publisher>
+    <name xlink:href="http://github.com/vmiklos/ged2dot">Miklos Vajna</name>
+  </publisher>
+</description>
+<!-- vim: shiftwidth=2 softtabstop=2 expandtab:
+-->
