@@ -90,9 +90,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
     def filter(self, props):
         try:
             self.props = self.__toDict(props)
-            # TODO clean this up
-            url = [i.Value for i in props if i.Name == "URL"][0]
-            path = unohelper.fileUrlToSystemPath(url)
+            path = unohelper.fileUrlToSystemPath(self.props["URL"])
             buf = self.__toSvg(path)
             xInputStream = self.__createUnoService("com.sun.star.io.SequenceInputStream")
             xInputStream.initialize((uno.ByteSequence(buf),))
