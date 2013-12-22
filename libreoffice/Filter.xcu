@@ -22,6 +22,9 @@
       <prop oor:name="Flags">
         <value>IMPORT ALIEN 3RDPARTYFILTER</value>
       </prop>
+      <prop oor:name="UIComponent">
+        <value>hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog</value>
+      </prop>
     </node>
   </node>
 </oor:component-data>
