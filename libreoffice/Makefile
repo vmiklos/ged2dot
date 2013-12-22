@@ -6,7 +6,7 @@ NAME = gedcom
 PACKAGE = hu.vmiklos.libreoffice.Draw.GedcomImportFilter
 
 PARENTFILES = inlineize.py ged2dot.py placeholder-m.png placeholder-f.png
-MYFILES = loader.py filter.py Config.xcs Config.xcu Filter.xcu Type.xcu description.xml META-INF/manifest.xml
+MYFILES = loader.py filter.py dialog.py Config.xcs Config.xcu Filter.xcu Type.xcu description.xml META-INF/manifest.xml
 
 PARENTFILES_SRC = $(foreach FILE,$(PARENTFILES),../$(FILE))
 
