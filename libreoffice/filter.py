@@ -27,6 +27,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
     def __init__(self, context):
         self.context = context
 
+    # TODO create base class for these 3 methods
     def __createUnoService(self, name):
         return self.context.ServiceManager.createInstanceWithContext(name, self.context)
 
@@ -46,10 +47,15 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
         return tuple(ret)
 
     def __toSvg(self, ged):
+        rootFamily = "F1"
+        if "FilterData" in self.props.keys():
+            filterData = self.__toDict(self.props["FilterData"])
+            if "rootFamily" in filterData.keys():
+                rootFamily = filterData["rootFamily"]
         configDict = {
             'ged2dot': {
                 'input': ged,
-                'rootFamily': 'F1'
+                'rootFamily': rootFamily
             }
         }
         config = ged2dot.Config(configDict)
@@ -81,9 +87,11 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
         return bytes.value.decode('utf-8') == magic
 
     # XFilter
-    def filter(self, args):
+    def filter(self, props):
         try:
-            url = [i.Value for i in args if i.Name == "URL"][0]
+            self.props = self.__toDict(props)
+            # TODO clean this up
+            url = [i.Value for i in props if i.Name == "URL"][0]
             path = unohelper.fileUrlToSystemPath(url)
             buf = self.__toSvg(path)
             xInputStream = self.__createUnoService("com.sun.star.io.SequenceInputStream")
