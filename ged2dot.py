@@ -55,8 +55,9 @@ class Individual:
             'surname': self.surname,
             'birt': self.birt
         }
-        if os.path.exists(path) and not self.model.config.anonMode:
-            picture = path
+        fullpath = os.path.join(self.model.basedir, path)
+        if os.path.exists(fullpath) and not self.model.config.anonMode:
+            picture = fullpath
         else:
             picture = os.path.join(Individual.placeholderDir, "placeholder-%s.png" % self.sex.lower())
 
@@ -196,6 +197,7 @@ class Model:
                 return i
 
     def load(self, name):
+        self.basedir = os.path.dirname(name)
         inf = open(name)
         GedcomImport(inf, self).load()
         inf.close()
