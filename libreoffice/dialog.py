@@ -48,8 +48,6 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         configDict = {
             'ged2dot': {
                 'input': ged,
-                # We want a simple list of families, just give something.
-                'rootFamily': 'F1'
             }
         }
         config = ged2dot.Config(configDict)
@@ -88,8 +86,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             control.SelectedItems = tuple([0])
         elif type == "com.sun.star.awt.UnoControlNumericFieldModel":
             control.Spin = True
-            # TODO import this default from ged2dot
-            control.Value = 5
+            control.Value = ged2dot.Config.layoutMaxDepthDefault
             control.DecimalAccuracy = 0
             control.ValueMin = 0
         xParent.insertByName(id, control)

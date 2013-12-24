@@ -47,9 +47,8 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
         return tuple(ret)
 
     def __toSvg(self, ged):
-        rootFamily = "F1"
-        # TODO import default from ged2dot
-        layoutMaxDepth = 5
+        rootFamily = ged2dot.Config.rootFamilyDefault
+        layoutMaxDepth = ged2dot.Config.layoutMaxDepthDefault
         if "FilterData" in self.props.keys():
             filterData = self.__toDict(self.props["FilterData"])
             if "rootFamily" in filterData.keys():
