@@ -655,6 +655,9 @@ class GedcomImport:
 # Configuration handling
 
 class Config:
+    layoutMaxDepthDefault = '5'
+    rootFamilyDefault = 'F1'
+
     def __init__(self, configDict):
         path = None
 
@@ -693,14 +696,14 @@ class Config:
         # Visible edges: show direction for debugging?
         self.edgeVisibleDirected = self.get('edgeVisibleDirected', 'False') == "True"
         # Number of ancestor generations to show.
-        self.layoutMaxDepth = int(self.get('layoutMaxDepth', '5'))
+        self.layoutMaxDepth = int(self.get('layoutMaxDepth', Config.layoutMaxDepthDefault))
         # Number of ancestor generations, where also sibling spouses are shown.
         # Default: same as layoutMaxDepth
         self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth', str(self.layoutMaxDepth)))
         # Number of anchester generations, where also sibling families are shown.
         # It's 1 by default, as values >= 2 causes edges to overlap each other in general.
         self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth', '1'))
-        self.rootFamily = self.get('rootFamily')
+        self.rootFamily = self.get('rootFamily', Config.rootFamilyDefault)
         # Comma-sepated list of individual ID's to hide from the output for debugging.
         # Example: "P526, P525"
         self.indiBlacklist = self.get('indiBlacklist', '').split(', ')
