@@ -86,6 +86,12 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             control.StringItemList = tuple(sorted(self.familyDict.keys(), key=lambda i: int(i.split(' (')[0][1:])))
             # Select the first item.
             control.SelectedItems = tuple([0])
+        elif type == "com.sun.star.awt.UnoControlNumericFieldModel":
+            control.Spin = True
+            # TODO import this default from ged2dot
+            control.Value = 5
+            control.DecimalAccuracy = 0
+            control.ValueMin = 0
         xParent.insertByName(id, control)
         return control
 
@@ -100,7 +106,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         xDialogModel.PositionX = 0
         xDialogModel.PositionY = 0
         xDialogModel.Width = 230
-        xDialogModel.Height = 50
+        xDialogModel.Height = 70
         xDialogModel.Title = "GEDCOM Import"
 
         # Then the model of the controls.
@@ -108,10 +114,14 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
                                             id="ftRootFamily", tabIndex=0, left=10, top=10, width=100, height=10, value="Root family")
         cbRootFamily = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlListBoxModel",
                                             id="cbRootFamily", tabIndex=1, left=120, top=10, width=100, height=10)
+        ftLayoutMax = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlFixedTextModel",
+                                           id="ftLayoutMax", tabIndex=2, left=10, top=30, width=100, height=10, value="Number of generations to show")
+        nfLayoutMax = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlNumericFieldModel",
+                                           id="nfLayoutMax", tabIndex=3, left=120, top=30, width=100, height=10)
         btnOk = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlButtonModel",
-                                     id="btnOk", tabIndex=2, left=110, top=30, width=50, height=10, buttonType=PushButtonType_OK)
+                                     id="btnOk", tabIndex=4, left=110, top=50, width=50, height=10, buttonType=PushButtonType_OK)
         btnCancel = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlButtonModel",
-                                         id="btnCancel", tabIndex=3, left=170, top=30, width=50, height=10, buttonType=PushButtonType_CANCEL)
+                                         id="btnCancel", tabIndex=5, left=170, top=50, width=50, height=10, buttonType=PushButtonType_CANCEL)
 
         # Finally show the dialog.
         xDialog = self.__createUnoService("com.sun.star.awt.UnoControlDialog")
@@ -122,6 +132,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         if ret == ExecutableDialogResults_OK:
             key = cbRootFamily.StringItemList[cbRootFamily.SelectedItems[0]]
             self.rootFamily = self.familyDict[key].id
+            self.layoutMax = int(nfLayoutMax.Value)
         return ret
 
     # XPropertyAccess
@@ -146,7 +157,10 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             self.__extractFamilies()
             ret = self.__execDialog()
             if ret == ExecutableDialogResults_OK:
-                self.props['FilterData'] = self.__toTuple({'rootFamily': self.rootFamily})
+                self.props['FilterData'] = self.__toTuple({
+                    'rootFamily': self.rootFamily,
+                    'layoutMaxDepth': self.layoutMax,
+                })
             return ret
         except:
             traceback.print_exc(file=sys.stderr)

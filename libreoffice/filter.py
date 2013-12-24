@@ -48,14 +48,19 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
 
     def __toSvg(self, ged):
         rootFamily = "F1"
+        # TODO import default from ged2dot
+        layoutMaxDepth = 5
         if "FilterData" in self.props.keys():
             filterData = self.__toDict(self.props["FilterData"])
             if "rootFamily" in filterData.keys():
                 rootFamily = filterData["rootFamily"]
+            if "layoutMaxDepth" in filterData.keys():
+                layoutMaxDepth = filterData["layoutMaxDepth"]
         configDict = {
             'ged2dot': {
                 'input': ged,
-                'rootFamily': rootFamily
+                'rootFamily': rootFamily,
+                'layoutMaxDepth': layoutMaxDepth
             }
         }
         config = ged2dot.Config(configDict)
