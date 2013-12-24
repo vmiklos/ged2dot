@@ -657,6 +657,8 @@ class GedcomImport:
 class Config:
     layoutMaxDepthDefault = '5'
     rootFamilyDefault = 'F1'
+    nodeLabelImageDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
+    nodeLabelImageSwappedDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
 
     def __init__(self, configDict):
         path = None
@@ -687,7 +689,7 @@ class Config:
         self.imageFormat = self.get('imageFormat', 'images/%(forename)s %(surname)s %(birt)s.jpg')
         # If images is True: label text of nodes.
         # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
-        self.nodeLabelImage = self.get('nodeLabelImage', '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>')
+        self.nodeLabelImage = self.get('nodeLabelImage', Config.nodeLabelImageDefault)
         # If images is False: label text of nodes.
         # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
         self.nodeLabelPlain = self.get('nodeLabelPlain', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"')
