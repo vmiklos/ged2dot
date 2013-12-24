@@ -19,38 +19,20 @@ from com.sun.star.beans import PropertyValue
 
 import ged2dot
 import inlineize
+import base
 
 
-class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection):
+class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection, base.GedcomBase):
     type = "draw_GEDCOM"
 
     def __init__(self, context):
-        self.context = context
-
-    # TODO create base class for these 3 methods
-    def __createUnoService(self, name):
-        return self.context.ServiceManager.createInstanceWithContext(name, self.context)
-
-    def __toDict(self, args):
-        ret = {}
-        for i in args:
-            ret[i.Name] = i.Value
-        return ret
-
-    def __toTuple(self, args):
-        ret = []
-        for k, v in args.items():
-            value = PropertyValue()
-            value.Name = k
-            value.Value = v
-            ret.append(value)
-        return tuple(ret)
+        base.GedcomBase.__init__(self, context)
 
     def __toSvg(self, ged):
         rootFamily = ged2dot.Config.rootFamilyDefault
         layoutMaxDepth = ged2dot.Config.layoutMaxDepthDefault
         if "FilterData" in self.props.keys():
-            filterData = self.__toDict(self.props["FilterData"])
+            filterData = self.toDict(self.props["FilterData"])
             if "rootFamily" in filterData.keys():
                 rootFamily = filterData["rootFamily"]
             if "layoutMaxDepth" in filterData.keys():
@@ -93,13 +75,13 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
     # XFilter
     def filter(self, props):
         try:
-            self.props = self.__toDict(props)
+            self.props = self.toDict(props)
             path = unohelper.fileUrlToSystemPath(self.props["URL"])
             buf = self.__toSvg(path)
-            xInputStream = self.__createUnoService("com.sun.star.io.SequenceInputStream")
+            xInputStream = self.createUnoService("com.sun.star.io.SequenceInputStream")
             xInputStream.initialize((uno.ByteSequence(buf),))
 
-            xFilter = self.__createUnoService("com.sun.star.comp.Draw.SVGFilter")
+            xFilter = self.createUnoService("com.sun.star.comp.Draw.SVGFilter")
             xFilter.setTargetDocument(self.xDstDoc)
 
             value = PropertyValue()
@@ -118,10 +100,10 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection)
     # XExtendedFilterDetection
     def detect(self, args):
         try:
-            dict = self.__toDict(args)
+            dict = self.toDict(args)
             if self.__detect(dict["InputStream"]):
                 dict["TypeName"] = GedcomImport.type
-                return GedcomImport.type, self.__toTuple(dict)
+                return GedcomImport.type, self.toTuple(dict)
         except:
             traceback.print_exc(file=sys.stderr)
         return ""

@@ -9,6 +9,7 @@ import sys
 import traceback
 
 import ged2dot
+import base
 
 import unohelper
 from com.sun.star.beans import XPropertyAccess
@@ -21,27 +22,9 @@ from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL
 from com.sun.star.beans import PropertyValue
 
 
-class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter):
+class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):
     def __init__(self, context):
-        self.context = context
-
-    def __createUnoService(self, name):
-        return self.context.ServiceManager.createInstanceWithContext(name, self.context)
-
-    def __toDict(self, args):
-        ret = {}
-        for i in args:
-            ret[i.Name] = i.Value
-        return ret
-
-    def __toTuple(self, args):
-        ret = []
-        for k, v in args.items():
-            value = PropertyValue()
-            value.Name = k
-            value.Value = v
-            ret.append(value)
-        return tuple(ret)
+        base.GedcomBase.__init__(self, context)
 
     def __extractFamilies(self):
         ged = unohelper.fileUrlToSystemPath(self.props['URL'])
@@ -99,7 +82,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         # The rest is just derived from this.
 
         # Create the dialog model.
-        xDialogModel = self.__createUnoService("com.sun.star.awt.UnoControlDialogModel")
+        xDialogModel = self.createUnoService("com.sun.star.awt.UnoControlDialogModel")
         xDialogModel.PositionX = 0
         xDialogModel.PositionY = 0
         xDialogModel.Width = 230
@@ -121,9 +104,9 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
                                          id="btnCancel", tabIndex=5, left=170, top=50, width=50, height=10, buttonType=PushButtonType_CANCEL)
 
         # Finally show the dialog.
-        xDialog = self.__createUnoService("com.sun.star.awt.UnoControlDialog")
+        xDialog = self.createUnoService("com.sun.star.awt.UnoControlDialog")
         xDialog.setModel(xDialogModel)
-        xToolkit = self.__createUnoService("com.sun.star.awt.ExtToolkit")
+        xToolkit = self.createUnoService("com.sun.star.awt.ExtToolkit")
         xDialog.createPeer(xToolkit, None)
         ret = xDialog.execute()
         if ret == ExecutableDialogResults_OK:
@@ -135,13 +118,13 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
     # XPropertyAccess
     def getPropertyValues(self):
         try:
-            return self.__toTuple(self.props)
+            return self.toTuple(self.props)
         except:
             traceback.print_exc(file=sys.stderr)
 
     def setPropertyValues(self, props):
         try:
-            self.props = self.__toDict(props)
+            self.props = self.toDict(props)
         except:
             traceback.print_exc(file=sys.stderr)
 
@@ -154,7 +137,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             self.__extractFamilies()
             ret = self.__execDialog()
             if ret == ExecutableDialogResults_OK:
-                self.props['FilterData'] = self.__toTuple({
+                self.props['FilterData'] = self.toTuple({
                     'rootFamily': self.rootFamily,
                     'layoutMaxDepth': self.layoutMax,
                 })
