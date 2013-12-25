@@ -85,7 +85,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         # The rest is just derived from this.
 
         # Create the dialog model.
-        xDialogModel = self.createUnoService("com.sun.star.awt.UnoControlDialogModel")
+        xDialogModel = self.createUnoService("awt.UnoControlDialogModel")
         xDialogModel.PositionX = 0
         xDialogModel.PositionY = 0
         xDialogModel.Width = 230
@@ -103,9 +103,9 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         btnCancel = self.__createControl(xDialogModel, type="Button", id="btnCancel", tabIndex=7, left=170, top=70, width=50, height=10, buttonType=PushButtonType_CANCEL)
 
         # Finally show the dialog.
-        xDialog = self.createUnoService("com.sun.star.awt.UnoControlDialog")
+        xDialog = self.createUnoService("awt.UnoControlDialog")
         xDialog.setModel(xDialogModel)
-        xToolkit = self.createUnoService("com.sun.star.awt.ExtToolkit")
+        xToolkit = self.createUnoService("awt.ExtToolkit")
         xDialog.createPeer(xToolkit, None)
         ret = xDialog.execute()
         if ret == ExecutableDialogResults_OK:

@@ -13,7 +13,7 @@ class GedcomBase(object):
         self.context = context
 
     def createUnoService(self, name):
-        return self.context.ServiceManager.createInstanceWithContext(name, self.context)
+        return self.context.ServiceManager.createInstanceWithContext("com.sun.star.%s" % name, self.context)
 
     def toDict(self, args):
         ret = {}

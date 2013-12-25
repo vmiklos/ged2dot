@@ -82,10 +82,10 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
             self.props = self.toDict(props)
             path = unohelper.fileUrlToSystemPath(self.props["URL"])
             buf = self.__toSvg(path)
-            xInputStream = self.createUnoService("com.sun.star.io.SequenceInputStream")
+            xInputStream = self.createUnoService("io.SequenceInputStream")
             xInputStream.initialize((uno.ByteSequence(buf),))
 
-            xFilter = self.createUnoService("com.sun.star.comp.Draw.SVGFilter")
+            xFilter = self.createUnoService("comp.Draw.SVGFilter")
             xFilter.setTargetDocument(self.xDstDoc)
 
             value = PropertyValue()
