@@ -31,17 +31,21 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
     def __toSvg(self, ged):
         rootFamily = ged2dot.Config.rootFamilyDefault
         layoutMaxDepth = ged2dot.Config.layoutMaxDepthDefault
+        nodeLabelImage = ged2dot.Config.nodeLabelImageDefault
         if "FilterData" in self.props.keys():
             filterData = self.toDict(self.props["FilterData"])
             if "rootFamily" in filterData.keys():
                 rootFamily = filterData["rootFamily"]
             if "layoutMaxDepth" in filterData.keys():
                 layoutMaxDepth = filterData["layoutMaxDepth"]
+            if "nodeLabelImage" in filterData.keys():
+                nodeLabelImage = filterData["nodeLabelImage"]
         configDict = {
             'ged2dot': {
                 'input': ged,
                 'rootFamily': rootFamily,
-                'layoutMaxDepth': layoutMaxDepth
+                'layoutMaxDepth': layoutMaxDepth,
+                'nodeLabelImage': nodeLabelImage
             }
         }
         config = ged2dot.Config(configDict)

@@ -72,6 +72,9 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             control.Value = ged2dot.Config.layoutMaxDepthDefault
             control.DecimalAccuracy = 0
             control.ValueMin = 0
+        elif type == "com.sun.star.awt.UnoControlCheckBoxModel":
+            control.Label = value
+            control.State = 1
         xParent.insertByName(id, control)
         return control
 
@@ -86,22 +89,26 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         xDialogModel.PositionX = 0
         xDialogModel.PositionY = 0
         xDialogModel.Width = 230
-        xDialogModel.Height = 70
+        xDialogModel.Height = 90
         xDialogModel.Title = "GEDCOM Import"
 
         # Then the model of the controls.
         ftRootFamily = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlFixedTextModel",
                                             id="ftRootFamily", tabIndex=0, left=10, top=10, width=100, height=10, value="Root family")
-        cbRootFamily = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlListBoxModel",
-                                            id="cbRootFamily", tabIndex=1, left=120, top=10, width=100, height=10)
+        lbRootFamily = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlListBoxModel",
+                                            id="lbRootFamily", tabIndex=1, left=120, top=10, width=100, height=10)
         ftLayoutMax = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlFixedTextModel",
                                            id="ftLayoutMax", tabIndex=2, left=10, top=30, width=100, height=10, value="Number of generations to show")
         nfLayoutMax = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlNumericFieldModel",
                                            id="nfLayoutMax", tabIndex=3, left=120, top=30, width=100, height=10)
+        ftNameOrder = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlFixedTextModel",
+                                           id="ftNameOrder", tabIndex=4, left=10, top=50, width=100, height=10, value="Name order")
+        cbNameOrder = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlCheckBoxModel",
+                                           id="cbNameOrder", tabIndex=5, left=120, top=50, width=100, height=10, value="Forename first")
         btnOk = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlButtonModel",
-                                     id="btnOk", tabIndex=4, left=110, top=50, width=50, height=10, buttonType=PushButtonType_OK)
+                                     id="btnOk", tabIndex=6, left=110, top=70, width=50, height=10, buttonType=PushButtonType_OK)
         btnCancel = self.__createControl(xDialogModel, type="com.sun.star.awt.UnoControlButtonModel",
-                                         id="btnCancel", tabIndex=5, left=170, top=50, width=50, height=10, buttonType=PushButtonType_CANCEL)
+                                         id="btnCancel", tabIndex=7, left=170, top=70, width=50, height=10, buttonType=PushButtonType_CANCEL)
 
         # Finally show the dialog.
         xDialog = self.createUnoService("com.sun.star.awt.UnoControlDialog")
@@ -110,9 +117,13 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         xDialog.createPeer(xToolkit, None)
         ret = xDialog.execute()
         if ret == ExecutableDialogResults_OK:
-            key = cbRootFamily.StringItemList[cbRootFamily.SelectedItems[0]]
+            key = lbRootFamily.StringItemList[lbRootFamily.SelectedItems[0]]
             self.rootFamily = self.familyDict[key].id
             self.layoutMax = int(nfLayoutMax.Value)
+            if cbNameOrder.State:
+                self.nodeLabelImage = ged2dot.Config.nodeLabelImageDefault
+            else:
+                self.nodeLabelImage = ged2dot.Config.nodeLabelImageSwappedDefault
         return ret
 
     # XPropertyAccess
@@ -140,6 +151,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
                 self.props['FilterData'] = self.toTuple({
                     'rootFamily': self.rootFamily,
                     'layoutMaxDepth': self.layoutMax,
+                    'nodeLabelImage': self.nodeLabelImage
                 })
             return ret
         except:
