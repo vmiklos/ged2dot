@@ -19,6 +19,54 @@ image::test/screenshot.png[]
 
 (But the tool can be easily extended to support other scenarios as well.)
 
+== LibreOffice Draw GEDCOM import filter
+
+The `libreoffice/` subdirectory contains a LibreOffice extension, that
+implements a GEDCOM import filter for Draw. Needless to say, it uses `ged2dot`
+internally. :-)
+
+Its dependencies:
+
+- It uses Graphviz to transfer the `dot` format into SVG. In case
+you don't have Graphviz installed:
+
+  * For Windows, http://www.graphviz.org/Download_windows.php[get it here] (2.34 is tested).
+
+  * For Linux, use your package manager to install the `graphviz` package (2.28 is tested).
+
+- We depend on LibreOffice >= 4.2 RC1 because
+  https://bugs.freedesktop.org/show_bug.cgi?id=39206[fdo#39206] is not fixed in
+  earlier versions.
+
+More on how to to install a LibreOffice extension
+https://wiki.documentfoundation.org/Documentation/HowTo/install_extension[here].
+
+Once that's done, you'll see something like this if you open a GEDCOM file:
+
+image::libreoffice/screenshot.png[]
+
+== Bugs
+
+For `ged2dot`, in case a given input results in a runtime crash, please open
+https://github.com/vmiklos/ged2dot/issues/new[a new issue] on GitHub, including
+an URL to your input.
+
+For the LibreOffice extension, in case you get an error during opening:
+
+- For Windows, the log file location is something like:
+
+----
+C:/Users/John/Application Data/LibreOffice/4/user/Scripts/python/log.txt
+----
+
+- For Linux, start LibreOffice from a terminal, the log is printed to the
+  standard error.
+
+In both cases, please open a new issue, including the log contents in addition
+to the input.
+
+== Icons
+
 Icons are from
 http://www.wpzoom.com/wpzoom/new-freebie-wpzoom-developer-icon-set-154-free-icons/[WPZOOM],
 in case placeholders have to be used for missing images.

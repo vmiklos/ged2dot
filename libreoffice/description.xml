@@ -13,7 +13,6 @@
     <name xlink:href="http://github.com/vmiklos/ged2dot">Miklos Vajna</name>
   </publisher>
   <dependencies xmlns:d="http://openoffice.org/extensions/description/2006" xmlns:l="http://libreoffice.org/extensions/description/2011">
-    <!-- We depend on >= 4.2 RC1 because fdo#39206 is not fixed in earlier versions. -->
     <l:LibreOffice-minimal-version value="4.2" d:name="LibreOffice 4.2"/>
   </dependencies>
 </description>
