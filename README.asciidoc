@@ -28,8 +28,8 @@ that you can hand-edit the resulting layout in Draw, if you want.
 
 Its dependencies:
 
-- It uses Graphviz to transfer the `dot` format into SVG. In case
-you don't have Graphviz installed:
+- It uses Graphviz to process the `dot` format. In case you don't have Graphviz
+  installed:
 
   * For Windows, http://www.graphviz.org/Download_windows.php[get it here] (2.34 is tested).
 
@@ -38,6 +38,17 @@ you don't have Graphviz installed:
 - We depend on LibreOffice >= 4.2 RC1 because
   https://bugs.freedesktop.org/show_bug.cgi?id=39206[fdo#39206] is not fixed in
   earlier versions.
+
+Features:
+
+- Filter detection: you can use File -> Open and select a GEDCOM file, and
+  it'll be opened in Draw automatically.
+- Import options: On import, a graphical dialog can be used to set a subset of
+  the options available in a `ged2dotrc`.
+- Internally reuses the excellent SVG import filter of LibreOffice, contributed
+  by Fridrich Strba and Thorsten Behrens, so the result can be manually
+  fine-tuned if necessary.
+- Runs on Windows and Linux.
 
 More on how to to install a LibreOffice extension
 https://wiki.documentfoundation.org/Documentation/HowTo/install_extension[here].
