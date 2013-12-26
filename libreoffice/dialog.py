@@ -6,7 +6,6 @@
 #
 
 import sys
-import traceback
 
 import ged2dot
 import base
@@ -123,13 +122,13 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         try:
             return self.toTuple(self.props)
         except:
-            traceback.print_exc(file=sys.stderr)
+            self.printTraceback()
 
     def setPropertyValues(self, props):
         try:
             self.props = self.toDict(props)
         except:
-            traceback.print_exc(file=sys.stderr)
+            self.printTraceback()
 
     # XExecutableDialog
     def setTitle(self, title):
@@ -147,7 +146,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
                 })
             return ret
         except:
-            traceback.print_exc(file=sys.stderr)
+            self.printTraceback()
             return ExecutableDialogResults_CANCEL
 
     # XImporter

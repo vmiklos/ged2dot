@@ -8,7 +8,6 @@
 import io
 import subprocess
 import sys
-import traceback
 
 import uno
 import unohelper
@@ -94,7 +93,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
             xFilter.filter((value,))
             return True
         except:
-            traceback.print_exc(file=sys.stderr)
+            self.printTraceback()
             return False
 
     # XImporter
@@ -109,7 +108,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
                 dict["TypeName"] = GedcomImport.type
                 return GedcomImport.type, self.toTuple(dict)
         except:
-            traceback.print_exc(file=sys.stderr)
+            self.printTraceback()
         return ""
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

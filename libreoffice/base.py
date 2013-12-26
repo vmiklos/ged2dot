@@ -5,7 +5,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+import os
+import sys
+import traceback
 from com.sun.star.beans import PropertyValue
+import uno
 
 
 class GedcomBase(object):
@@ -29,5 +33,19 @@ class GedcomBase(object):
             value.Value = v
             ret.append(value)
         return tuple(ret)
+
+    def printTraceback(self):
+        if sys.platform.startswith("linux"):
+            traceback.print_exc(file=sys.stderr)
+        elif sys.platform.startswith("win"):
+            xPathSubstitution = self.context.ServiceManager.createInstance("com.sun.star.util.PathSubstitution")
+            user = xPathSubstitution.getSubstituteVariableValue("user")
+            path = uno.fileUrlToSystemPath(user + "/Scripts/python/log.txt")
+            dir = os.path.dirname(path)
+            if not os.path.exists(dir):
+                os.makedirs(dir)
+            sock = open(path, "a")
+            traceback.print_exc(file=sock)
+            sock.close()
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
