@@ -5,7 +5,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+import glob
 import io
+import os
 import subprocess
 import sys
 
@@ -53,7 +55,15 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         dot = io.StringIO()
         model.save(dot)
 
-        graphviz = subprocess.Popen(['dot', '-Tsvg'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        if sys.platform.startswith("win"):
+            pattern = os.environ['PROGRAMFILES'] + '\\Graphviz*\\bin\\dot.exe'
+            dotPaths = glob.glob(pattern)
+            if not len(dotPaths):
+                raise Exception("No dot.exe found at '%s', please download it from <http://www.graphviz.org/Download_windows.php>." % pattern)
+            dotPath = dotPaths[-1]
+        else:
+            dotPath = "dot"
+        graphviz = subprocess.Popen([dotPath, '-Tsvg'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         dot.seek(0)
         graphviz.stdin.write(dot.read().encode('utf-8'))
         graphviz.stdin.close()
