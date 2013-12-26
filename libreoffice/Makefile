@@ -18,9 +18,9 @@ $(NAME).oxt: $(PARENTFILES_SRC) $(MYFILES) Makefile
 
 install: $(NAME).oxt
 	echo '[pkg   REM] $(NAME)'
-	$(UNOPKG_PREFIX)unopkg remove $(PACKAGE) || :
+	"$(UNOPKG_PREFIX)unopkg" remove $(PACKAGE) || :
 	echo '[pkg   ADD] $(NAME)'
-	$(UNOPKG_PREFIX)unopkg add -s $(NAME).oxt
+	"$(UNOPKG_PREFIX)unopkg" add -s $(NAME).oxt
 
 .PHONY : install
 

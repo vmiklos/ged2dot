@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ "$(uname -s)" == "Linux" ]; then
+	make -s install UNOPKG_PREFIX=$HOME/git/libreoffice/lo42/opt/libreoffice4.2/program/
+else
+	make -s install UNOPKG_PREFIX="/cygdrive/c/Program Files/LibreOffice 4/program/"
+fi
