@@ -23,7 +23,8 @@ image::test/screenshot.png[]
 
 The `libreoffice/` subdirectory contains a LibreOffice extension, that
 implements a GEDCOM import filter for Draw. Needless to say, it uses `ged2dot`
-internally. :-)
+internally -- think of it as a GUI for `ged2dot`, with the additional benefit
+that you can hand-edit the resulting layout in Draw, if you want.
 
 Its dependencies:
 
