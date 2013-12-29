@@ -81,9 +81,13 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
 
     def __detect(self, xInputStream):
         bytes = uno.ByteSequence('')
-        magic = "0 HEAD"
-        read, bytes = xInputStream.readBytes(bytes, len(magic))
-        return bytes.value.decode('utf-8') == magic
+        # Input with and without UTF-8 BOM is OK.
+        for i in ["0 HEAD", "\ufeff0 HEAD"]:
+            xInputStream.seek(0)
+            read, bytes = xInputStream.readBytes(bytes, len(i.encode('utf-8')))
+            if bytes.value.decode('utf-8') == i:
+                return True
+        return False
 
     # XFilter
     def filter(self, props):
