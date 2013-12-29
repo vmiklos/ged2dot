@@ -591,7 +591,13 @@ class GedcomImport:
         for i in self.inf.readlines():
             line = i.strip()
             tokens = line.split(' ')
-            level = int(tokens[0])
+
+            firstToken = tokens[0]
+            # Ignore UTF-8 BOM, if there is one at the begining of the line.
+            if firstToken.startswith("\ufeff"):
+                firstToken = firstToken[1:]
+
+            level = int(firstToken)
             rest = " ".join(tokens[1:])
             if level == 0:
                 if self.indi:

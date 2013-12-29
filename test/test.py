@@ -37,6 +37,16 @@ class Test(unittest.TestCase):
         }
         self.convert('hello', configDict)
 
+    def test_bom(self):
+        # Parser failed as the input file had a leading BOM.
+        configDict = {
+            'ged2dot': {
+                'input': 'bom.ged',
+                'rootFamily': 'F1'
+            }
+        }
+        self.convert('bom', configDict)
+
     def test_noyeardate(self):
         configDict = {
             'ged2dot': {
