@@ -518,6 +518,9 @@ class Layout:
 
         subgraph = self.getSubgraph("Depth%s" % depth)
         prevParent = subgraph.getPrevOf(family.husb)
+        if not prevParent:
+            # TODO: handle cousins in this case
+            return
         lastChild = prevParent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
