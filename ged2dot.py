@@ -596,6 +596,34 @@ class Layout:
                 self.__addSiblingChildren(f)
 
 
+class DescendantsLayout(Layout):
+    """A layout that shows all descendants of a root family."""
+    def filterFamilies(self):
+        self.filteredFamilies = [self.model.getFamily(self.model.config.rootFamily)]
+
+        depth = 0
+        pendings = [self.model.getFamily(self.model.config.rootFamily)]
+        while depth < self.model.config.layoutMaxDepth:
+            nextPendings = []
+            for pending in pendings:
+                for indi in pending.chil:
+                    indiFamily = self.model.getIndividual(indi).fams
+                    if indiFamily:
+                        indiFamily.depth = depth + 1
+                        self.filteredFamilies.append(indiFamily)
+                        nextPendings.append(indiFamily)
+            pendings = nextPendings
+            depth += 1
+
+    def calc(self):
+        self.filterFamilies()
+
+        pendingChildNodes = []
+        for depth in range(self.model.config.layoutMaxDepth + 1):
+            pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes, descendants=True)
+            self.buildConnectorSubgraph(depth)
+
+
 # Import filter
 
 class GedcomImport:

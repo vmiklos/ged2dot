@@ -9,15 +9,15 @@ families to graph edges, then `dot` takes care of the rest. What's unique about
 `ged2dot` is that it allows more than showing ancestors and descendants of a
 single individual (what you can easily do with random family editor software).
 
-== Scenarios
+== Layouts
 
-Currently it allows to show ancestors of a family (both husband and wife), and
-you can set how many generations do you want to see, and also for how many
-generations you want to include sibling families as well:
+- The default layout allows to show ancestors of a family (both husband and
+wife), and you can set how many generations do you want to see:
 
 image::test/screenshot.png[]
 
-(But the tool can be easily extended to support other scenarios as well.)
+- There is also a `Descendants` layout, that shows all descendants of a root
+  family.
 
 == LibreOffice Draw GEDCOM import filter
 
