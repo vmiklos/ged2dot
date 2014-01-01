@@ -398,7 +398,7 @@ class Layout:
 
         return siblingFamilies
 
-    def __buildSubgraph(self, depth, pendingChildNodes):
+    def __buildSubgraph(self, depth, pendingChildNodes, descendants=False):
         """Builds a subgraph, that contains the real nodes for a generation.
         This consists of:
 
@@ -429,7 +429,16 @@ class Layout:
             for child in family.chil:
                 pendingChildNodes.append(self.model.getIndividual(child).getNode(self.out))
                 if prevChil:
-                    pendingChildNodes.append(self.makeEdge(prevChil, child, invisible=True))
+                    # In case child is female and has a husb, then link prevChild to husb, not to child.
+                    handled = False
+                    childIndi = self.model.getIndividual(child)
+                    if descendants and childIndi.sex == 'F':
+                        childFamily = childIndi.fams
+                        if childFamily and childFamily.husb:
+                            pendingChildNodes.append(self.makeEdge(prevChil, childFamily.husb.id, invisible=True))
+                            handled = True
+                    if not handled:
+                        pendingChildNodes.append(self.makeEdge(prevChil, child, invisible=True))
                 prevChil = child
                 pendingChildrenDeps.append(self.makeEdge("%sConnect" % child, child, comment=self.model.getIndividual(child).getFullName()))
         subgraph.end()
