@@ -330,7 +330,8 @@ class Marriage:
 
 
 class Layout:
-    """Generates the graphviz digraph, contains subgraphs."""
+    """Generates the graphviz digraph, contains subgraphs.
+    The stock layout shows ancestors of a root family."""
     def __init__(self, model, out):
         self.model = model
         self.out = out
@@ -355,7 +356,7 @@ class Layout:
     def makeEdge(self, fro, to, invisible=False, comment=None):
         return Edge(self.model, fro, to, invisible=invisible, comment=comment)
 
-    def __filterFamilies(self):
+    def filterFamilies(self):
         """Iterate over all families, find out directly interesting and sibling
         families. Populates filteredFamilies, returns sibling ones."""
 
@@ -398,7 +399,7 @@ class Layout:
 
         return siblingFamilies
 
-    def __buildSubgraph(self, depth, pendingChildNodes, descendants=False):
+    def buildSubgraph(self, depth, pendingChildNodes, descendants=False):
         """Builds a subgraph, that contains the real nodes for a generation.
         This consists of:
 
@@ -447,8 +448,8 @@ class Layout:
         self.append(subgraph)
         return pendingChildNodes
 
-    def __buildConnectorSubgraph(self, depth):
-        """Does the same as __buildSubgraph(), but deals with connector nodes."""
+    def buildConnectorSubgraph(self, depth):
+        """Does the same as buildSubgraph(), but deals with connector nodes."""
         subgraph = Subgraph("Depth%sConnects" % depth, self.model)
         pendingDeps = []
         prevChild = None
@@ -569,14 +570,14 @@ class Layout:
         defined, the exact positions and sizes are still determined by
         graphviz."""
 
-        siblingFamilies = self.__filterFamilies()
+        siblingFamilies = self.filterFamilies()
 
         pendingChildNodes = []  # Children from generation N are nodes in the N+1th generation.
         for depth in reversed(list(range(self.model.config.layoutMaxDepth + 1))):
             # Draw two subgraphs for each generation. The first contains the real nodes.
-            pendingChildNodes = self.__buildSubgraph(depth, pendingChildNodes)
+            pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes)
             # The other contains the connector nodes.
-            self.__buildConnectorSubgraph(depth)
+            self.buildConnectorSubgraph(depth)
 
         # Now add the side-families.
         for f in siblingFamilies:
