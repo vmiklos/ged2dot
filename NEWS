@@ -1,0 +1,6 @@
+VERSION         DESCRIPTION
+-----------------------------------------------------------------------------
+0.3           - Handle UTF-8 BOM at the begining of .ged files
+              - Fixed layout crash on missing previous parent
+0.2           - Initial LibreOffice extension
+0.1           - Initial release
