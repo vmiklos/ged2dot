@@ -27,6 +27,7 @@ class Test(unittest.TestCase):
         sock = open("%s.dot" % name, "w")
         model.save(sock)
         sock.close()
+        return model
 
     def test_hello(self):
         configDict = {
@@ -36,6 +37,17 @@ class Test(unittest.TestCase):
             }
         }
         self.convert('hello', configDict)
+
+    def test_partialname(self):
+        configDict = {
+            'ged2dot': {
+                'input': 'partial-name.ged',
+                'rootFamily': 'F1'
+            }
+        }
+        model = self.convert('partial-name', configDict)
+        indi = model.getIndividual("P48")
+        assert(not "None" in indi.getLabel(sys.stdout))
 
     def test_husbcousin(self):
         # Layout failed when handling cousins on the left edge of the layout.

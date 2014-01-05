@@ -50,9 +50,17 @@ class Individual:
         return "%s %s" % (self.forename, self.surname)
 
     def getLabel(self, out):
+        if self.forename:
+            forename = self.forename
+        else:
+            forename = ""
+        if self.surname:
+            surname = self.surname
+        else:
+            surname = ""
         path = self.model.config.imageFormat % {
-            'forename': self.forename,
-            'surname': self.surname,
+            'forename': forename,
+            'surname': surname,
             'birt': self.birt
         }
         fullpath = os.path.join(self.model.basedir, path)
@@ -90,8 +98,8 @@ class Individual:
         else:
             return format % {
                 'picture': picture,
-                'surname': self.surname,
-                'forename': self.forename,
+                'surname': surname,
+                'forename': forename,
                 'birt': self.birt,
                 'deat': self.deat
             }
