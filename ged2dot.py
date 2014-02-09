@@ -230,6 +230,9 @@ class Model:
         layout.calc()
         layout.render()
 
+    def escape(self, s):
+        return s.replace("-", "_")
+
 
 # Layout (view)
 
@@ -423,7 +426,7 @@ class Layout:
         2) Pending children from the previous generation.
 
         Returns pending children for the next subgraph."""
-        subgraph = Subgraph("Depth%s" % depth, self.model)
+        subgraph = Subgraph(self.model.escape("Depth%s" % depth), self.model)
         for child in pendingChildNodes:
             subgraph.append(child)
         pendingChildNodes = []
@@ -466,7 +469,7 @@ class Layout:
 
     def buildConnectorSubgraph(self, depth):
         """Does the same as buildSubgraph(), but deals with connector nodes."""
-        subgraph = Subgraph("Depth%sConnects" % depth, self.model)
+        subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)
         pendingDeps = []
         prevChild = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
@@ -509,7 +512,7 @@ class Layout:
     def __addSiblingSpouses(self, family):
         """Add husb and wife from a family to the layout."""
         depth = family.depth
-        subgraph = self.getSubgraph("Depth%s" % depth)
+        subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
         existingIndi, existingPos = subgraph.findFamily(family)
         newIndi = None
         if family.wife and existingIndi == family.wife.id:
@@ -542,7 +545,7 @@ class Layout:
         if depth > self.model.config.layoutMaxSiblingFamilyDepth:
             return
 
-        subgraph = self.getSubgraph("Depth%s" % depth)
+        subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
         prevParent = subgraph.getPrevOf(family.husb)
         if not prevParent:
             # TODO: handle cousins in this case
@@ -550,7 +553,7 @@ class Layout:
         lastChild = prevParent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
-        subgraphConnect = self.getSubgraph("Depth%sConnects" % depth)
+        subgraphConnect = self.getSubgraph(self.model.escape("Depth%sConnects" % depth))
 
         marriage = Marriage(family)
         subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))
@@ -573,7 +576,7 @@ class Layout:
             prevChild = c
 
         # Then, add the real nodes.
-        subgraphChild = self.getSubgraph("Depth%s" % (depth - 1))
+        subgraphChild = self.getSubgraph(self.model.escape("Depth%s" % (depth - 1)))
         prevChild = lastChild
         for c in family.chil:
             subgraphChild.prepend(self.makeEdge(prevChild, c, invisible=True))
