@@ -7,7 +7,7 @@ VERSION = $(shell git describe)
 OXT = $(NAME)-$(VERSION).oxt
 PACKAGE = hu.vmiklos.libreoffice.Draw.GedcomImportFilter
 
-PARENTFILES = inlineize.py ged2dot.py placeholder-m.png placeholder-f.png
+PARENTFILES = inlineize.py ged2dot.py placeholder-m.png placeholder-f.png placeholder-u.png
 MYFILES = loader.py base.py filter.py dialog.py Config.xcs Config.xcu Filter.xcu Type.xcu description.xml META-INF/manifest.xml
 
 PARENTFILES_SRC = $(foreach FILE,$(PARENTFILES),../$(FILE))

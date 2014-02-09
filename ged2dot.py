@@ -105,7 +105,7 @@ class Individual:
             }
 
     def getColor(self):
-        return {'M': 'blue', 'F': 'pink'}[self.sex]
+        return {'M': 'blue', 'F': 'pink', 'U': 'black'}[self.sex]
 
     def getNode(self, out):
         return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(out), self.getColor()))
