@@ -592,7 +592,7 @@ class Layout:
         siblingFamilies = self.filterFamilies()
 
         pendingChildNodes = []  # Children from generation N are nodes in the N+1th generation.
-        for depth in reversed(list(range(self.model.config.layoutMaxDepth + 1))):
+        for depth in reversed(list(range(-1, self.model.config.layoutMaxDepth + 1))):
             # Draw two subgraphs for each generation. The first contains the real nodes.
             pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes)
             # The other contains the connector nodes.
