@@ -35,6 +35,8 @@ Its dependencies:
 
   * For Linux, use your package manager to install the `graphviz` package (2.28 is tested).
 
+  * For Mac, http://www.graphviz.org/Download_macos.php[get it here] (2.36 is tested).
+
 - We depend on LibreOffice >= 4.2 RC1 because
   https://bugs.freedesktop.org/show_bug.cgi?id=39206[fdo#39206] is not fixed in
   earlier versions.
@@ -75,6 +77,15 @@ C:/Users/John/Application Data/LibreOffice/4/user/Scripts/python/log.txt
 
 - For Linux, start LibreOffice from a terminal, the log is printed to the
   standard error.
+
+- For Mac, start LibreOffice from Terminal:
+
+----
+cd /Applications/LibreOffice.app/Contents/program
+./soffice --nologo /path/to/test.ged
+----
+
+then the log is printed to the standard error as well.
 
 In both cases, please open a new issue, including the log contents in addition
 to the input.
