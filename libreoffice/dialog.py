@@ -92,7 +92,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         xDialogModel.Title = "GEDCOM Import"
 
         # Then the model of the controls.
-         self.__createControl(xDialogModel, type="FixedText", id="ftRootFamily", tabIndex=0, left=10, top=10, width=100, height=10, value="Root family")
+        self.__createControl(xDialogModel, type="FixedText", id="ftRootFamily", tabIndex=0, left=10, top=10, width=100, height=10, value="Root family")
         lbRootFamily = self.__createControl(xDialogModel, type="ListBox", id="lbRootFamily", tabIndex=1, left=120, top=10, width=100, height=10)
         self.__createControl(xDialogModel, type="FixedText", id="ftLayoutMax", tabIndex=2, left=10, top=30, width=100, height=10, value="Number of generations to show")
         nfLayoutMax = self.__createControl(xDialogModel, type="NumericField", id="nfLayoutMax", tabIndex=3, left=120, top=30, width=100, height=10)
