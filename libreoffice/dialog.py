@@ -92,14 +92,14 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         xDialogModel.Title = "GEDCOM Import"
 
         # Then the model of the controls.
-        ftRootFamily = self.__createControl(xDialogModel, type="FixedText", id="ftRootFamily", tabIndex=0, left=10, top=10, width=100, height=10, value="Root family")
+         self.__createControl(xDialogModel, type="FixedText", id="ftRootFamily", tabIndex=0, left=10, top=10, width=100, height=10, value="Root family")
         lbRootFamily = self.__createControl(xDialogModel, type="ListBox", id="lbRootFamily", tabIndex=1, left=120, top=10, width=100, height=10)
-        ftLayoutMax = self.__createControl(xDialogModel, type="FixedText", id="ftLayoutMax", tabIndex=2, left=10, top=30, width=100, height=10, value="Number of generations to show")
+        self.__createControl(xDialogModel, type="FixedText", id="ftLayoutMax", tabIndex=2, left=10, top=30, width=100, height=10, value="Number of generations to show")
         nfLayoutMax = self.__createControl(xDialogModel, type="NumericField", id="nfLayoutMax", tabIndex=3, left=120, top=30, width=100, height=10)
-        ftNameOrder = self.__createControl(xDialogModel, type="FixedText", id="ftNameOrder", tabIndex=4, left=10, top=50, width=100, height=10, value="Name order")
+        self.__createControl(xDialogModel, type="FixedText", id="ftNameOrder", tabIndex=4, left=10, top=50, width=100, height=10, value="Name order")
         cbNameOrder = self.__createControl(xDialogModel, type="CheckBox", id="cbNameOrder", tabIndex=5, left=120, top=50, width=100, height=10, value="Forename first")
-        btnOk = self.__createControl(xDialogModel, type="Button", id="btnOk", tabIndex=6, left=110, top=70, width=50, height=10, buttonType=PushButtonType_OK)
-        btnCancel = self.__createControl(xDialogModel, type="Button", id="btnCancel", tabIndex=7, left=170, top=70, width=50, height=10, buttonType=PushButtonType_CANCEL)
+        self.__createControl(xDialogModel, type="Button", id="btnOk", tabIndex=6, left=110, top=70, width=50, height=10, buttonType=PushButtonType_OK)
+        self.__createControl(xDialogModel, type="Button", id="btnCancel", tabIndex=7, left=170, top=70, width=50, height=10, buttonType=PushButtonType_CANCEL)
 
         # Finally show the dialog.
         xDialog = self.createUnoService("awt.UnoControlDialog")
