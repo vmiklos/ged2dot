@@ -342,7 +342,6 @@ class Marriage:
         return "%sAnd%s" % (self.family.getHusb().id, self.family.getWife().id)
 
     def getNode(self):
-        model = self.family.model
         husb = self.family.getHusb().getFullName()
         wife = self.family.getWife().getFullName()
         return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))
