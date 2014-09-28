@@ -341,7 +341,7 @@ class Marriage:
     def getName(self):
         return "%sAnd%s" % (self.family.getHusb().id, self.family.getWife().id)
 
-    def getNode(self, out):
+    def getNode(self):
         model = self.family.model
         husb = self.family.getHusb().getFullName()
         wife = self.family.getWife().getFullName()
@@ -443,7 +443,7 @@ class Layout:
             subgraph.append(wife.getNode(self.out))
             prevWife = family.wife
             marriage = Marriage(family)
-            subgraph.append(marriage.getNode(self.out))
+            subgraph.append(marriage.getNode())
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
             subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
             for child in family.chil:
@@ -533,7 +533,7 @@ class Layout:
         subgraph.elements.insert(existingPos, newIndi.getNode(self.out))
 
         marriage = Marriage(family)
-        subgraph.elements.insert(existingPos, marriage.getNode(self.out))
+        subgraph.elements.insert(existingPos, marriage.getNode())
 
         subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
         subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
