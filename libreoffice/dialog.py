@@ -5,8 +5,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-import sys
-
 import ged2dot
 import base
 
@@ -18,7 +16,6 @@ from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as Executable
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK as ExecutableDialogResults_OK
 from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK
 from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL
-from com.sun.star.beans import PropertyValue
 
 
 class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):

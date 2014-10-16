@@ -1,6 +1,6 @@
 #!/bin/sh
 if [ "$(uname -s)" == "Linux" ]; then
-	make -s install UNOPKG_PREFIX=$HOME/git/libreoffice/lo42/opt/libreoffice4.2/program/
+	make -s install UNOPKG_PREFIX=$HOME/git/libreoffice/lo43/opt/libreoffice4.3/program/
 elif [ "$(uname -s)" == "Darwin" ]; then
 	make -s install UNOPKG_PREFIX=/Applications/LibreOffice.app/Contents/MacOS/
 else
