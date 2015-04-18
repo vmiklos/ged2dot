@@ -567,7 +567,7 @@ class Layout:
 
         prevChild = lastChild
         for c in children:
-            if not prevChild in children:
+            if prevChild not in children:
                 subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c, invisible=True))
             else:
                 subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c))
@@ -668,7 +668,7 @@ class GedcomImport:
 
                 if rest.startswith("@") and rest.endswith("INDI"):
                     id = rest[1:-6]
-                    if not id in self.model.config.indiBlacklist:
+                    if id not in self.model.config.indiBlacklist:
                         self.indi = Individual(self.model)
                         self.indi.id = rest[1:-6]
                 elif rest.startswith("@") and rest.endswith("FAM"):
@@ -705,7 +705,7 @@ class GedcomImport:
                     self.family.wife = rest[6:-1]
                 elif rest.startswith("CHIL") and self.family:
                     id = rest[6:-1]
-                    if not id in self.model.config.indiBlacklist:
+                    if id not in self.model.config.indiBlacklist:
                         self.family.chil.append(rest[6:-1])
 
             elif level == 2:
