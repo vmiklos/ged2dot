@@ -3,3 +3,5 @@
 *.png
 __pycache__
 images
+ged2dotrc
+test.ged
