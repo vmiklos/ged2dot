@@ -9,6 +9,7 @@ import time
 import os
 import sys
 import configparser
+import codecs
 from functools import cmp_to_key
 
 
@@ -63,7 +64,11 @@ class Individual:
             'surname': surname,
             'birt': self.birt
         }
-        fullpath = os.path.join(self.model.basedir, path)
+        try:
+            fullpath = os.path.join(self.model.basedir, path)
+        except (UnicodeDecodeError) as ude:
+            sys.stderr.write("Wrong encoding? %s\n" % str(ude))
+            fullpath = ""
         if os.path.exists(fullpath) and not self.model.config.anonMode:
             picture = fullpath
         else:
@@ -549,6 +554,9 @@ class Layout:
         if not prevParent:
             # TODO: handle cousins in this case
             return
+        if len(prevParent.fams.chil) == 0:
+            sys.stderr.write("prevParent.fams.chil should not be empty?\n")
+            return
         lastChild = prevParent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
@@ -648,7 +656,7 @@ class GedcomImport:
 
     def load(self):
         for i in self.inf.readlines():
-            line = i.strip()
+            line = i.strip().decode(self.model.config.inputEncoding)
             tokens = line.split(' ')
 
             firstToken = tokens[0]
@@ -775,10 +783,15 @@ class Config:
         # Example: "P526, P525"
         self.indiBlacklist = self.get('indiBlacklist', '').split(', ')
         self.layout = self.get('layout', '')
+        #encoding of the gedcom file
+        #example "UTF-8" or "ISO 8859-15"
+        self.inputEncoding = self.get('inputEncoding','UTF-8')
+        #encoding of the output file
+        #should be UTF-8 for dot-files
+        self.outputEncoding = self.get('outputEncoding','UTF-8')
 
     def get(self, what, fallback=configparser._UNSET):
         return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
-
 
 def main():
     try:
@@ -790,6 +803,7 @@ def main():
         sys.exit(1)
     model = Model(config)
     model.load(config.input)
+    sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
     model.save(sys.stdout)
 
 if __name__ == "__main__":
