@@ -734,10 +734,60 @@ class Config:
     nodeLabelImageSwappedDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
 
     def __init__(self, configDict):
+        self.configDict = configDict
+        self.configOptions=()
+        # (name, type, default, description)
+        self.configOptions+=(('input','str',"input.ged","Input filename (GEDCOM file)"),)
+        self.configOptions+=(('rootFamily','str',Config.rootFamilyDefault,"Starting from family with this identifier"),)
+
+        self.configOptions+=(('considerAgeDead','int',"120","Consider someone dead at this age: put a question mark if death date is missing."),)
+        self.configOptions+=(('anonMode','bool','False',"Anonymous mode: avoid any kind of sensitive data in the output."),)
+        self.configOptions+=(('images','bool','True',"Should the output contain images?"),)
+        self.configOptions+=(('imageFormat','str','images/%(forename)s %(surname)s %(birt)s.jpg',
+"""If images is True: format of the image paths.
+Possible variables: %(forename)s, %(surname)s and %(birt)s."""),)
+
+
+        self.configOptions+=(('nodeLabelImage','str',Config.nodeLabelImageDefault,
+"""If images is True: label text of nodes.
+Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),)
+
+        self.configOptions+=(('nodeLabelPlain','str','"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"',
+"""If images is False: label text of nodes.
+Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),)
+
+        
+        self.configOptions+=(('edgeInvisibleRed', 'bool', 'False', "Invisible edges: red for debugging or really invisible?"),)
+        self.configOptions+=(('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),)
+        self.configOptions+=(('layoutMaxDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations to show."),)
+
+        # TODO: implement 'parameter-copy' Default: same as layoutMaxDepth
+        self.configOptions+=(('layoutMaxSiblingDepth','int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),)
+        self.configOptions+=(('layoutMaxSiblingFamilyDepth','int','1',
+"""Number of anchester generations, where also sibling families are shown.
+It's 1 by default, as values >= 2 causes edges to overlap each other in general."""),)
+
+
+        self.configOptions+=(('indiBlacklist','str','',
+"""Comma-sepated list of individual ID's to hide from the output for debugging.
+Example: \"P526, P525\""""),)
+
+        self.configOptions+=(('layout','str','',"Currently supported: \"\" or Descendants"),)
+
+        self.configOptions+=(('inputEncoding','str','UTF-8',
+"""encoding of the gedcom 
+example \"UTF-8\" or \"ISO 8859-15\""""),)
+
+
+        self.configOptions+=(('outputEncoding','str','UTF-8',
+"""encoding of the output file
+should be UTF-8 for dot-files"""),)
+
+    def parse(self):
         path = None
 
-        if type(configDict) == list:
-            args = configDict
+        if type(self.configDict) == list:
+            args = self.configDict
             if len(args):
                 path = args[0]
             else:
@@ -750,59 +800,46 @@ class Config:
             self.parser.read_dict(configDict)
         else:
             self.parser.read(path)
-        self.input = self.get('input')
-        # Consider someone dead at this age: put a question mark if death date is missing.
-        self.considerAgeDead = int(self.get('considerAgeDead', '120'))
-        # Anonymous mode: avoid any kind of sensitive data in the output.
-        self.anonMode = self.get('anonMode', 'False') == "True"
-        # Should the output contain images?
-        self.images = self.get('images', 'True') == "True"
-        # If images is True: format of the image paths.
-        # Possible variables: %(forename)s, %(surname)s and %(birt)s.
-        self.imageFormat = self.get('imageFormat', 'images/%(forename)s %(surname)s %(birt)s.jpg')
-        # If images is True: label text of nodes.
-        # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
-        self.nodeLabelImage = self.get('nodeLabelImage', Config.nodeLabelImageDefault)
-        # If images is False: label text of nodes.
-        # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
-        self.nodeLabelPlain = self.get('nodeLabelPlain', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"')
-        # Invisible edges: red for debugging or really invisible?
-        self.edgeInvisibleRed = self.get('edgeInvisibleRed', 'False') == "True"
-        # Visible edges: show direction for debugging?
-        self.edgeVisibleDirected = self.get('edgeVisibleDirected', 'False') == "True"
-        # Number of ancestor generations to show.
-        self.layoutMaxDepth = int(self.get('layoutMaxDepth', Config.layoutMaxDepthDefault))
-        # Number of ancestor generations, where also sibling spouses are shown.
-        # Default: same as layoutMaxDepth
-        self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth', str(self.layoutMaxDepth)))
-        # Number of anchester generations, where also sibling families are shown.
-        # It's 1 by default, as values >= 2 causes edges to overlap each other in general.
-        self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth', '1'))
-        self.rootFamily = self.get('rootFamily', Config.rootFamilyDefault)
-        # Comma-sepated list of individual ID's to hide from the output for debugging.
-        # Example: "P526, P525"
-        self.indiBlacklist = self.get('indiBlacklist', '').split(', ')
-        self.layout = self.get('layout', '')
-        #encoding of the gedcom file
-        #example "UTF-8" or "ISO 8859-15"
-        self.inputEncoding = self.get('inputEncoding','UTF-8')
-        #encoding of the output file
-        #should be UTF-8 for dot-files
-        self.outputEncoding = self.get('outputEncoding','UTF-8')
+        self.option={}
+        for entry in self.configOptions:
+            if (entry[1] == 'str'):
+                self.option[entry[0]] = self.get(entry[0], entry[2])
+            elif (entry[1] == 'int'):
+                self.option[entry[0]] = int(self.get(entry[0], entry[2]))
+            elif (entry[1] == 'bool'):
+                self.option[entry[0]] = (self.get(entry[0], entry[2]) == "True")
+    def usage(self):
+        sys.stderr.write("\n -- Sample config file below --\n")
+        sys.stderr.write("    Un-comment all options where the given default does not fit your needs\n")
+        sys.stderr.write("    and either save as \"ged2dotrc\" or provide the filename as first argument\n")
 
+        sys.stderr.write("\n--------\n")
+        sys.stderr.write("[ged2dot]\n")
+        for entry in self.configOptions:
+            for l in entry[3].split('\n'):
+                sys.stderr.write("#%s\n" % l)
+            sys.stderr.write("#type: %s\n" % entry[1])
+            sys.stderr.write("#%s = %s\n\n" % (entry[0], entry[2]))
+        sys.stderr.write("--------\n")
+    def __getattr__(self, attr):
+        return self.option[attr]
     def get(self, what, fallback=configparser._UNSET):
         return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
 
 def main():
+    config = Config(sys.argv[1:])
     try:
-        config = Config(sys.argv[1:])
+        config.parse()
     except (BaseException) as be:
         print("Configuration invalid? %s" % (str(be)))
-        print("An example configuration is in test/screenshotrc")
-        print("You could also call \"make test.dot\"")
+        config.usage()
         sys.exit(1)
     model = Model(config)
-    model.load(config.input)
+    try:
+        model.load(config.input)
+    except (BaseException) as be:
+        config.usage()
+        raise be
     sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
     model.save(sys.stdout)
 
