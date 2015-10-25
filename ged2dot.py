@@ -781,7 +781,13 @@ class Config:
 
 
 def main():
-    config = Config(sys.argv[1:])
+    try:
+        config = Config(sys.argv[1:])
+    except (BaseException) as be:
+        print("Configuration invalid? %s" % (str(be)))
+        print("An example configuration is in test/screenshotrc")
+        print("You could also call \"make test.dot\"")
+        sys.exit(1)
     model = Model(config)
     model.load(config.input)
     model.save(sys.stdout)
