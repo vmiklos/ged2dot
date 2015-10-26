@@ -211,7 +211,7 @@ class Model:
 
     def load(self, name):
         self.basedir = os.path.dirname(name)
-        inf = open(name)
+        inf = open(name,"rb")
         GedcomImport(inf, self).load()
         inf.close()
         for i in self.individuals:
@@ -745,6 +745,7 @@ class Config:
         self.configOptions+=(('images','bool','True',"Should the output contain images?"),)
         self.configOptions+=(('imageFormat','str','images/%(forename)s %(surname)s %(birt)s.jpg',
 """If images is True: format of the image paths.
+Use a path relative to \"input\" document here!
 Possible variables: %(forename)s, %(surname)s and %(birt)s."""),)
 
 
@@ -840,7 +841,8 @@ def main():
     except (BaseException) as be:
         config.usage()
         raise be
-    sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
+    if (sys.version_info[0] < 3):
+        sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
     model.save(sys.stdout)
 
 if __name__ == "__main__":
