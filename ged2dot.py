@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -70,8 +71,15 @@ class Individual:
         path = self.model.config.imageFormat % {
             'forename': forename,
             'surname': surname,
+            'gwIndex': self.model.getIndividualGeneWebIndex(self.id,self.forename, self.surname),
             'birt': self.birt
         }
+
+        if (self.model.config.imageFormatGeneweb):
+            import unicodedata
+            path = unicodedata.normalize('NFKD', path).encode('ascii','ignore').decode('ascii')
+            path = path.translate(dict({ord("-"):"_"}))
+
         try:
             fullpath = os.path.join(self.model.basedir, path)
         except (UnicodeDecodeError) as ude:
@@ -214,6 +222,13 @@ class Model:
             if i.id == id:
                 return i
 
+    def getIndividualGeneWebIndex(self, searchId, forename, surname):
+        myList = []
+        for i in self.individuals:
+            if (i.forename == forename) and (i.surname == surname):
+                myList.append(i.id)
+        myList.sort
+        return myList.index(searchId)
     def getFamily(self, id, familySet=None):
         if not familySet:
             familySet = self.families
@@ -758,12 +773,17 @@ class Config:
         self.configOptions+=(('imageFormat','str','images/%(forename)s %(surname)s %(birt)s.jpg',
 """If images is True: format of the image paths.
 Use a path relative to \"input\" document here!
-Possible variables: %(forename)s, %(surname)s and %(birt)s."""),)
+Possible variables: %(forename)s, %(surname)s, %(birt)s and %(gwIndex)s.
+where gwIndex is 0 unless there are more individuals with the same forename and surname"""),)
         self.configOptions+=(('imageFormatCase','str', '',
 """Should the filenames (from \"imageFormat\") be converted?
 Possible values: \"\" - don't convert
                  \"upper\" - convert all characters to upper case
                  \"lower\" - convert all characters to lower case (use this for geneweb export)
+"""),)
+        self.configOptions+=(('imageFormatGeneweb','bool','False',
+"""Convert some special characters in the imagefilename
+to find pictures of geneweb (also set imageFormatCase to lower for geneweb images)
 """),)
 
         self.configOptions+=(('nodeLabelImage','str',Config.nodeLabelImageDefault,
