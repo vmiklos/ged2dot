@@ -59,6 +59,14 @@ class Individual:
             surname = self.surname
         else:
             surname = ""
+
+        if (self.model.config.imageFormatCase.lower() == 'lower'):
+            forename = forename.lower()
+            surname = surname.lower()
+        elif (self.model.config.imageFormatCase.lower() == 'upper'):
+            forename = forename.upper()
+            surname = surname.upper()
+
         path = self.model.config.imageFormat % {
             'forename': forename,
             'surname': surname,
@@ -78,7 +86,11 @@ class Individual:
             from PIL import Image
             i = Image.open(picture)
             if i.size != (100, 100):
-                out.write("// warning, picture of %s has custom (not 100x100 px) size." % self.getFullName())
+                picture = "%s.tumbnail.png" % picture
+                if not os.path.exists(picture):
+                    sys.stderr.write("// Scaling picture of %s as it didn't have 100x100 px\n" % self.getFullName())
+                    i.thumbnail( (100,100), Image.ANTIALIAS)
+                    i.save(picture, "PNG")
         except ImportError:
             pass
 
@@ -747,7 +759,12 @@ class Config:
 """If images is True: format of the image paths.
 Use a path relative to \"input\" document here!
 Possible variables: %(forename)s, %(surname)s and %(birt)s."""),)
-
+        self.configOptions+=(('imageFormatCase','str', '',
+"""Should the filenames (from \"imageFormat\") be converted?
+Possible values: \"\" - don't convert
+                 \"upper\" - convert all characters to upper case
+                 \"lower\" - convert all characters to lower case (use this for geneweb export)
+"""),)
 
         self.configOptions+=(('nodeLabelImage','str',Config.nodeLabelImageDefault,
 """If images is True: label text of nodes.
@@ -808,7 +825,7 @@ should be UTF-8 for dot-files"""),)
             elif (entry[1] == 'int'):
                 self.option[entry[0]] = int(self.get(entry[0], entry[2]))
             elif (entry[1] == 'bool'):
-                self.option[entry[0]] = (self.get(entry[0], entry[2]) == "True")
+                self.option[entry[0]] = (self.get(entry[0], entry[2]).lower() == "true")
     def usage(self):
         sys.stderr.write("\n -- Sample config file below --\n")
         sys.stderr.write("    Un-comment all options where the given default does not fit your needs\n")
