@@ -1,5 +1,6 @@
 VERSION         DESCRIPTION
 -----------------------------------------------------------------------------
+0.6           - two layout fixes, tested with LibreOffice 5.1
 0.5           - pylint fixes, tested with LibreOffice 4.4
 0.4           - New 'layout = Descendants' configuration key to show
                 descendants, not ancestors of the root family.
