@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: UTF-8 -*-
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,6 +10,7 @@ import time
 import os
 import sys
 import configparser
+import codecs
 from functools import cmp_to_key
 
 
@@ -58,12 +60,31 @@ class Individual:
             surname = self.surname
         else:
             surname = ""
+
+        if (self.model.config.imageFormatCase.lower() == 'lower'):
+            forename = forename.lower()
+            surname = surname.lower()
+        elif (self.model.config.imageFormatCase.lower() == 'upper'):
+            forename = forename.upper()
+            surname = surname.upper()
+
         path = self.model.config.imageFormat % {
             'forename': forename,
             'surname': surname,
+            'gwIndex': self.model.getIndividualGeneWebIndex(self.id, self.forename, self.surname),
             'birt': self.birt
         }
-        fullpath = os.path.join(self.model.basedir, path)
+
+        if (self.model.config.imageFormatGeneweb):
+            import unicodedata
+            path = unicodedata.normalize('NFKD', path).encode('ascii', 'ignore').decode('ascii')
+            path = path.translate(dict({ord("-"): "_"}))
+
+        try:
+            fullpath = os.path.join(self.model.basedir, path)
+        except (UnicodeDecodeError) as ude:
+            sys.stderr.write("Wrong encoding? %s\n" % str(ude))
+            fullpath = ""
         if os.path.exists(fullpath) and not self.model.config.anonMode:
             picture = fullpath
         else:
@@ -73,7 +94,12 @@ class Individual:
             from PIL import Image
             i = Image.open(picture)
             if i.size != (100, 100):
-                out.write("// warning, picture of %s has custom (not 100x100 px) size." % self.getFullName())
+                picture = "%s.tumbnail.png" % picture
+                if not os.path.exists(picture):
+                    sys.stderr.write("// Scaling picture of %s as it didn't have 100x100 px\n" % self.getFullName())
+                    i.thumbnail((100, 100), Image.ANTIALIAS)
+                    i.save(picture, "PNG")
+            i.close()
         except ImportError:
             pass
 
@@ -197,6 +223,14 @@ class Model:
             if i.id == id:
                 return i
 
+    def getIndividualGeneWebIndex(self, searchId, forename, surname):
+        myList = []
+        for i in self.individuals:
+            if (i.forename == forename) and (i.surname == surname):
+                myList.append(i.id)
+        myList.sort
+        return myList.index(searchId)
+
     def getFamily(self, id, familySet=None):
         if not familySet:
             familySet = self.families
@@ -206,7 +240,7 @@ class Model:
 
     def load(self, name):
         self.basedir = os.path.dirname(name)
-        inf = open(name)
+        inf = open(name, "rb")
         GedcomImport(inf, self).load()
         inf.close()
         for i in self.individuals:
@@ -550,6 +584,11 @@ class Layout:
             # TODO: handle cousins in this case
             # TODO: handle None prevParent.fams
             return
+        if not prevParent.fams:
+            return
+        if len(prevParent.fams.chil) == 0:
+            sys.stderr.write("prevParent.fams.chil should not be empty?\n")
+            return
         lastChild = prevParent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
@@ -649,7 +688,7 @@ class GedcomImport:
 
     def load(self):
         for i in self.inf.readlines():
-            line = i.strip()
+            line = i.strip().decode(self.model.config.inputEncoding)
             tokens = line.split(' ')
 
             firstToken = tokens[0]
@@ -727,10 +766,60 @@ class Config:
     nodeLabelImageSwappedDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
 
     def __init__(self, configDict):
+        self.configDict = configDict
+        self.configOptions = ()
+        # (name, type, default, description)
+        self.configOptions += (('input', 'str', "test.ged", "Input filename (GEDCOM file)"),)
+        self.configOptions += (('rootFamily', 'str', Config.rootFamilyDefault, "Starting from family with this identifier"),)
+
+        self.configOptions += (('considerAgeDead', 'int', "120", "Consider someone dead at this age: put a question mark if death date is missing."),)
+        self.configOptions += (('anonMode', 'bool', 'False', "Anonymous mode: avoid any kind of sensitive data in the output."),)
+        self.configOptions += (('images', 'bool', 'True', "Should the output contain images?"),)
+        self.configOptions += (('imageFormat', 'str', 'images/%(forename)s %(surname)s %(birt)s.jpg', """If images is True: format of the image paths.
+Use a path relative to \"input\" document here!
+Possible variables: %(forename)s, %(surname)s, %(birt)s and %(gwIndex)s.
+where gwIndex is 0 unless there are more individuals with the same forename and surname"""),)
+        self.configOptions += (('imageFormatCase', 'str', '', """Should the filenames (from \"imageFormat\") be converted?
+Possible values: \"\" - don't convert
+                 \"upper\" - convert all characters to upper case
+                 \"lower\" - convert all characters to lower case (use this for geneweb export)
+"""),)
+        self.configOptions += (('imageFormatGeneweb', 'bool', 'False', """Convert some special characters in the imagefilename
+to find pictures of geneweb (also set imageFormatCase to lower for geneweb images)
+"""),)
+
+        self.configOptions += (('nodeLabelImage', 'str', Config.nodeLabelImageDefault, """If images is True: label text of nodes.
+Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),)
+
+        self.configOptions += (('nodeLabelPlain', 'str', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"', """If images is False: label text of nodes.
+Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),)
+
+        self.configOptions += (('edgeInvisibleRed', 'bool', 'False', "Invisible edges: red for debugging or really invisible?"),)
+        self.configOptions += (('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),)
+        self.configOptions += (('layoutMaxDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations to show."),)
+
+        # TODO: implement 'parameter-copy' Default: same as layoutMaxDepth
+        self.configOptions += (('layoutMaxSiblingDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),)
+        self.configOptions += (('layoutMaxSiblingFamilyDepth', 'int', '1', """Number of anchester generations, where also sibling families are shown.
+It's 1 by default, as values >= 2 causes edges to overlap each other in general."""),)
+
+        self.configOptions += (('indiBlacklist', 'str', '', """Comma-sepated list of individual ID's to hide from the output for debugging.
+Example: \"P526, P525\""""),)
+
+        self.configOptions += (('layout', 'str', '', "Currently supported: \"\" or Descendants"),)
+
+        self.configOptions += (('inputEncoding', 'str', 'UTF-8', """encoding of the gedcom
+example \"UTF-8\" or \"ISO 8859-15\""""),)
+
+        self.configOptions += (('outputEncoding', 'str', 'UTF-8', """encoding of the output file
+should be UTF-8 for dot-files"""),)
+        self.parse()
+
+    def parse(self):
         path = None
 
-        if type(configDict) == list:
-            args = configDict
+        if type(self.configDict) == list:
+            args = self.configDict
             if len(args):
                 path = args[0]
             else:
@@ -740,51 +829,60 @@ class Config:
 
         self.parser = configparser.RawConfigParser()
         if not path:
-            self.parser.read_dict(configDict)
+            self.parser.read_dict(self.configDict)
         else:
             self.parser.read(path)
-        self.input = self.get('input')
-        # Consider someone dead at this age: put a question mark if death date is missing.
-        self.considerAgeDead = int(self.get('considerAgeDead', '120'))
-        # Anonymous mode: avoid any kind of sensitive data in the output.
-        self.anonMode = self.get('anonMode', 'False') == "True"
-        # Should the output contain images?
-        self.images = self.get('images', 'True') == "True"
-        # If images is True: format of the image paths.
-        # Possible variables: %(forename)s, %(surname)s and %(birt)s.
-        self.imageFormat = self.get('imageFormat', 'images/%(forename)s %(surname)s %(birt)s.jpg')
-        # If images is True: label text of nodes.
-        # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
-        self.nodeLabelImage = self.get('nodeLabelImage', Config.nodeLabelImageDefault)
-        # If images is False: label text of nodes.
-        # Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s.
-        self.nodeLabelPlain = self.get('nodeLabelPlain', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"')
-        # Invisible edges: red for debugging or really invisible?
-        self.edgeInvisibleRed = self.get('edgeInvisibleRed', 'False') == "True"
-        # Visible edges: show direction for debugging?
-        self.edgeVisibleDirected = self.get('edgeVisibleDirected', 'False') == "True"
-        # Number of ancestor generations to show.
-        self.layoutMaxDepth = int(self.get('layoutMaxDepth', Config.layoutMaxDepthDefault))
-        # Number of ancestor generations, where also sibling spouses are shown.
-        # Default: same as layoutMaxDepth
-        self.layoutMaxSiblingDepth = int(self.get('layoutMaxSiblingDepth', str(self.layoutMaxDepth)))
-        # Number of anchester generations, where also sibling families are shown.
-        # It's 1 by default, as values >= 2 causes edges to overlap each other in general.
-        self.layoutMaxSiblingFamilyDepth = int(self.get('layoutMaxSiblingFamilyDepth', '1'))
-        self.rootFamily = self.get('rootFamily', Config.rootFamilyDefault)
-        # Comma-sepated list of individual ID's to hide from the output for debugging.
-        # Example: "P526, P525"
-        self.indiBlacklist = self.get('indiBlacklist', '').split(', ')
-        self.layout = self.get('layout', '')
+        self.option = {}
+        for entry in self.configOptions:
+            if (entry[1] == 'str'):
+                self.option[entry[0]] = self.get(entry[0], entry[2])
+            elif (entry[1] == 'int'):
+                self.option[entry[0]] = int(self.get(entry[0], entry[2]))
+            elif (entry[1] == 'bool'):
+                self.option[entry[0]] = (self.get(entry[0], entry[2]).lower() == "true")
+
+    def usage(self):
+        sys.stderr.write("\n -- Sample config file below --\n")
+        sys.stderr.write("    Un-comment all options where the given default does not fit your needs\n")
+        sys.stderr.write("    and either save as \"ged2dotrc\" or provide the filename as first argument\n")
+
+        sys.stderr.write("\n--------\n")
+        sys.stderr.write("[ged2dot]\n")
+        for entry in self.configOptions:
+            for l in entry[3].split('\n'):
+                sys.stderr.write("#%s\n" % l)
+            sys.stderr.write("#type: %s\n" % entry[1])
+            sys.stderr.write("#%s = %s\n\n" % (entry[0], entry[2]))
+        sys.stderr.write("--------\n")
+
+    def __getattr__(self, attr):
+        if attr in self.__dict__:
+            return self.__dict__[attr]
+        else:
+            if attr in self.__dict__["option"]:
+                return self.__dict__["option"][attr]
+            else:
+                return None
 
     def get(self, what, fallback=configparser._UNSET):
         return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
 
 
 def main():
-    config = Config(sys.argv[1:])
+    try:
+        config = Config(sys.argv[1:])
+    except (BaseException) as be:
+        print("Configuration invalid? %s" % (str(be)))
+        config.usage()
+        sys.exit(1)
     model = Model(config)
-    model.load(config.input)
+    try:
+        model.load(config.input)
+    except (BaseException) as be:
+        config.usage()
+        raise be
+    if (sys.version_info[0] < 3):
+        sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
     model.save(sys.stdout)
 
 if __name__ == "__main__":
