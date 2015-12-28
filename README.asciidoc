@@ -1,5 +1,7 @@
 = ged2dot, a GEDCOM to Graphviz converter
 
+image:https://travis-ci.org/vmiklos/ged2dot.svg?branch=master["Build Status", link="https://travis-ci.org/vmiklos/ged2dot"]
+
 == What's the problem the tool solves?
 
 `ged2dot` is a script that takes a http://en.wikipedia.org/wiki/GEDCOM[GEDCOM]
