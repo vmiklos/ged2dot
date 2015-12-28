@@ -546,7 +546,7 @@ class Layout:
 
         subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
         prevParent = subgraph.getPrevOf(family.husb)
-        if (not prevParent) or (not prevParent.fams):
+        if (not prevParent) or (not prevParent.fams) or (not len(prevParent.fams.chil)):
             # TODO: handle cousins in this case
             # TODO: handle None prevParent.fams
             return
