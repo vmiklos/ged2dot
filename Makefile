@@ -1,3 +1,5 @@
+SHELL := bash
+
 test.png: test.dot
 	dot -Tpng -o test.png test.dot
 
