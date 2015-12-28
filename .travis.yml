@@ -1,4 +1,6 @@
 language: python
 python:
   - "3.4"
+install:
+  - pip install pep8 --use-mirrors
 script: make check
