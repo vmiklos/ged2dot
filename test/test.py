@@ -8,7 +8,6 @@
 import os
 import sys
 import unittest
-sys.path.append(os.path.join(sys.path[0], ".."))
 import ged2dot
 
 

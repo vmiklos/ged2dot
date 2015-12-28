@@ -11,7 +11,7 @@ test.dot: test.ged ged2dot.py ged2dotrc Makefile
 	./ged2dot.py > test.dot
 
 check:
-	cd test && ./test.py
+	cd test && PYTHONPATH=$(PWD) ./test.py
 	pep8 ged2dot.py inlineize.py test/test.py libreoffice/{base,loader,filter,dialog}.py
 
 # In case ged2dotrc or test.dot is missing, create a copy based on the
