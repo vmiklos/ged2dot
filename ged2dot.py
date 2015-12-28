@@ -583,6 +583,8 @@ class Layout:
         if not prevParent:
             # TODO: handle cousins in this case
             return
+        if not prevParent.fams:
+            return
         if len(prevParent.fams.chil) == 0:
             sys.stderr.write("prevParent.fams.chil should not be empty?\n")
             return
