@@ -71,14 +71,14 @@ class Individual:
         path = self.model.config.imageFormat % {
             'forename': forename,
             'surname': surname,
-            'gwIndex': self.model.getIndividualGeneWebIndex(self.id,self.forename, self.surname),
+            'gwIndex': self.model.getIndividualGeneWebIndex(self.id, self.forename, self.surname),
             'birt': self.birt
         }
 
         if (self.model.config.imageFormatGeneweb):
             import unicodedata
-            path = unicodedata.normalize('NFKD', path).encode('ascii','ignore').decode('ascii')
-            path = path.translate(dict({ord("-"):"_"}))
+            path = unicodedata.normalize('NFKD', path).encode('ascii', 'ignore').decode('ascii')
+            path = path.translate(dict({ord("-"): "_"}))
 
         try:
             fullpath = os.path.join(self.model.basedir, path)
@@ -97,8 +97,9 @@ class Individual:
                 picture = "%s.tumbnail.png" % picture
                 if not os.path.exists(picture):
                     sys.stderr.write("// Scaling picture of %s as it didn't have 100x100 px\n" % self.getFullName())
-                    i.thumbnail( (100,100), Image.ANTIALIAS)
+                    i.thumbnail((100, 100), Image.ANTIALIAS)
                     i.save(picture, "PNG")
+            i.close()
         except ImportError:
             pass
 
@@ -229,6 +230,7 @@ class Model:
                 myList.append(i.id)
         myList.sort
         return myList.index(searchId)
+
     def getFamily(self, id, familySet=None):
         if not familySet:
             familySet = self.families
@@ -238,7 +240,7 @@ class Model:
 
     def load(self, name):
         self.basedir = os.path.dirname(name)
-        inf = open(name,"rb")
+        inf = open(name, "rb")
         GedcomImport(inf, self).load()
         inf.close()
         for i in self.individuals:
@@ -762,64 +764,53 @@ class Config:
 
     def __init__(self, configDict):
         self.configDict = configDict
-        self.configOptions=()
+        self.configOptions = ()
         # (name, type, default, description)
-        self.configOptions+=(('input','str',"input.ged","Input filename (GEDCOM file)"),)
-        self.configOptions+=(('rootFamily','str',Config.rootFamilyDefault,"Starting from family with this identifier"),)
+        self.configOptions += (('input', 'str', "test.ged", "Input filename (GEDCOM file)"),)
+        self.configOptions += (('rootFamily', 'str', Config.rootFamilyDefault, "Starting from family with this identifier"),)
 
-        self.configOptions+=(('considerAgeDead','int',"120","Consider someone dead at this age: put a question mark if death date is missing."),)
-        self.configOptions+=(('anonMode','bool','False',"Anonymous mode: avoid any kind of sensitive data in the output."),)
-        self.configOptions+=(('images','bool','True',"Should the output contain images?"),)
-        self.configOptions+=(('imageFormat','str','images/%(forename)s %(surname)s %(birt)s.jpg',
-"""If images is True: format of the image paths.
+        self.configOptions += (('considerAgeDead', 'int', "120", "Consider someone dead at this age: put a question mark if death date is missing."),)
+        self.configOptions += (('anonMode', 'bool', 'False', "Anonymous mode: avoid any kind of sensitive data in the output."),)
+        self.configOptions += (('images', 'bool', 'True', "Should the output contain images?"),)
+        self.configOptions += (('imageFormat', 'str', 'images/%(forename)s %(surname)s %(birt)s.jpg', """If images is True: format of the image paths.
 Use a path relative to \"input\" document here!
 Possible variables: %(forename)s, %(surname)s, %(birt)s and %(gwIndex)s.
 where gwIndex is 0 unless there are more individuals with the same forename and surname"""),)
-        self.configOptions+=(('imageFormatCase','str', '',
-"""Should the filenames (from \"imageFormat\") be converted?
+        self.configOptions += (('imageFormatCase', 'str', '', """Should the filenames (from \"imageFormat\") be converted?
 Possible values: \"\" - don't convert
                  \"upper\" - convert all characters to upper case
                  \"lower\" - convert all characters to lower case (use this for geneweb export)
 """),)
-        self.configOptions+=(('imageFormatGeneweb','bool','False',
-"""Convert some special characters in the imagefilename
+        self.configOptions += (('imageFormatGeneweb', 'bool', 'False', """Convert some special characters in the imagefilename
 to find pictures of geneweb (also set imageFormatCase to lower for geneweb images)
 """),)
 
-        self.configOptions+=(('nodeLabelImage','str',Config.nodeLabelImageDefault,
-"""If images is True: label text of nodes.
+        self.configOptions += (('nodeLabelImage', 'str', Config.nodeLabelImageDefault, """If images is True: label text of nodes.
 Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),)
 
-        self.configOptions+=(('nodeLabelPlain','str','"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"',
-"""If images is False: label text of nodes.
+        self.configOptions += (('nodeLabelPlain', 'str', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"', """If images is False: label text of nodes.
 Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),)
 
-        
-        self.configOptions+=(('edgeInvisibleRed', 'bool', 'False', "Invisible edges: red for debugging or really invisible?"),)
-        self.configOptions+=(('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),)
-        self.configOptions+=(('layoutMaxDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations to show."),)
+        self.configOptions += (('edgeInvisibleRed', 'bool', 'False', "Invisible edges: red for debugging or really invisible?"),)
+        self.configOptions += (('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),)
+        self.configOptions += (('layoutMaxDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations to show."),)
 
         # TODO: implement 'parameter-copy' Default: same as layoutMaxDepth
-        self.configOptions+=(('layoutMaxSiblingDepth','int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),)
-        self.configOptions+=(('layoutMaxSiblingFamilyDepth','int','1',
-"""Number of anchester generations, where also sibling families are shown.
+        self.configOptions += (('layoutMaxSiblingDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),)
+        self.configOptions += (('layoutMaxSiblingFamilyDepth', 'int', '1', """Number of anchester generations, where also sibling families are shown.
 It's 1 by default, as values >= 2 causes edges to overlap each other in general."""),)
 
-
-        self.configOptions+=(('indiBlacklist','str','',
-"""Comma-sepated list of individual ID's to hide from the output for debugging.
+        self.configOptions += (('indiBlacklist', 'str', '', """Comma-sepated list of individual ID's to hide from the output for debugging.
 Example: \"P526, P525\""""),)
 
-        self.configOptions+=(('layout','str','',"Currently supported: \"\" or Descendants"),)
+        self.configOptions += (('layout', 'str', '', "Currently supported: \"\" or Descendants"),)
 
-        self.configOptions+=(('inputEncoding','str','UTF-8',
-"""encoding of the gedcom 
+        self.configOptions += (('inputEncoding', 'str', 'UTF-8', """encoding of the gedcom
 example \"UTF-8\" or \"ISO 8859-15\""""),)
 
-
-        self.configOptions+=(('outputEncoding','str','UTF-8',
-"""encoding of the output file
+        self.configOptions += (('outputEncoding', 'str', 'UTF-8', """encoding of the output file
 should be UTF-8 for dot-files"""),)
+        self.parse()
 
     def parse(self):
         path = None
@@ -835,10 +826,10 @@ should be UTF-8 for dot-files"""),)
 
         self.parser = configparser.RawConfigParser()
         if not path:
-            self.parser.read_dict(configDict)
+            self.parser.read_dict(self.configDict)
         else:
             self.parser.read(path)
-        self.option={}
+        self.option = {}
         for entry in self.configOptions:
             if (entry[1] == 'str'):
                 self.option[entry[0]] = self.get(entry[0], entry[2])
@@ -846,6 +837,7 @@ should be UTF-8 for dot-files"""),)
                 self.option[entry[0]] = int(self.get(entry[0], entry[2]))
             elif (entry[1] == 'bool'):
                 self.option[entry[0]] = (self.get(entry[0], entry[2]).lower() == "true")
+
     def usage(self):
         sys.stderr.write("\n -- Sample config file below --\n")
         sys.stderr.write("    Un-comment all options where the given default does not fit your needs\n")
@@ -859,15 +851,23 @@ should be UTF-8 for dot-files"""),)
             sys.stderr.write("#type: %s\n" % entry[1])
             sys.stderr.write("#%s = %s\n\n" % (entry[0], entry[2]))
         sys.stderr.write("--------\n")
+
     def __getattr__(self, attr):
-        return self.option[attr]
+        if attr in self.__dict__:
+            return self.__dict__[attr]
+        else:
+            if attr in self.__dict__["option"]:
+                return self.__dict__["option"][attr]
+            else:
+                return None
+
     def get(self, what, fallback=configparser._UNSET):
         return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
 
+
 def main():
-    config = Config(sys.argv[1:])
     try:
-        config.parse()
+        config = Config(sys.argv[1:])
     except (BaseException) as be:
         print("Configuration invalid? %s" % (str(be)))
         config.usage()
