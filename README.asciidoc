@@ -65,9 +65,10 @@ image::libreoffice/screenshot.png[]
 
 == Bugs
 
-For `ged2dot`, in case a given input results in a runtime crash, please open
-https://github.com/vmiklos/ged2dot/issues/new[a new issue] on GitHub, including
-an URL to your input.
+For `ged2dot`, in case a given input results in a runtime crash, it's
+considered a bug. If you have a fix for it,
+https://github.com/vmiklos/ged2dot/pull/new/master[pull requests] on GitHub are
+welcome, especially if the fix comes with a test as well.
 
 For the LibreOffice extension, in case you get an error during opening:
 
@@ -88,9 +89,6 @@ cd /Applications/LibreOffice.app/Contents/program
 ----
 
 then the log is printed to the standard error as well.
-
-In both cases, please open a new issue, including the log contents in addition
-to the input.
 
 == Icons
 
