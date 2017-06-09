@@ -88,7 +88,8 @@ class Individual:
         if os.path.exists(fullpath) and not self.model.config.anonMode:
             picture = fullpath
         else:
-            picture = os.path.join(Individual.placeholderDir, "placeholder-%s.png" % self.sex.lower())
+            sex = 'u' if self.sex is None else self.sex.lower()
+            picture = os.path.join(Individual.placeholderDir, "placeholder-%s.png" % sex)
 
         try:
             from PIL import Image
@@ -131,7 +132,8 @@ class Individual:
             }
 
     def getColor(self):
-        return {'M': 'blue', 'F': 'pink', 'U': 'black'}[self.sex]
+        sex = 'U' if self.sex is None else self.sex.upper()
+        return {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
     def getNode(self, out):
         return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(out), self.getColor()))
@@ -363,7 +365,7 @@ class Subgraph:
     def getPrevOf(self, individual):
         """The passed individual follows the returned ID in this subgraph."""
         for e in self.elements:
-            if e.__class__ == Edge and e.to == individual.id:
+            if e.__class__ == Edge and hasattr(individual,'id') and e.to == individual.id:
                 return self.model.getIndividual(e.fro)
 
 
