@@ -365,7 +365,7 @@ class Subgraph:
     def getPrevOf(self, individual):
         """The passed individual follows the returned ID in this subgraph."""
         for e in self.elements:
-            if e.__class__ == Edge and hasattr(individual,'id') and e.to == individual.id:
+            if e.__class__ == Edge and hasattr(individual, 'id') and e.to == individual.id:
                 return self.model.getIndividual(e.fro)
 
 
