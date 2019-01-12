@@ -887,6 +887,7 @@ def main():
         sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
     model.save(sys.stdout)
 
+
 if __name__ == "__main__":
     main()
 

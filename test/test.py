@@ -105,6 +105,7 @@ class Test(unittest.TestCase):
     def test_screenshot(self):
         self.convert('descendants')
 
+
 if __name__ == '__main__':
     unittest.main()
 

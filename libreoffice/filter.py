@@ -107,7 +107,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
             value.Value = xInputStream
             xFilter.filter((value,))
             return True
-        except:
+        except Exception:
             self.printTraceback()
             return False
 
@@ -122,7 +122,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
             if self.__detect(dict["InputStream"]):
                 dict["TypeName"] = GedcomImport.type
                 return GedcomImport.type, self.toTuple(dict)
-        except:
+        except Exception:
             self.printTraceback()
         return ""
 

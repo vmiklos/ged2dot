@@ -118,13 +118,13 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
     def getPropertyValues(self):
         try:
             return self.toTuple(self.props)
-        except:
+        except Exception:
             self.printTraceback()
 
     def setPropertyValues(self, props):
         try:
             self.props = self.toDict(props)
-        except:
+        except Exception:
             self.printTraceback()
 
     # XExecutableDialog
@@ -142,7 +142,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
                     'nodeLabelImage': self.nodeLabelImage
                 })
             return ret
-        except:
+        except Exception:
             self.printTraceback()
             return ExecutableDialogResults_CANCEL
 

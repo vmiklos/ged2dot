@@ -37,7 +37,7 @@ try:
     g_ImplementationHelper = unohelper.ImplementationHelper()
     g_ImplementationHelper.addImplementation(dialog.GedcomDialog, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog", ("com.sun.star.ui.dialogs.FilterOptionsDialog",))
     g_ImplementationHelper.addImplementation(filter.GedcomImport, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter", ("com.sun.star.document.ImportFilter",))
-except:
+except Exception:
     traceback.print_exc(file=sys.stderr)
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

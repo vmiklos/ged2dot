@@ -2,5 +2,5 @@ language: python
 python:
   - "3.5"
 install:
-  - pip install pep8
+  - pip install pycodestyle
 script: make check
