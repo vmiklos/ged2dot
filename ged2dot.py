@@ -51,7 +51,7 @@ class Individual:
         file to ease debugging."""
         return "%s %s" % (self.forename, self.surname)
 
-    def getLabel(self, out):
+    def getLabel(self):
         if self.forename:
             forename = self.forename
         else:
@@ -135,8 +135,8 @@ class Individual:
         sex = 'U' if self.sex is None else self.sex.upper()
         return {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
-    def getNode(self, out):
-        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(out), self.getColor()))
+    def getNode(self):
+        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))
 
     def setBirt(self, birt):
         if not len(birt):
@@ -471,18 +471,18 @@ class Layout:
         prevChil = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
             husb = family.getHusb()
-            subgraph.append(husb.getNode(self.out))
+            subgraph.append(husb.getNode())
             if prevWife:
                 subgraph.append(self.makeEdge(prevWife.id, family.husb.id, invisible=True))
             wife = family.getWife()
-            subgraph.append(wife.getNode(self.out))
+            subgraph.append(wife.getNode())
             prevWife = family.wife
             marriage = Marriage(family)
             subgraph.append(marriage.getNode())
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
             subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
             for child in family.chil:
-                pendingChildNodes.append(self.model.getIndividual(child).getNode(self.out))
+                pendingChildNodes.append(self.model.getIndividual(child).getNode())
                 if prevChil:
                     # In case child is female and has a husb, then link prevChild to husb, not to child.
                     handled = False
@@ -565,7 +565,7 @@ class Layout:
                 e.fro = newIndi.id
             found = True
         assert found
-        subgraph.elements.insert(existingPos, newIndi.getNode(self.out))
+        subgraph.elements.insert(existingPos, newIndi.getNode())
 
         marriage = Marriage(family)
         subgraph.elements.insert(existingPos, marriage.getNode())
@@ -621,7 +621,7 @@ class Layout:
         prevChild = lastChild
         for c in family.chil:
             subgraphChild.prepend(self.makeEdge(prevChild, c, invisible=True))
-            subgraphChild.prepend(self.model.getIndividual(c).getNode(self.out))
+            subgraphChild.prepend(self.model.getIndividual(c).getNode())
             subgraphChild.append(self.makeEdge("%sConnect" % c, c))
             prevChild = c
 

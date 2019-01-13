@@ -6,7 +6,6 @@
 #
 
 import os
-import sys
 import unittest
 import ged2dot
 
@@ -46,7 +45,7 @@ class Test(unittest.TestCase):
         }
         model = self.convert('partial-name', configDict)
         indi = model.getIndividual("P48")
-        assert("None" not in indi.getLabel(sys.stdout))
+        assert("None" not in indi.getLabel())
 
     def test_husbcousin(self):
         # Layout failed when handling cousins on the left edge of the layout.
