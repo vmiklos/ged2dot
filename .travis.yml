@@ -1,6 +1,8 @@
+# This line can be removed as soon as latest stable Python is available in the default dist.
+dist: xenial
 language: python
 python:
-  - "3.6"
+  - "3.7"
 install:
   - pip install pycodestyle
   - pip install pylint
