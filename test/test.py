@@ -101,7 +101,7 @@ class Test(unittest.TestCase):
         # Also, this time use a config file path, to test that as well.
         self.convert('screenshot')
 
-    def test_screenshot(self):
+    def test_descendants(self):
         self.convert('descendants')
 
 
