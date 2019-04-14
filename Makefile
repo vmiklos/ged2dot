@@ -1,5 +1,5 @@
 SHELL := bash
-PYFILES := ged2dot.py inlineize.py test/test.py libreoffice/{base,loader,filter,dialog}.py
+PYFILES := ged2dot.py inlineize.py test/test.py libreoffice/base.py libreoffice/loader.py libreoffice/filter.py libreoffice/dialog.py
 
 test.png: test.dot
 	dot -Tpng -o test.png test.dot
@@ -13,7 +13,10 @@ test-noinline.svg: test.dot
 test.dot: test.ged ged2dot.py ged2dotrc Makefile
 	./ged2dot.py > test.dot
 
-check:
+%.mypy : %.py
+	mypy --strict $< && touch $@
+
+check: $(patsubst %.py,%.mypy,$(PYFILES))
 	cd test && PYTHONPATH=$(PWD) ./test.py
 	pycodestyle $(PYFILES)
 	! pylint $(PYFILES) 2>&1 | egrep -i 'unused|indent'

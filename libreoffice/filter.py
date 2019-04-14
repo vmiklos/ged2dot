@@ -11,25 +11,25 @@ import os
 import subprocess
 import sys
 
-import uno
-import unohelper
-from com.sun.star.document import XFilter
+import uno  # type: ignore
+import unohelper  # type: ignore
+from com.sun.star.document import XFilter  # type: ignore
 from com.sun.star.document import XImporter
 from com.sun.star.document import XExtendedFilterDetection
-from com.sun.star.beans import PropertyValue
+from com.sun.star.beans import PropertyValue  # type: ignore
 
 import ged2dot
 import inlineize
 import base
 
 
-class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection, base.GedcomBase):
+class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection, base.GedcomBase):  # type: ignore
     type = "draw_GEDCOM"
 
-    def __init__(self, context):
-        base.GedcomBase.__init__(self, context)
+    def __init__(self, context):  # type: ignore
+        base.GedcomBase.__init__(self, context)  # type: ignore
 
-    def __toSvg(self, ged):
+    def __toSvg(self, ged):  # type: ignore
         rootFamily = ged2dot.Config.rootFamilyDefault
         layoutMaxDepth = ged2dot.Config.layoutMaxDepthDefault
         nodeLabelImage = ged2dot.Config.nodeLabelImageDefault
@@ -49,8 +49,8 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
                 'nodeLabelImage': nodeLabelImage
             }
         }
-        config = ged2dot.Config(configDict)
-        model = ged2dot.Model(config)
+        config = ged2dot.Config(configDict)  # type: ignore
+        model = ged2dot.Model(config)  # type: ignore
         model.load(config.input)
         dot = io.StringIO()
         model.save(dot)
@@ -74,12 +74,12 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
 
         noinline.seek(0)
         inline = io.BytesIO()
-        inlineize.inlineize(noinline, inline)
+        inlineize.inlineize(noinline, inline)  # type: ignore
 
         inline.seek(0)
         return inline.read()
 
-    def __detect(self, xInputStream):
+    def __detect(self, xInputStream):  # type: ignore
         byteSequence = uno.ByteSequence(bytes())
         # Input with and without UTF-8 BOM is OK.
         for i in ["0 HEAD", "\ufeff0 HEAD"]:
@@ -91,7 +91,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         return False
 
     # XFilter
-    def filter(self, props):
+    def filter(self, props):  # type: ignore
         try:
             self.props = self.toDict(props)
             path = unohelper.fileUrlToSystemPath(self.props["URL"])
@@ -112,11 +112,11 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
             return False
 
     # XImporter
-    def setTargetDocument(self, xDstDoc):
+    def setTargetDocument(self, xDstDoc):  # type: ignore
         self.xDstDoc = xDstDoc
 
     # XExtendedFilterDetection
-    def detect(self, args):
+    def detect(self, args):  # type: ignore
         try:
             dict = self.toDict(args)
             if self.__detect(dict["InputStream"]):

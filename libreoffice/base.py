@@ -8,24 +8,24 @@
 import os
 import sys
 import traceback
-from com.sun.star.beans import PropertyValue
-import uno
+from com.sun.star.beans import PropertyValue  # type: ignore
+import uno  # type: ignore
 
 
 class GedcomBase(object):
-    def __init__(self, context):
+    def __init__(self, context):  # type: ignore
         self.context = context
 
-    def createUnoService(self, name):
+    def createUnoService(self, name):  # type: ignore
         return self.context.ServiceManager.createInstanceWithContext("com.sun.star.%s" % name, self.context)
 
-    def toDict(self, args):
+    def toDict(self, args):  # type: ignore
         ret = {}
         for i in args:
             ret[i.Name] = i.Value
         return ret
 
-    def toTuple(self, args):
+    def toTuple(self, args):  # type: ignore
         ret = []
         for k, v in args.items():
             value = PropertyValue()
@@ -34,7 +34,7 @@ class GedcomBase(object):
             ret.append(value)
         return tuple(ret)
 
-    def printTraceback(self):
+    def printTraceback(self):  # type: ignore
         if sys.platform.startswith("win"):
             xPathSubstitution = self.context.ServiceManager.createInstance("com.sun.star.util.PathSubstitution")
             user = xPathSubstitution.getSubstituteVariableValue("user")

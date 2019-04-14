@@ -25,7 +25,7 @@ class NoSuchFamilyException(Exception):
 class Individual:
     placeholderDir = os.path.dirname(os.path.realpath(__file__))
     """An individual is our basic building block, can be part of multiple families (usually two)."""
-    def __init__(self, model):
+    def __init__(self, model):  # type: ignore
         self.model = model
         self.id = None
         self.sex = None
@@ -38,20 +38,20 @@ class Individual:
         # Horizontal order is ensured by order deps. Any order dep starting from this node?
         # Set to true on first addition, so that we can avoid redundant deps.
 
-    def __str__(self):
+    def __str__(self):  # type: ignore
         return "id: %s, sex: %s, forename: %s, surname: %s: famc: %s, fams: %s, birt: %s, deat: %s" % (self.id, self.sex, self.forename, self.surname, self.famc, self.fams, self.birt, self.deat)
 
-    def resolve(self):
+    def resolve(self):  # type: ignore
         """Replaces family reference strings with references to objects."""
         self.famc = self.model.getFamily(self.famc)
         self.fams = self.model.getFamily(self.fams)
 
-    def getFullName(self):
+    def getFullName(self):  # type: ignore
         """Full name of the individual. Only used as comments in the output
         file to ease debugging."""
         return "%s %s" % (self.forename, self.surname)
 
-    def getLabel(self):
+    def getLabel(self):  # type: ignore
         if self.forename:
             forename = self.forename
         else:
@@ -92,7 +92,7 @@ class Individual:
             picture = os.path.join(Individual.placeholderDir, "placeholder-%s.png" % sex)
 
         try:
-            from PIL import Image
+            from PIL import Image  # type: ignore
             i = Image.open(picture)
             if i.size != (100, 100):
                 picture = "%s.tumbnail.png" % picture
@@ -131,14 +131,14 @@ class Individual:
                 'deat': self.deat
             }
 
-    def getColor(self):
+    def getColor(self):  # type: ignore
         sex = 'U' if self.sex is None else self.sex.upper()
         return {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
-    def getNode(self):
-        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))
+    def getNode(self):  # type: ignore
+        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))  # type: ignore
 
-    def setBirt(self, birt):
+    def setBirt(self, birt):  # type: ignore
         if not len(birt):
             return
         self.birt = birt
@@ -154,25 +154,25 @@ class Family:
     """Family has exactly one wife and husb, 0..* children."""
     phCount = 0
 
-    def __init__(self, model):
+    def __init__(self, model):  # type: ignore
         self.model = model
         self.id = None
         self.husb = None
         self.wife = None
-        self.chil = []
+        self.chil = []  # type: ignore
         self.depth = 0
 
-    def __str__(self):
+    def __str__(self):  # type: ignore
         return "id: %s, husb: %s, wife: %s, chil: %s, depth: %s" % (self.id, self.husb, self.wife, self.chil, self.depth)
 
-    def resolve(self):
+    def resolve(self):  # type: ignore
         """Replaces individual reference strings with references to objects."""
         self.husb = self.model.getIndividual(self.husb)
         self.wife = self.model.getIndividual(self.wife)
 
-    def sortChildren(self, filteredFamilies):
+    def sortChildren(self, filteredFamilies):  # type: ignore
         """Sort children, based on filtered families of the layout."""
-        def compareChildren(x, y):
+        def compareChildren(x, y):  # type: ignore
             # For now just try to produce a traditional "husb left, wife right"
             # order, ignore birth date.
             xObj = self.model.getIndividual(x)
@@ -188,11 +188,11 @@ class Family:
             return 0
         self.chil.sort(key=cmp_to_key(compareChildren))
 
-    def getHusb(self):
+    def getHusb(self):  # type: ignore
         """Same as accessing 'husb' directly, except that in case that would be
         None, a placeholder individual is created."""
         if not self.husb:
-            self.husb = Individual(self.model)
+            self.husb = Individual(self.model)  # type: ignore
             self.husb.id = "PH%d" % Family.phCount
             Family.phCount += 1
             self.husb.sex = 'M'
@@ -201,10 +201,10 @@ class Family:
             self.model.individuals.append(self.husb)
         return self.husb
 
-    def getWife(self):
+    def getWife(self):  # type: ignore
         """Same as getHusb(), but for wifes."""
         if not self.wife:
-            self.wife = Individual(self.model)
+            self.wife = Individual(self.model)  # type: ignore
             self.wife.id = "PH%d" % Family.phCount
             Family.phCount += 1
             self.wife.sex = 'F'
@@ -215,17 +215,19 @@ class Family:
 
 
 class Model:
-    def __init__(self, config):
+    def __init__(self, config):  # type: ignore
         self.config = config
-        self.individuals = []  # List of all individuals.
-        self.families = []  # List of all families.
+        # List of all individuals.
+        self.individuals = []  # type: ignore
+        # List of all families.
+        self.families = []  # type: ignore
 
-    def getIndividual(self, id):
+    def getIndividual(self, id):  # type: ignore
         for i in self.individuals:
             if i.id == id:
                 return i
 
-    def getIndividualGeneWebIndex(self, searchId, forename, surname):
+    def getIndividualGeneWebIndex(self, searchId, forename, surname):  # type: ignore
         myList = []
         for i in self.individuals:
             if (i.forename == forename) and (i.surname == surname):
@@ -233,24 +235,24 @@ class Model:
         myList.sort
         return myList.index(searchId)
 
-    def getFamily(self, id, familySet=None):
+    def getFamily(self, id, familySet=None):  # type: ignore
         if not familySet:
             familySet = self.families
         for i in familySet:
             if i.id == id:
                 return i
 
-    def load(self, name):
+    def load(self, name):  # type: ignore
         self.basedir = os.path.dirname(name)
         inf = open(name, "rb")
-        GedcomImport(inf, self).load()
+        GedcomImport(inf, self).load()  # type: ignore
         inf.close()
         for i in self.individuals:
             i.resolve()
         for i in self.families:
             i.resolve()
 
-    def save(self, out):
+    def save(self, out):  # type: ignore
         """Save is done by calcularing and rendering the layout on the output."""
         if not out:
             out = sys.stdout
@@ -261,12 +263,12 @@ class Model:
             layoutName = self.config.layout + layoutName
             layout = globals()[layoutName](self, out)
         else:
-            layout = Layout(self, out)
+            layout = Layout(self, out)  # type: ignore
 
         layout.calc()
         layout.render()
 
-    def escape(self, s):
+    def escape(self, s):  # type: ignore
         return s.replace("-", "_")
 
 
@@ -274,7 +276,7 @@ class Model:
 
 class Edge:
     """A graph edge."""
-    def __init__(self, model, fro, to, invisible=False, comment=None):
+    def __init__(self, model, fro, to, invisible=False, comment=None):  # type: ignore
         self.fro = fro
         self.to = to
         self.rest = ""
@@ -289,13 +291,13 @@ class Edge:
         if comment:
             self.rest += "// %s" % comment
 
-    def render(self, out):
+    def render(self, out):  # type: ignore
         out.write("%s -> %s %s\n" % (self.fro, self.to, self.rest))
 
 
 class Node:
     """A graph node."""
-    def __init__(self, id, rest="", point=False, visiblePoint=False, comment=None):
+    def __init__(self, id, rest="", point=False, visiblePoint=False, comment=None):  # type: ignore
         self.id = id
         self.rest = rest
         if point:
@@ -305,7 +307,7 @@ class Node:
         if comment:
             self.rest += " // %s" % comment
 
-    def render(self, out):
+    def render(self, out):  # type: ignore
         out.write("%s %s\n" % (self.id, self.rest))
 
 
@@ -317,40 +319,40 @@ class Subgraph:
 
     class Start:
         """Special start node that acts like a node/edge."""
-        def __init__(self, name):
+        def __init__(self, name):  # type: ignore
             self.name = name
 
-        def render(self, out):
+        def render(self, out):  # type: ignore
             out.write("subgraph %s {\n" % self.name)
             out.write("rank = same\n")
 
     class End:
         """Special end node that acts like a node/edge."""
-        def render(self, out):
+        def render(self, out):  # type: ignore
             out.write("}\n")
 
-    def __init__(self, name, model):
+    def __init__(self, name, model):  # type: ignore
         self.name = name
         self.model = model
-        self.elements = []
-        self.start = Subgraph.Start(name)
+        self.elements = []  # type: ignore
+        self.start = Subgraph.Start(name)  # type: ignore
 
-    def prepend(self, element):
+    def prepend(self, element):  # type: ignore
         self.elements.insert(0, element)
 
-    def append(self, element):
+    def append(self, element):  # type: ignore
         self.elements.append(element)
 
-    def end(self):
+    def end(self):  # type: ignore
         self.append(Subgraph.End())
 
-    def render(self, out):
+    def render(self, out):  # type: ignore
         self.start.render(out)
         for i in self.elements:
             i.render(out)
         out.write("\n")
 
-    def findFamily(self, family):
+    def findFamily(self, family):  # type: ignore
         """Find the wife or husb or a family in this subgraph.
         If any of them are found, return the individual's ID and pos."""
         count = 0
@@ -362,7 +364,7 @@ class Subgraph:
                     return (family.husb.id, count)
             count += 1
 
-    def getPrevOf(self, individual):
+    def getPrevOf(self, individual):  # type: ignore
         """The passed individual follows the returned ID in this subgraph."""
         for e in self.elements:
             if e.__class__ == Edge and hasattr(individual, 'id') and e.to == individual.id:
@@ -371,46 +373,47 @@ class Subgraph:
 
 class Marriage:
     """Kind of a fake node, produced from a family."""
-    def __init__(self, family):
+    def __init__(self, family):  # type: ignore
         self.family = family
 
-    def getName(self):
+    def getName(self):  # type: ignore
         return "%sAnd%s" % (self.family.getHusb().id, self.family.getWife().id)
 
-    def getNode(self):
+    def getNode(self):  # type: ignore
         husb = self.family.getHusb().getFullName()
         wife = self.family.getWife().getFullName()
-        return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))
+        return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))  # type: ignore
 
 
 class Layout:
     """Generates the graphviz digraph, contains subgraphs.
     The stock layout shows ancestors of a root family."""
-    def __init__(self, model, out):
+    def __init__(self, model, out):  # type: ignore
         self.model = model
         self.out = out
-        self.subgraphs = []
-        self.filteredFamilies = []  # List of families, which are directly interesting for us.
+        self.subgraphs = []  # type: ignore
+        # List of families, which are directly interesting for us.
+        self.filteredFamilies = []   # type: ignore
 
-    def append(self, subgraph):
+    def append(self, subgraph):  # type: ignore
         self.subgraphs.append(subgraph)
 
-    def render(self):
+    def render(self):  # type: ignore
         self.out.write("digraph {\n")
         self.out.write("splines = ortho\n")
         for i in self.subgraphs:
             i.render(self.out)
         self.out.write("}\n")
 
-    def getSubgraph(self, id):
+    def getSubgraph(self, id):  # type: ignore
         for s in self.subgraphs:
             if s.name == id:
                 return s
 
-    def makeEdge(self, fro, to, invisible=False, comment=None):
-        return Edge(self.model, fro, to, invisible=invisible, comment=comment)
+    def makeEdge(self, fro, to, invisible=False, comment=None):  # type: ignore
+        return Edge(self.model, fro, to, invisible=invisible, comment=comment)  # type: ignore
 
-    def filterFamilies(self):
+    def filterFamilies(self):  # type: ignore
         """Iterate over all families, find out directly interesting and sibling
         families. Populates filteredFamilies, returns sibling ones."""
 
@@ -426,7 +429,7 @@ class Layout:
         while depth < self.model.config.layoutMaxDepth:
             nextPendings = []
             for pending in pendings:
-                children = []
+                children = []  # type: ignore
                 for indi in ('husb', 'wife'):
                     if getattr(pending, indi):
                         indiFamily = getattr(pending, indi).famc
@@ -453,7 +456,7 @@ class Layout:
 
         return siblingFamilies
 
-    def buildSubgraph(self, depth, pendingChildNodes, descendants=False):
+    def buildSubgraph(self, depth, pendingChildNodes, descendants=False):  # type: ignore
         """Builds a subgraph, that contains the real nodes for a generation.
         This consists of:
 
@@ -461,7 +464,7 @@ class Layout:
         2) Pending children from the previous generation.
 
         Returns pending children for the next subgraph."""
-        subgraph = Subgraph(self.model.escape("Depth%s" % depth), self.model)
+        subgraph = Subgraph(self.model.escape("Depth%s" % depth), self.model)  # type: ignore
         for child in pendingChildNodes:
             subgraph.append(child)
         pendingChildNodes = []
@@ -477,7 +480,7 @@ class Layout:
             wife = family.getWife()
             subgraph.append(wife.getNode())
             prevWife = family.wife
-            marriage = Marriage(family)
+            marriage = Marriage(family)  # type: ignore
             subgraph.append(marriage.getNode())
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
             subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
@@ -502,13 +505,13 @@ class Layout:
         self.append(subgraph)
         return pendingChildNodes
 
-    def buildConnectorSubgraph(self, depth):
+    def buildConnectorSubgraph(self, depth):  # type: ignore
         """Does the same as buildSubgraph(), but deals with connector nodes."""
-        subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)
+        subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)  # type: ignore
         pendingDeps = []
         prevChild = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
-            marriage = Marriage(family)
+            marriage = Marriage(family)  # type: ignore
             children = family.chil[:]
             if not (len(children) % 2 == 1 or len(children) == 0):
                 # If there is no middle child, then insert a fake node here, so
@@ -517,9 +520,9 @@ class Layout:
                 children.insert(half, marriage.getName())
             for child in children:
                 if self.model.getIndividual(child):
-                    subgraph.append(Node("%sConnect" % child, point=True, comment=self.model.getIndividual(child).getFullName()))
+                    subgraph.append(Node("%sConnect" % child, point=True, comment=self.model.getIndividual(child).getFullName()))  # type: ignore
                 else:
-                    subgraph.append(Node("%sConnect" % child, point=True))
+                    subgraph.append(Node("%sConnect" % child, point=True))  # type: ignore
 
             middle = int(len(children) / 2)
             count = 0
@@ -544,7 +547,7 @@ class Layout:
             subgraph.append(dep)
         self.append(subgraph)
 
-    def __addSiblingSpouses(self, family):
+    def __addSiblingSpouses(self, family):  # type: ignore
         """Add husb and wife from a family to the layout."""
         depth = family.depth
         subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
@@ -567,13 +570,13 @@ class Layout:
         assert found
         subgraph.elements.insert(existingPos, newIndi.getNode())
 
-        marriage = Marriage(family)
+        marriage = Marriage(family)  # type: ignore
         subgraph.elements.insert(existingPos, marriage.getNode())
 
         subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
         subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
 
-    def __addSiblingChildren(self, family):
+    def __addSiblingChildren(self, family):  # type: ignore
         """Add children from a sibling family to the layout."""
         depth = family.depth
 
@@ -596,8 +599,8 @@ class Layout:
         # First, add connect nodes and their deps.
         subgraphConnect = self.getSubgraph(self.model.escape("Depth%sConnects" % depth))
 
-        marriage = Marriage(family)
-        subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))
+        marriage = Marriage(family)  # type: ignore
+        subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))  # type: ignore
         subgraphConnect.append(self.makeEdge(marriage.getName(), "%sConnect" % marriage.getName()))
 
         children = family.chil[:]
@@ -613,7 +616,7 @@ class Layout:
                 subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c, invisible=True))
             else:
                 subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c))
-            subgraphConnect.prepend(Node("%sConnect" % c, point=True))
+            subgraphConnect.prepend(Node("%sConnect" % c, point=True))  # type: ignore
             prevChild = c
 
         # Then, add the real nodes.
@@ -625,14 +628,15 @@ class Layout:
             subgraphChild.append(self.makeEdge("%sConnect" % c, c))
             prevChild = c
 
-    def calc(self):
+    def calc(self):  # type: ignore
         """Tries the arrange nodes on a logical grid. Only logical order is
         defined, the exact positions and sizes are still determined by
         graphviz."""
 
         siblingFamilies = self.filterFamilies()
 
-        pendingChildNodes = []  # Children from generation N are nodes in the N+1th generation.
+        # Children from generation N are nodes in the N+1th generation.
+        pendingChildNodes = []  # type: ignore
         for depth in reversed(list(range(-1, self.model.config.layoutMaxDepth + 1))):
             # Draw two subgraphs for each generation. The first contains the real nodes.
             pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes)
@@ -650,7 +654,7 @@ class Layout:
 
 class DescendantsLayout(Layout):
     """A layout that shows all descendants of a root family."""
-    def filterFamilies(self):
+    def filterFamilies(self):  # type: ignore
         self.filteredFamilies = [self.model.getFamily(self.model.config.rootFamily)]
 
         depth = 0
@@ -667,10 +671,10 @@ class DescendantsLayout(Layout):
             pendings = nextPendings
             depth += 1
 
-    def calc(self):
+    def calc(self):  # type: ignore
         self.filterFamilies()
 
-        pendingChildNodes = []
+        pendingChildNodes = []  # type: ignore
         for depth in range(self.model.config.layoutMaxDepth + 1):
             pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes, descendants=True)
             self.buildConnectorSubgraph(depth)
@@ -680,7 +684,7 @@ class DescendantsLayout(Layout):
 
 class GedcomImport:
     """Builds the model from GEDCOM."""
-    def __init__(self, inf, model):
+    def __init__(self, inf, model):  # type: ignore
         self.inf = inf
         self.model = model
         self.indi = None
@@ -688,7 +692,7 @@ class GedcomImport:
         self.inBirt = False
         self.inDeat = False
 
-    def load(self):
+    def load(self):  # type: ignore
         for i in self.inf.readlines():
             line = i.strip().decode(self.model.config.inputEncoding)
             tokens = line.split(' ')
@@ -711,10 +715,10 @@ class GedcomImport:
                 if rest.startswith("@") and rest.endswith("INDI"):
                     id = rest[1:-6]
                     if id not in self.model.config.indiBlacklist:
-                        self.indi = Individual(self.model)
+                        self.indi = Individual(self.model)  # type: ignore
                         self.indi.id = rest[1:-6]
                 elif rest.startswith("@") and rest.endswith("FAM"):
-                    self.family = Family(self.model)
+                    self.family = Family(self.model)  # type: ignore
                     self.family.id = rest[1:-5]
 
             elif level == 1:
@@ -767,7 +771,7 @@ class Config:
     nodeLabelImageDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
     nodeLabelImageSwappedDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
 
-    def __init__(self, configDict):
+    def __init__(self, configDict):  # type: ignore
         self.configDict = configDict
         self.configOptions = ()
         # (name, type, default, description)
@@ -817,7 +821,7 @@ example \"UTF-8\" or \"ISO 8859-15\""""),)
 should be UTF-8 for dot-files"""),)
         self.parse()
 
-    def parse(self):
+    def parse(self):  # type: ignore
         path = None
 
         if type(self.configDict) == list:
@@ -834,7 +838,7 @@ should be UTF-8 for dot-files"""),)
             self.parser.read_dict(self.configDict)
         else:
             self.parser.read(path)
-        self.option = {}
+        self.option = {}  # type: ignore
         for entry in self.configOptions:
             if (entry[1] == 'str'):
                 self.option[entry[0]] = self.get(entry[0], entry[2])
@@ -843,7 +847,7 @@ should be UTF-8 for dot-files"""),)
             elif (entry[1] == 'bool'):
                 self.option[entry[0]] = (self.get(entry[0], entry[2]).lower() == "true")
 
-    def usage(self):
+    def usage(self):  # type: ignore
         sys.stderr.write("\n -- Sample config file below --\n")
         sys.stderr.write("    Un-comment all options where the given default does not fit your needs\n")
         sys.stderr.write("    and either save as \"ged2dotrc\" or provide the filename as first argument\n")
@@ -857,7 +861,7 @@ should be UTF-8 for dot-files"""),)
             sys.stderr.write("#%s = %s\n\n" % (entry[0], entry[2]))
         sys.stderr.write("--------\n")
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr):  # type: ignore
         if attr in self.__dict__:
             return self.__dict__[attr]
         else:
@@ -866,18 +870,18 @@ should be UTF-8 for dot-files"""),)
             else:
                 return None
 
-    def get(self, what, fallback=configparser._UNSET):
+    def get(self, what, fallback=configparser._UNSET):  # type: ignore
         return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
 
 
-def main():
+def main():  # type: ignore
     try:
-        config = Config(sys.argv[1:])
+        config = Config(sys.argv[1:])  # type: ignore
     except (BaseException) as be:
         print("Configuration invalid? %s" % (str(be)))
         config.usage()
         sys.exit(1)
-    model = Model(config)
+    model = Model(config)  # type: ignore
     try:
         model.load(config.input)
     except (BaseException) as be:
@@ -889,6 +893,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main()  # type: ignore
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

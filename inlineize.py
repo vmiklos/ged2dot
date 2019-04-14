@@ -15,7 +15,7 @@ namespaces = {
 }
 
 
-def inlineize(fro, to):
+def inlineize(fro, to):  # type: ignore
     ElementTree.register_namespace('', namespaces['svg'])
     ElementTree.register_namespace('xlink', namespaces['xlink'])
     tree = ElementTree.ElementTree()
@@ -29,11 +29,11 @@ def inlineize(fro, to):
     tree.write(to)
 
 
-def main():
-    inlineize(sys.argv[1], sys.argv[2])
+def main():  # type: ignore
+    inlineize(sys.argv[1], sys.argv[2])  # type: ignore
 
 
 if __name__ == "__main__":
-    main()
+    main()  # type: ignore
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

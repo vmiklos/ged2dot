@@ -6,4 +6,5 @@ python:
 install:
   - pip install pycodestyle
   - pip install pylint
+  - pip install mypy==0.590
 script: make check

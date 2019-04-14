@@ -8,31 +8,31 @@
 import ged2dot
 import base
 
-import unohelper
-from com.sun.star.beans import XPropertyAccess
-from com.sun.star.ui.dialogs import XExecutableDialog
-from com.sun.star.document import XImporter
-from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as ExecutableDialogResults_CANCEL
+import unohelper  # type: ignore
+from com.sun.star.beans import XPropertyAccess  # type: ignore
+from com.sun.star.ui.dialogs import XExecutableDialog  # type: ignore
+from com.sun.star.document import XImporter  # type: ignore
+from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as ExecutableDialogResults_CANCEL  # type: ignore
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK as ExecutableDialogResults_OK
-from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK
+from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK  # type: ignore
 from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL
 
 
-class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):
-    def __init__(self, context, _dialogArgs):
-        base.GedcomBase.__init__(self, context)
+class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):  # type: ignore
+    def __init__(self, context, _dialogArgs):  # type: ignore
+        base.GedcomBase.__init__(self, context)  # type: ignore
 
-    def __extractFamilies(self):
+    def __extractFamilies(self):  # type: ignore
         ged = unohelper.fileUrlToSystemPath(self.props['URL'])
         configDict = {
             'ged2dot': {
                 'input': ged,
             }
         }
-        config = ged2dot.Config(configDict)
-        model = ged2dot.Model(config)
+        config = ged2dot.Config(configDict)  # type: ignore
+        model = ged2dot.Model(config)  # type: ignore
         model.load(config.input)
-        self.familyDict = {}
+        self.familyDict = {}  # type: ignore
         for i in model.families:
             help = ""
             if i.husb and i.husb.surname:
@@ -43,7 +43,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             key = "%s (%s)" % (i.id, help)
             self.familyDict[key] = i
 
-    def __createControl(self, xParent, type, id, tabIndex, left, top, width, height,
+    def __createControl(self, xParent, type, id, tabIndex, left, top, width, height,  # type: ignore
                         value=None, buttonType=None):
         control = xParent.createInstance("com.sun.star.awt.UnoControl%sModel" % type)
         control.PositionX = left
@@ -74,7 +74,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         xParent.insertByName(id, control)
         return control
 
-    def __execDialog(self):
+    def __execDialog(self):  # type: ignore
         # .ui files can't be used in extensions ATM, so just to have some guidelines, here are the basics:
         # 1) Control width: 50, 100, etc -- based on demand.
         # 2) Control height, padding: 10
@@ -115,23 +115,23 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         return ret
 
     # XPropertyAccess
-    def getPropertyValues(self):
+    def getPropertyValues(self):  # type: ignore
         try:
             return self.toTuple(self.props)
         except Exception:
             self.printTraceback()
 
-    def setPropertyValues(self, props):
+    def setPropertyValues(self, props):  # type: ignore
         try:
             self.props = self.toDict(props)
         except Exception:
             self.printTraceback()
 
     # XExecutableDialog
-    def setTitle(self, title):
+    def setTitle(self, title):  # type: ignore
         pass
 
-    def execute(self):
+    def execute(self):  # type: ignore
         try:
             self.__extractFamilies()
             ret = self.__execDialog()
@@ -147,7 +147,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             return ExecutableDialogResults_CANCEL
 
     # XImporter
-    def setTargetDocument(self, xDstDoc):
+    def setTargetDocument(self, xDstDoc):  # type: ignore
         self.xDstDoc = xDstDoc
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
