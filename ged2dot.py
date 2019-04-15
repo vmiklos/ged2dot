@@ -12,6 +12,8 @@ import sys
 import configparser
 import codecs
 from functools import cmp_to_key
+from typing import Optional
+from typing import TextIO
 
 
 # Exceptions
@@ -25,7 +27,7 @@ class NoSuchFamilyException(Exception):
 class Individual:
     placeholderDir = os.path.dirname(os.path.realpath(__file__))
     """An individual is our basic building block, can be part of multiple families (usually two)."""
-    def __init__(self, model):  # type: ignore
+    def __init__(self, model: 'Model') -> None:
         self.model = model
         self.id = None
         self.sex = None
@@ -38,20 +40,20 @@ class Individual:
         # Horizontal order is ensured by order deps. Any order dep starting from this node?
         # Set to true on first addition, so that we can avoid redundant deps.
 
-    def __str__(self):  # type: ignore
+    def __str__(self) -> str:
         return "id: %s, sex: %s, forename: %s, surname: %s: famc: %s, fams: %s, birt: %s, deat: %s" % (self.id, self.sex, self.forename, self.surname, self.famc, self.fams, self.birt, self.deat)
 
-    def resolve(self):  # type: ignore
+    def resolve(self) -> None:
         """Replaces family reference strings with references to objects."""
-        self.famc = self.model.getFamily(self.famc)
-        self.fams = self.model.getFamily(self.fams)
+        self.famc = self.model.getFamily(self.famc)  # type: ignore
+        self.fams = self.model.getFamily(self.fams)  # type: ignore
 
-    def getFullName(self):  # type: ignore
+    def getFullName(self) -> str:
         """Full name of the individual. Only used as comments in the output
         file to ease debugging."""
         return "%s %s" % (self.forename, self.surname)
 
-    def getLabel(self):  # type: ignore
+    def getLabel(self) -> str:
         if self.forename:
             forename = self.forename
         else:
@@ -71,7 +73,7 @@ class Individual:
         path = self.model.config.imageFormat % {
             'forename': forename,
             'surname': surname,
-            'gwIndex': self.model.getIndividualGeneWebIndex(self.id, self.forename, self.surname),
+            'gwIndex': self.model.getIndividualGeneWebIndex(self.id, self.forename, self.surname),  # type: ignore
             'birt': self.birt
         }
 
@@ -88,7 +90,7 @@ class Individual:
         if os.path.exists(fullpath) and not self.model.config.anonMode:
             picture = fullpath
         else:
-            sex = 'u' if self.sex is None else self.sex.lower()
+            sex = 'u' if self.sex is None else self.sex.lower()  # type: ignore
             picture = os.path.join(Individual.placeholderDir, "placeholder-%s.png" % sex)
 
         try:
@@ -115,15 +117,15 @@ class Individual:
             deat = self.deat
             if len(deat) > 1:
                 deat = "YYYY"
-            return format % {
+            return format % {  # type: ignore
                 'picture': picture,
-                'surname': self.id[0],
-                'forename': self.id[1:],
+                'surname': self.id[0],  # type: ignore
+                'forename': self.id[1:],  # type: ignore
                 'birt': birt,
                 'deat': deat
             }
         else:
-            return format % {
+            return format % {  # type: ignore
                 'picture': picture,
                 'surname': surname,
                 'forename': forename,
@@ -131,11 +133,14 @@ class Individual:
                 'deat': self.deat
             }
 
-    def getColor(self):  # type: ignore
-        sex = 'U' if self.sex is None else self.sex.upper()
+    def getColor(self) -> str:
+        if self.sex is None:
+            sex = 'U'
+        else:
+            sex = self.sex.upper()
         return {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
-    def getNode(self):  # type: ignore
+    def getNode(self) -> 'Node':
         return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))  # type: ignore
 
     def setBirt(self, birt):  # type: ignore
@@ -192,7 +197,7 @@ class Family:
         """Same as accessing 'husb' directly, except that in case that would be
         None, a placeholder individual is created."""
         if not self.husb:
-            self.husb = Individual(self.model)  # type: ignore
+            self.husb = Individual(self.model)
             self.husb.id = "PH%d" % Family.phCount
             Family.phCount += 1
             self.husb.sex = 'M'
@@ -204,7 +209,7 @@ class Family:
     def getWife(self):  # type: ignore
         """Same as getHusb(), but for wifes."""
         if not self.wife:
-            self.wife = Individual(self.model)  # type: ignore
+            self.wife = Individual(self.model)
             self.wife.id = "PH%d" % Family.phCount
             Family.phCount += 1
             self.wife.sex = 'F'
@@ -242,7 +247,7 @@ class Model:
             if i.id == id:
                 return i
 
-    def load(self, name):  # type: ignore
+    def load(self, name: str) -> None:
         self.basedir = os.path.dirname(name)
         inf = open(name, "rb")
         GedcomImport(inf, self).load()  # type: ignore
@@ -252,7 +257,7 @@ class Model:
         for i in self.families:
             i.resolve()
 
-    def save(self, out):  # type: ignore
+    def save(self, out: Optional[TextIO]) -> None:
         """Save is done by calcularing and rendering the layout on the output."""
         if not out:
             out = sys.stdout
@@ -715,7 +720,7 @@ class GedcomImport:
                 if rest.startswith("@") and rest.endswith("INDI"):
                     id = rest[1:-6]
                     if id not in self.model.config.indiBlacklist:
-                        self.indi = Individual(self.model)  # type: ignore
+                        self.indi = Individual(self.model)
                         self.indi.id = rest[1:-6]
                 elif rest.startswith("@") and rest.endswith("FAM"):
                     self.family = Family(self.model)  # type: ignore
