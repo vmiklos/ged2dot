@@ -29,7 +29,7 @@ class Individual:
     """An individual is our basic building block, can be part of multiple families (usually two)."""
     def __init__(self, model: 'Model') -> None:
         self.model = model
-        self.id = None
+        self.id = ""
         self.sex = None
         self.forename = None  # John
         self.surname = None  # Smith
@@ -119,8 +119,8 @@ class Individual:
                 deat = "YYYY"
             return format % {  # type: ignore
                 'picture': picture,
-                'surname': self.id[0],  # type: ignore
-                'forename': self.id[1:],  # type: ignore
+                'surname': self.id[0],
+                'forename': self.id[1:],
                 'birt': birt,
                 'deat': deat
             }
