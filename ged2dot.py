@@ -31,8 +31,8 @@ class Individual:
         self.model = model
         self.id = ""
         self.sex = None
-        self.forename = None  # John
-        self.surname = None  # Smith
+        self.forename = ""  # John
+        self.surname = ""  # Smith
         self.famc = None
         self.fams = None
         self.birt = ""
@@ -73,7 +73,7 @@ class Individual:
         path = self.model.config.imageFormat % {
             'forename': forename,
             'surname': surname,
-            'gwIndex': self.model.getIndividualGeneWebIndex(self.id, self.forename, self.surname),  # type: ignore
+            'gwIndex': self.model.getIndividualGeneWebIndex(self.id, self.forename, self.surname),
             'birt': self.birt
         }
 
@@ -232,12 +232,12 @@ class Model:
             if i.id == id:
                 return i
 
-    def getIndividualGeneWebIndex(self, searchId, forename, surname):  # type: ignore
+    def getIndividualGeneWebIndex(self, searchId: str, forename: str, surname: str) -> int:
         myList = []
         for i in self.individuals:
             if (i.forename == forename) and (i.surname == surname):
                 myList.append(i.id)
-        myList.sort
+        myList.sort()
         return myList.index(searchId)
 
     def getFamily(self, id, familySet=None):  # type: ignore
