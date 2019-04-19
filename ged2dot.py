@@ -12,6 +12,8 @@ import sys
 import configparser
 import codecs
 from functools import cmp_to_key
+from typing import Any
+from typing import List
 from typing import Optional
 from typing import TextIO
 
@@ -33,8 +35,8 @@ class Individual:
         self.sex = None
         self.forename = ""  # John
         self.surname = ""  # Smith
-        self.famc = None
-        self.fams = None
+        self.famc: Any = None  # str or Family
+        self.fams: Any = None  # str or Family
         self.birt = ""
         self.deat = ""
         # Horizontal order is ensured by order deps. Any order dep starting from this node?
@@ -45,8 +47,8 @@ class Individual:
 
     def resolve(self) -> None:
         """Replaces family reference strings with references to objects."""
-        self.famc = self.model.getFamily(self.famc)  # type: ignore
-        self.fams = self.model.getFamily(self.fams)  # type: ignore
+        self.famc = self.model.getFamily(self.famc)
+        self.fams = self.model.getFamily(self.fams)
 
     def getFullName(self) -> str:
         """Full name of the individual. Only used as comments in the output
@@ -90,11 +92,14 @@ class Individual:
         if os.path.exists(fullpath) and not self.model.config.anonMode:
             picture = fullpath
         else:
-            sex = 'u' if self.sex is None else self.sex.lower()  # type: ignore
+            if self.sex:
+                sex = self.sex.lower()
+            else:
+                sex = 'u'
             picture = os.path.join(Individual.placeholderDir, "placeholder-%s.png" % sex)
 
         try:
-            from PIL import Image  # type: ignore
+            from PIL import Image  # type: ignore  # No library stub file for module
             i = Image.open(picture)
             if i.size != (100, 100):
                 picture = "%s.tumbnail.png" % picture
@@ -240,12 +245,15 @@ class Model:
         myList.sort()
         return myList.index(searchId)
 
-    def getFamily(self, id, familySet=None):  # type: ignore
-        if not familySet:
-            familySet = self.families
-        for i in familySet:
+    def getFamily(self, id: str, familySet: Optional[List[Family]] = None) -> Optional[Family]:
+        if familySet:
+            families = familySet
+        else:
+            families = self.families
+        for i in families:
             if i.id == id:
                 return i
+        return None
 
     def load(self, name: str) -> None:
         self.basedir = os.path.dirname(name)
@@ -879,7 +887,7 @@ should be UTF-8 for dot-files"""),)
         return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
 
 
-def main():  # type: ignore
+def main() -> None:
     try:
         config = Config(sys.argv[1:])  # type: ignore
     except (BaseException) as be:
@@ -898,6 +906,6 @@ def main():  # type: ignore
 
 
 if __name__ == "__main__":
-    main()  # type: ignore
+    main()
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
