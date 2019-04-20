@@ -111,6 +111,7 @@ class Individual:
         except ImportError:
             pass
 
+        format = ""
         if self.model.config.images:
             format = self.model.config.nodeLabelImage
         else:
@@ -122,7 +123,7 @@ class Individual:
             deat = self.deat
             if len(deat) > 1:
                 deat = "YYYY"
-            return format % {  # type: ignore
+            return format % {
                 'picture': picture,
                 'surname': self.id[0],
                 'forename': self.id[1:],
@@ -130,7 +131,7 @@ class Individual:
                 'deat': deat
             }
         else:
-            return format % {  # type: ignore
+            return format % {
                 'picture': picture,
                 'surname': surname,
                 'forename': forename,
@@ -146,7 +147,7 @@ class Individual:
         return {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
     def getNode(self) -> 'Node':
-        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))  # type: ignore
+        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))
 
     def setBirt(self, birt):  # type: ignore
         if not len(birt):
@@ -310,14 +311,14 @@ class Edge:
 
 class Node:
     """A graph node."""
-    def __init__(self, id, rest="", point=False, visiblePoint=False, comment=None):  # type: ignore
+    def __init__(self, id: str, rest: str = "", point: bool = False, visiblePoint: bool = False, comment: str = "") -> None:
         self.id = id
         self.rest = rest
         if point:
             self.rest += "[ shape = point, width = 0 ]"
         elif visiblePoint:
             self.rest += "[ shape = point ]"
-        if comment:
+        if len(comment):
             self.rest += " // %s" % comment
 
     def render(self, out):  # type: ignore
@@ -395,7 +396,7 @@ class Marriage:
     def getNode(self):  # type: ignore
         husb = self.family.getHusb().getFullName()
         wife = self.family.getWife().getFullName()
-        return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))  # type: ignore
+        return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))
 
 
 class Layout:
@@ -533,9 +534,9 @@ class Layout:
                 children.insert(half, marriage.getName())
             for child in children:
                 if self.model.getIndividual(child):
-                    subgraph.append(Node("%sConnect" % child, point=True, comment=self.model.getIndividual(child).getFullName()))  # type: ignore
+                    subgraph.append(Node("%sConnect" % child, point=True, comment=self.model.getIndividual(child).getFullName()))
                 else:
-                    subgraph.append(Node("%sConnect" % child, point=True))  # type: ignore
+                    subgraph.append(Node("%sConnect" % child, point=True))
 
             middle = int(len(children) / 2)
             count = 0
@@ -613,7 +614,7 @@ class Layout:
         subgraphConnect = self.getSubgraph(self.model.escape("Depth%sConnects" % depth))
 
         marriage = Marriage(family)  # type: ignore
-        subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))  # type: ignore
+        subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))
         subgraphConnect.append(self.makeEdge(marriage.getName(), "%sConnect" % marriage.getName()))
 
         children = family.chil[:]
@@ -629,7 +630,7 @@ class Layout:
                 subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c, invisible=True))
             else:
                 subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c))
-            subgraphConnect.prepend(Node("%sConnect" % c, point=True))  # type: ignore
+            subgraphConnect.prepend(Node("%sConnect" % c, point=True))
             prevChild = c
 
         # Then, add the real nodes.
