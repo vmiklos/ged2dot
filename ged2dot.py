@@ -149,7 +149,7 @@ class Individual:
     def getNode(self) -> 'Node':
         return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))
 
-    def setBirt(self, birt):  # type: ignore
+    def setBirt(self, birt: str) -> None:
         if not len(birt):
             return
         self.birt = birt
@@ -165,18 +165,18 @@ class Family:
     """Family has exactly one wife and husb, 0..* children."""
     phCount = 0
 
-    def __init__(self, model):  # type: ignore
+    def __init__(self, model: 'Model') -> None:
         self.model = model
         self.id = None
-        self.husb = None
-        self.wife = None
-        self.chil = []  # type: ignore
+        self.husb: Any = None  # str or Individual
+        self.wife: Any = None  # str or Individual
+        self.chil: List[str] = []
         self.depth = 0
 
-    def __str__(self):  # type: ignore
+    def __str__(self) -> str:
         return "id: %s, husb: %s, wife: %s, chil: %s, depth: %s" % (self.id, self.husb, self.wife, self.chil, self.depth)
 
-    def resolve(self):  # type: ignore
+    def resolve(self) -> None:
         """Replaces individual reference strings with references to objects."""
         self.husb = self.model.getIndividual(self.husb)
         self.wife = self.model.getIndividual(self.wife)
@@ -229,14 +229,15 @@ class Model:
     def __init__(self, config):  # type: ignore
         self.config = config
         # List of all individuals.
-        self.individuals = []  # type: ignore
+        self.individuals: List[Individual] = []
         # List of all families.
         self.families = []  # type: ignore
 
-    def getIndividual(self, id):  # type: ignore
+    def getIndividual(self, id: str) -> Optional[Individual]:
         for i in self.individuals:
             if i.id == id:
                 return i
+        return None
 
     def getIndividualGeneWebIndex(self, searchId: str, forename: str, surname: str) -> int:
         myList = []
@@ -732,7 +733,7 @@ class GedcomImport:
                         self.indi = Individual(self.model)
                         self.indi.id = rest[1:-6]
                 elif rest.startswith("@") and rest.endswith("FAM"):
-                    self.family = Family(self.model)  # type: ignore
+                    self.family = Family(self.model)
                     self.family.id = rest[1:-5]
 
             elif level == 1:
