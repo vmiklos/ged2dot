@@ -24,6 +24,10 @@ class NoSuchFamilyException(Exception):
     pass
 
 
+class NoSuchIndividualException(Exception):
+    pass
+
+
 # Model
 
 class Individual:
@@ -181,13 +185,19 @@ class Family:
         self.husb = self.model.getIndividual(self.husb)
         self.wife = self.model.getIndividual(self.wife)
 
-    def sortChildren(self, filteredFamilies):  # type: ignore
+    def sortChildren(self, filteredFamilies: List['Family']) -> None:
         """Sort children, based on filtered families of the layout."""
         def compareChildren(x, y):  # type: ignore
             # For now just try to produce a traditional "husb left, wife right"
             # order, ignore birth date.
             xObj = self.model.getIndividual(x)
+            if not xObj:
+                raise NoSuchIndividualException("Can't find individual '%s' in the input file." % x)
+
             yObj = self.model.getIndividual(y)
+            if not yObj:
+                raise NoSuchIndividualException("Can't find individual '%s' in the input file." % y)
+
             if xObj.sex == "M" and xObj.fams and self.model.getFamily(xObj.fams.id, filteredFamilies):
                 return 1
             if yObj.sex == "M" and yObj.fams and self.model.getFamily(yObj.fams.id, filteredFamilies):
@@ -199,7 +209,7 @@ class Family:
             return 0
         self.chil.sort(key=cmp_to_key(compareChildren))
 
-    def getHusb(self):  # type: ignore
+    def getHusb(self) -> Individual:
         """Same as accessing 'husb' directly, except that in case that would be
         None, a placeholder individual is created."""
         if not self.husb:
@@ -210,9 +220,10 @@ class Family:
             self.husb.forename = "?"
             self.husb.surname = ""
             self.model.individuals.append(self.husb)
+        assert isinstance(self.husb, Individual)
         return self.husb
 
-    def getWife(self):  # type: ignore
+    def getWife(self) -> Individual:
         """Same as getHusb(), but for wifes."""
         if not self.wife:
             self.wife = Individual(self.model)
@@ -222,6 +233,7 @@ class Family:
             self.wife.forename = "?"
             self.wife.surname = ""
             self.model.individuals.append(self.wife)
+        assert isinstance(self.wife, Individual)
         return self.wife
 
 
