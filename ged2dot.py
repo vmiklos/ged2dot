@@ -187,7 +187,7 @@ class Family:
 
     def sortChildren(self, filteredFamilies: List['Family']) -> None:
         """Sort children, based on filtered families of the layout."""
-        def compareChildren(x, y):  # type: ignore
+        def compareChildren(x: str, y: str) -> int:
             # For now just try to produce a traditional "husb left, wife right"
             # order, ignore birth date.
             xObj = self.model.getIndividual(x)
@@ -303,7 +303,7 @@ class Model:
 
 class Edge:
     """A graph edge."""
-    def __init__(self, model, fro, to, invisible=False, comment=None):  # type: ignore
+    def __init__(self, model: Model, fro: str, to: str, invisible: bool = False, comment: Optional[str] = None) -> None:
         self.fro = fro
         self.to = to
         self.rest = ""
@@ -318,7 +318,7 @@ class Edge:
         if comment:
             self.rest += "// %s" % comment
 
-    def render(self, out):  # type: ignore
+    def render(self, out: TextIO) -> None:
         out.write("%s -> %s %s\n" % (self.fro, self.to, self.rest))
 
 
@@ -438,7 +438,7 @@ class Layout:
                 return s
 
     def makeEdge(self, fro, to, invisible=False, comment=None):  # type: ignore
-        return Edge(self.model, fro, to, invisible=invisible, comment=comment)  # type: ignore
+        return Edge(self.model, fro, to, invisible=invisible, comment=comment)
 
     def filterFamilies(self):  # type: ignore
         """Iterate over all families, find out directly interesting and sibling
