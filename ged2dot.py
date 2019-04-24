@@ -13,6 +13,7 @@ import configparser
 import codecs
 from functools import cmp_to_key
 from typing import Any
+from typing import BinaryIO
 from typing import List
 from typing import Optional
 from typing import TextIO
@@ -36,7 +37,7 @@ class Individual:
     def __init__(self, model: 'Model') -> None:
         self.model = model
         self.id = ""
-        self.sex = None
+        self.sex: Optional[str] = None
         self.forename = ""  # John
         self.surname = ""  # Smith
         self.famc: Any = None  # str or Family
@@ -171,7 +172,7 @@ class Family:
 
     def __init__(self, model: 'Model') -> None:
         self.model = model
-        self.id = None
+        self.id: Optional[str] = None
         self.husb: Any = None  # str or Individual
         self.wife: Any = None  # str or Individual
         self.chil: List[str] = []
@@ -238,12 +239,12 @@ class Family:
 
 
 class Model:
-    def __init__(self, config):  # type: ignore
+    def __init__(self, config: 'Config') -> None:
         self.config = config
         # List of all individuals.
         self.individuals: List[Individual] = []
         # List of all families.
-        self.families = []  # type: ignore
+        self.families: List[Family] = []
 
     def getIndividual(self, id: str) -> Optional[Individual]:
         for i in self.individuals:
@@ -272,12 +273,12 @@ class Model:
     def load(self, name: str) -> None:
         self.basedir = os.path.dirname(name)
         inf = open(name, "rb")
-        GedcomImport(inf, self).load()  # type: ignore
+        GedcomImport(inf, self).load()
         inf.close()
-        for i in self.individuals:
-            i.resolve()
-        for i in self.families:
-            i.resolve()
+        for individual in self.individuals:
+            individual.resolve()
+        for family in self.families:
+            family.resolve()
 
     def save(self, out: Optional[TextIO]) -> None:
         """Save is done by calcularing and rendering the layout on the output."""
@@ -711,15 +712,15 @@ class DescendantsLayout(Layout):
 
 class GedcomImport:
     """Builds the model from GEDCOM."""
-    def __init__(self, inf, model):  # type: ignore
+    def __init__(self, inf: BinaryIO, model: Model) -> None:
         self.inf = inf
         self.model = model
-        self.indi = None
-        self.family = None
+        self.indi: Optional[Individual] = None
+        self.family: Optional[Family] = None
         self.inBirt = False
         self.inDeat = False
 
-    def load(self):  # type: ignore
+    def load(self) -> None:
         for i in self.inf.readlines():
             line = i.strip().decode(self.model.config.inputEncoding)
             tokens = line.split(' ')
@@ -908,7 +909,7 @@ def main() -> None:
         print("Configuration invalid? %s" % (str(be)))
         config.usage()
         sys.exit(1)
-    model = Model(config)  # type: ignore
+    model = Model(config)
     try:
         model.load(config.input)
     except (BaseException) as be:

@@ -16,7 +16,7 @@ class Test(unittest.TestCase):
             config = ged2dot.Config(configDict)  # type: ignore
         else:
             config = ged2dot.Config(["%src" % name])  # type: ignore
-        model = ged2dot.Model(config)  # type: ignore
+        model = ged2dot.Model(config)
         model.load(config.input)
         try:
             os.unlink("%s.dot" % name)

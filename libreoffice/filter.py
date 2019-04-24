@@ -50,7 +50,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
             }
         }
         config = ged2dot.Config(configDict)  # type: ignore
-        model = ged2dot.Model(config)  # type: ignore
+        model = ged2dot.Model(config)
         model.load(config.input)
         dot = io.StringIO()
         model.save(dot)

@@ -30,7 +30,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             }
         }
         config = ged2dot.Config(configDict)  # type: ignore
-        model = ged2dot.Model(config)  # type: ignore
+        model = ged2dot.Model(config)
         model.load(config.input)
         self.familyDict = {}  # type: ignore
         for i in model.families:
