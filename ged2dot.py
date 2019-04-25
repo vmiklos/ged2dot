@@ -17,6 +17,14 @@ from typing import BinaryIO
 from typing import List
 from typing import Optional
 from typing import TextIO
+from typing_extensions import Protocol
+
+
+# Protocols
+
+class Renderable(Protocol):
+    def render(self, _out: TextIO) -> None:
+        ...
 
 
 # Exceptions
@@ -291,12 +299,12 @@ class Model:
             layoutName = self.config.layout + layoutName
             layout = globals()[layoutName](self, out)
         else:
-            layout = Layout(self, out)  # type: ignore
+            layout = Layout(self, out)
 
         layout.calc()
         layout.render()
 
-    def escape(self, s):  # type: ignore
+    def escape(self, s: str) -> str:
         return s.replace("-", "_")
 
 
@@ -335,7 +343,7 @@ class Node:
         if len(comment):
             self.rest += " // %s" % comment
 
-    def render(self, out):  # type: ignore
+    def render(self, out: TextIO) -> None:
         out.write("%s %s\n" % (self.id, self.rest))
 
 
@@ -347,31 +355,31 @@ class Subgraph:
 
     class Start:
         """Special start node that acts like a node/edge."""
-        def __init__(self, name):  # type: ignore
+        def __init__(self, name: str) -> None:
             self.name = name
 
-        def render(self, out):  # type: ignore
+        def render(self, out: TextIO) -> None:
             out.write("subgraph %s {\n" % self.name)
             out.write("rank = same\n")
 
     class End:
         """Special end node that acts like a node/edge."""
-        def render(self, out):  # type: ignore
+        def render(self, out: TextIO) -> None:
             out.write("}\n")
 
-    def __init__(self, name, model):  # type: ignore
+    def __init__(self, name: str, model: Model) -> None:
         self.name = name
         self.model = model
-        self.elements = []  # type: ignore
-        self.start = Subgraph.Start(name)  # type: ignore
+        self.elements: List[Renderable] = []
+        self.start = Subgraph.Start(name)
 
     def prepend(self, element):  # type: ignore
         self.elements.insert(0, element)
 
-    def append(self, element):  # type: ignore
+    def append(self, element: Renderable) -> None:
         self.elements.append(element)
 
-    def end(self):  # type: ignore
+    def end(self) -> None:
         self.append(Subgraph.End())
 
     def render(self, out):  # type: ignore
@@ -416,7 +424,7 @@ class Marriage:
 class Layout:
     """Generates the graphviz digraph, contains subgraphs.
     The stock layout shows ancestors of a root family."""
-    def __init__(self, model, out):  # type: ignore
+    def __init__(self, model: Model, out: TextIO) -> None:
         self.model = model
         self.out = out
         self.subgraphs = []  # type: ignore
@@ -492,7 +500,7 @@ class Layout:
         2) Pending children from the previous generation.
 
         Returns pending children for the next subgraph."""
-        subgraph = Subgraph(self.model.escape("Depth%s" % depth), self.model)  # type: ignore
+        subgraph = Subgraph(self.model.escape("Depth%s" % depth), self.model)
         for child in pendingChildNodes:
             subgraph.append(child)
         pendingChildNodes = []
@@ -535,7 +543,7 @@ class Layout:
 
     def buildConnectorSubgraph(self, depth):  # type: ignore
         """Does the same as buildSubgraph(), but deals with connector nodes."""
-        subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)  # type: ignore
+        subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)
         pendingDeps = []
         prevChild = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
