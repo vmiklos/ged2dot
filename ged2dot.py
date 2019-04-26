@@ -17,6 +17,8 @@ from typing import BinaryIO
 from typing import List
 from typing import Optional
 from typing import TextIO
+from typing import Tuple
+from typing import cast
 from typing_extensions import Protocol
 
 
@@ -373,7 +375,7 @@ class Subgraph:
         self.elements: List[Renderable] = []
         self.start = Subgraph.Start(name)
 
-    def prepend(self, element):  # type: ignore
+    def prepend(self, element: Renderable) -> None:
         self.elements.insert(0, element)
 
     def append(self, element: Renderable) -> None:
@@ -382,23 +384,25 @@ class Subgraph:
     def end(self) -> None:
         self.append(Subgraph.End())
 
-    def render(self, out):  # type: ignore
+    def render(self, out: TextIO) -> None:
         self.start.render(out)
         for i in self.elements:
             i.render(out)
         out.write("\n")
 
-    def findFamily(self, family):  # type: ignore
+    def findFamily(self, family: Family) -> Tuple[str, int]:
         """Find the wife or husb or a family in this subgraph.
         If any of them are found, return the individual's ID and pos."""
         count = 0
         for e in self.elements:
             if e.__class__ == Node:
-                if family.wife and e.id == family.wife.id:
+                n = cast(Node, e)
+                if family.wife and n.id == family.wife.id:
                     return (family.wife.id, count)
-                elif family.husb and e.id == family.husb.id:
+                elif family.husb and n.id == family.husb.id:
                     return (family.husb.id, count)
             count += 1
+        return ("", 0)
 
     def getPrevOf(self, individual):  # type: ignore
         """The passed individual follows the returned ID in this subgraph."""
