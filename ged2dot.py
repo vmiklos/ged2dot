@@ -404,22 +404,26 @@ class Subgraph:
             count += 1
         return ("", 0)
 
-    def getPrevOf(self, individual):  # type: ignore
+    def getPrevOf(self, individual: Individual) -> Optional[Individual]:
         """The passed individual follows the returned ID in this subgraph."""
         for e in self.elements:
-            if e.__class__ == Edge and hasattr(individual, 'id') and e.to == individual.id:
-                return self.model.getIndividual(e.fro)
+            if e.__class__ == Edge:
+                edge = cast(Edge, e)
+                if hasattr(individual, 'id') and edge.to == individual.id:
+                    return self.model.getIndividual(edge.fro)
+
+        return None
 
 
 class Marriage:
     """Kind of a fake node, produced from a family."""
-    def __init__(self, family):  # type: ignore
+    def __init__(self, family: Family) -> None:
         self.family = family
 
-    def getName(self):  # type: ignore
+    def getName(self) -> str:
         return "%sAnd%s" % (self.family.getHusb().id, self.family.getWife().id)
 
-    def getNode(self):  # type: ignore
+    def getNode(self) -> Node:
         husb = self.family.getHusb().getFullName()
         wife = self.family.getWife().getFullName()
         return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))
@@ -520,7 +524,7 @@ class Layout:
             wife = family.getWife()
             subgraph.append(wife.getNode())
             prevWife = family.wife
-            marriage = Marriage(family)  # type: ignore
+            marriage = Marriage(family)
             subgraph.append(marriage.getNode())
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
             subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
@@ -551,7 +555,7 @@ class Layout:
         pendingDeps = []
         prevChild = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
-            marriage = Marriage(family)  # type: ignore
+            marriage = Marriage(family)
             children = family.chil[:]
             if not (len(children) % 2 == 1 or len(children) == 0):
                 # If there is no middle child, then insert a fake node here, so
@@ -610,7 +614,7 @@ class Layout:
         assert found
         subgraph.elements.insert(existingPos, newIndi.getNode())
 
-        marriage = Marriage(family)  # type: ignore
+        marriage = Marriage(family)
         subgraph.elements.insert(existingPos, marriage.getNode())
 
         subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
@@ -639,7 +643,7 @@ class Layout:
         # First, add connect nodes and their deps.
         subgraphConnect = self.getSubgraph(self.model.escape("Depth%sConnects" % depth))
 
-        marriage = Marriage(family)  # type: ignore
+        marriage = Marriage(family)
         subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))
         subgraphConnect.append(self.makeEdge(marriage.getName(), "%sConnect" % marriage.getName()))
 
