@@ -435,38 +435,40 @@ class Layout:
     def __init__(self, model: Model, out: TextIO) -> None:
         self.model = model
         self.out = out
-        self.subgraphs = []  # type: ignore
+        self.subgraphs: List[Subgraph] = []
         # List of families, which are directly interesting for us.
-        self.filteredFamilies = []   # type: ignore
+        self.filteredFamilies: List[Family] = []
 
-    def append(self, subgraph):  # type: ignore
+    def append(self, subgraph: Subgraph) -> None:
         self.subgraphs.append(subgraph)
 
-    def render(self):  # type: ignore
+    def render(self) -> None:
         self.out.write("digraph {\n")
         self.out.write("splines = ortho\n")
         for i in self.subgraphs:
             i.render(self.out)
         self.out.write("}\n")
 
-    def getSubgraph(self, id):  # type: ignore
+    def getSubgraph(self, id: str) -> Optional[Subgraph]:
         for s in self.subgraphs:
             if s.name == id:
                 return s
+        return None
 
-    def makeEdge(self, fro, to, invisible=False, comment=None):  # type: ignore
+    def makeEdge(self, fro: str, to: str, invisible: bool = False, comment: Optional[str] = None) -> Edge:
         return Edge(self.model, fro, to, invisible=invisible, comment=comment)
 
-    def filterFamilies(self):  # type: ignore
+    def filterFamilies(self) -> List[Family]:
         """Iterate over all families, find out directly interesting and sibling
         families. Populates filteredFamilies, returns sibling ones."""
 
-        self.filteredFamilies = [self.model.getFamily(self.model.config.rootFamily)]
+        family = self.model.getFamily(self.model.config.rootFamily)
+        if not family:
+            raise NoSuchFamilyException("Can't find family '%s' in the input file." % self.model.config.rootFamily)
+        self.filteredFamilies = [family]
 
         depth = 0
-        if not self.model.getFamily(self.model.config.rootFamily):
-            raise NoSuchFamilyException("Can't find family '%s' in the input file." % self.model.config.rootFamily)
-        pendings = [self.model.getFamily(self.model.config.rootFamily)]
+        pendings = [family]
         # List of families, which are interesting for us, as A is in the
         # family, B is in filteredFamilies, and A is a sibling of B.
         siblingFamilies = []
@@ -487,7 +489,10 @@ class Layout:
                 if depth < self.model.config.layoutMaxSiblingDepth + 1:
                     # +1, because children are in the previous generation.
                     for chil in children:
-                        chilFamily = self.model.getIndividual(chil).fams
+                        individual = self.model.getIndividual(chil)
+                        if not individual:
+                            raise NoSuchIndividualException("Can't find individual '%s' in the input file." % chil)
+                        chilFamily = individual.fams
                         if not chilFamily or self.model.getFamily(chilFamily.id, self.filteredFamilies):
                             continue
                         chilFamily.depth = depth
@@ -500,7 +505,7 @@ class Layout:
 
         return siblingFamilies
 
-    def buildSubgraph(self, depth, pendingChildNodes, descendants=False):  # type: ignore
+    def buildSubgraph(self, depth: int, pendingChildNodes: List[Renderable], descendants: bool = False) -> List[Renderable]:
         """Builds a subgraph, that contains the real nodes for a generation.
         This consists of:
 
@@ -528,28 +533,31 @@ class Layout:
             subgraph.append(marriage.getNode())
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
             subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
-            for child in family.chil:
-                pendingChildNodes.append(self.model.getIndividual(child).getNode())
+            for familyChild in family.chil:
+                individual = self.model.getIndividual(familyChild)
+                if not individual:
+                    raise NoSuchIndividualException("Can't find individual '%s' in the input file." % familyChild)
+                pendingChildNodes.append(individual.getNode())
                 if prevChil:
-                    # In case child is female and has a husb, then link prevChild to husb, not to child.
+                    # In case familyChild is female and has a husb, then link prevChild to husb, not to familyChild.
                     handled = False
-                    childIndi = self.model.getIndividual(child)
-                    if descendants and childIndi.sex == 'F':
-                        childFamily = childIndi.fams
-                        if childFamily and childFamily.husb:
-                            pendingChildNodes.append(self.makeEdge(prevChil, childFamily.husb.id, invisible=True))
+                    familyChildIndi = self.model.getIndividual(familyChild)
+                    if descendants and familyChildIndi.sex == 'F':
+                        familyChildFamily = familyChildIndi.fams
+                        if familyChildFamily and familyChildFamily.husb:
+                            pendingChildNodes.append(self.makeEdge(prevChil, familyChildFamily.husb.id, invisible=True))
                             handled = True
                     if not handled:
-                        pendingChildNodes.append(self.makeEdge(prevChil, child, invisible=True))
-                prevChil = child
-                pendingChildrenDeps.append(self.makeEdge("%sConnect" % child, child, comment=self.model.getIndividual(child).getFullName()))
+                        pendingChildNodes.append(self.makeEdge(prevChil, familyChild, invisible=True))
+                prevChil = familyChild
+                pendingChildrenDeps.append(self.makeEdge("%sConnect" % familyChild, familyChild, comment=individual.getFullName()))
         subgraph.end()
         for i in pendingChildrenDeps:
             subgraph.append(i)
         self.append(subgraph)
         return pendingChildNodes
 
-    def buildConnectorSubgraph(self, depth):  # type: ignore
+    def buildConnectorSubgraph(self, depth: int) -> None:
         """Does the same as buildSubgraph(), but deals with connector nodes."""
         subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)
         pendingDeps = []
@@ -563,23 +571,29 @@ class Layout:
                 half = int(len(children) / 2)
                 children.insert(half, marriage.getName())
             for child in children:
-                if self.model.getIndividual(child):
-                    subgraph.append(Node("%sConnect" % child, point=True, comment=self.model.getIndividual(child).getFullName()))
+                individual = self.model.getIndividual(child)
+                if individual:
+                    subgraph.append(Node("%sConnect" % child, point=True, comment=individual.getFullName()))
                 else:
                     subgraph.append(Node("%sConnect" % child, point=True))
 
             middle = int(len(children) / 2)
             count = 0
             for child in children:
+                individual = self.model.getIndividual(child)
                 if count < middle:
-                    subgraph.append(self.makeEdge("%sConnect" % child, "%sConnect" % children[count + 1], comment=self.model.getIndividual(child).getFullName()))
+                    if not individual:
+                        raise NoSuchIndividualException("Can't find individual '%s' in the input file." % child)
+                    subgraph.append(self.makeEdge("%sConnect" % child, "%sConnect" % children[count + 1], comment=individual.getFullName()))
                 elif count == middle:
-                    if self.model.getIndividual(child):
-                        pendingDeps.append(self.makeEdge(marriage.getName(), "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
+                    if individual:
+                        pendingDeps.append(self.makeEdge(marriage.getName(), "%sConnect" % child, comment=individual.getFullName()))
                     else:
                         pendingDeps.append(self.makeEdge(marriage.getName(), "%sConnect" % child))
                 elif count > middle:
-                    subgraph.append(self.makeEdge("%sConnect" % children[count - 1], "%sConnect" % child, comment=self.model.getIndividual(child).getFullName()))
+                    if not individual:
+                        raise NoSuchIndividualException("Can't find individual '%s' in the input file." % child)
+                    subgraph.append(self.makeEdge("%sConnect" % children[count - 1], "%sConnect" % child, comment=individual.getFullName()))
                 if prevChild:
                     subgraph.append(self.makeEdge("%sConnect" % prevChild, "%sConnect" % child, invisible=True))
                     prevChild = None
