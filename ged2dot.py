@@ -475,7 +475,7 @@ class Layout:
         while depth < self.model.config.layoutMaxDepth:
             nextPendings = []
             for pending in pendings:
-                children = []  # type: ignore
+                children: List[str] = []
                 for indi in ('husb', 'wife'):
                     if getattr(pending, indi):
                         indiFamily = getattr(pending, indi).famc
@@ -605,10 +605,11 @@ class Layout:
             subgraph.append(dep)
         self.append(subgraph)
 
-    def __addSiblingSpouses(self, family):  # type: ignore
+    def __addSiblingSpouses(self, family: Family) -> None:
         """Add husb and wife from a family to the layout."""
         depth = family.depth
         subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
+        assert subgraph
         existingIndi, existingPos = subgraph.findFamily(family)
         newIndi = None
         if family.wife and existingIndi == family.wife.id:
@@ -620,10 +621,10 @@ class Layout:
             return
         found = False
         for e in subgraph.elements:
-            if existingIndi == family.wife.id and e.__class__ == Edge and e.to == existingIndi:
-                e.to = newIndi.id
-            elif existingIndi == family.husb.id and e.__class__ == Edge and e.fro == existingIndi:
-                e.fro = newIndi.id
+            if existingIndi == family.wife.id and e.__class__ == Edge and cast(Edge, e).to == existingIndi:
+                cast(Edge, e).to = newIndi.id
+            elif existingIndi == family.husb.id and e.__class__ == Edge and cast(Edge, e).fro == existingIndi:
+                cast(Edge, e).fro = newIndi.id
             found = True
         assert found
         subgraph.elements.insert(existingPos, newIndi.getNode())
@@ -634,7 +635,7 @@ class Layout:
         subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
         subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
 
-    def __addSiblingChildren(self, family):  # type: ignore
+    def __addSiblingChildren(self, family: Family) -> None:
         """Add children from a sibling family to the layout."""
         depth = family.depth
 
@@ -642,6 +643,7 @@ class Layout:
             return
 
         subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
+        assert subgraph
         prevParent = subgraph.getPrevOf(family.husb)
         if (not prevParent) or (not prevParent.fams) or (not len(prevParent.fams.chil)):
             # TODO: handle cousins in this case
@@ -656,6 +658,7 @@ class Layout:
 
         # First, add connect nodes and their deps.
         subgraphConnect = self.getSubgraph(self.model.escape("Depth%sConnects" % depth))
+        assert subgraphConnect
 
         marriage = Marriage(family)
         subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))
@@ -679,14 +682,18 @@ class Layout:
 
         # Then, add the real nodes.
         subgraphChild = self.getSubgraph(self.model.escape("Depth%s" % (depth - 1)))
+        assert subgraphChild
         prevChild = lastChild
         for c in family.chil:
             subgraphChild.prepend(self.makeEdge(prevChild, c, invisible=True))
-            subgraphChild.prepend(self.model.getIndividual(c).getNode())
+            individual = self.model.getIndividual(c)
+            if not individual:
+                raise NoSuchIndividualException("Can't find individual '%s' in the input file." % individual)
+            subgraphChild.prepend(individual.getNode())
             subgraphChild.append(self.makeEdge("%sConnect" % c, c))
             prevChild = c
 
-    def calc(self):  # type: ignore
+    def calc(self) -> None:
         """Tries the arrange nodes on a logical grid. Only logical order is
         defined, the exact positions and sizes are still determined by
         graphviz."""
@@ -694,7 +701,7 @@ class Layout:
         siblingFamilies = self.filterFamilies()
 
         # Children from generation N are nodes in the N+1th generation.
-        pendingChildNodes = []  # type: ignore
+        pendingChildNodes: List[Renderable] = []
         for depth in reversed(list(range(-1, self.model.config.layoutMaxDepth + 1))):
             # Draw two subgraphs for each generation. The first contains the real nodes.
             pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes)
