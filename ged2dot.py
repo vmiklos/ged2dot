@@ -719,16 +719,20 @@ class Layout:
 
 class DescendantsLayout(Layout):
     """A layout that shows all descendants of a root family."""
-    def filterFamilies(self):  # type: ignore
-        self.filteredFamilies = [self.model.getFamily(self.model.config.rootFamily)]
+    def filterFamilies(self) -> List[Family]:
+        family = self.model.getFamily(self.model.config.rootFamily)
+        assert family
+        self.filteredFamilies = [family]
 
         depth = 0
-        pendings = [self.model.getFamily(self.model.config.rootFamily)]
+        pendings = [family]
         while depth < self.model.config.layoutMaxDepth:
             nextPendings = []
             for pending in pendings:
                 for indi in pending.chil:
-                    indiFamily = self.model.getIndividual(indi).fams
+                    individual = self.model.getIndividual(indi)
+                    assert individual
+                    indiFamily = individual.fams
                     if indiFamily:
                         indiFamily.depth = depth + 1
                         self.filteredFamilies.append(indiFamily)
@@ -736,10 +740,12 @@ class DescendantsLayout(Layout):
             pendings = nextPendings
             depth += 1
 
-    def calc(self):  # type: ignore
+        return []
+
+    def calc(self) -> None:
         self.filterFamilies()
 
-        pendingChildNodes = []  # type: ignore
+        pendingChildNodes: List[Renderable] = []
         for depth in range(self.model.config.layoutMaxDepth + 1):
             pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes, descendants=True)
             self.buildConnectorSubgraph(depth)
