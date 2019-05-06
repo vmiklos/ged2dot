@@ -49,7 +49,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
                 'nodeLabelImage': nodeLabelImage
             }
         }
-        config = ged2dot.Config(configDict)  # type: ignore
+        config = ged2dot.Config(configDict)
         model = ged2dot.Model(config)
         model.load(config.input)
         dot = io.StringIO()

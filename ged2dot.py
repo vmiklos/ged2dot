@@ -14,6 +14,7 @@ import codecs
 from functools import cmp_to_key
 from typing import Any
 from typing import BinaryIO
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import TextIO
@@ -842,61 +843,15 @@ class Config:
     nodeLabelImageDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
     nodeLabelImageSwappedDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
 
-    def __init__(self, configDict):  # type: ignore
+    def __init__(self, configDict: Any) -> None:
         self.configDict = configDict
-        self.configOptions = ()
-        # (name, type, default, description)
-        self.configOptions += (('input', 'str', "test.ged", "Input filename (GEDCOM file)"),)
-        self.configOptions += (('rootFamily', 'str', Config.rootFamilyDefault, "Starting from family with this identifier"),)
-
-        self.configOptions += (('considerAgeDead', 'int', "120", "Consider someone dead at this age: put a question mark if death date is missing."),)
-        self.configOptions += (('anonMode', 'bool', 'False', "Anonymous mode: avoid any kind of sensitive data in the output."),)
-        self.configOptions += (('images', 'bool', 'True', "Should the output contain images?"),)
-        self.configOptions += (('imageFormat', 'str', 'images/%(forename)s %(surname)s %(birt)s.jpg', """If images is True: format of the image paths.
-Use a path relative to \"input\" document here!
-Possible variables: %(forename)s, %(surname)s, %(birt)s and %(gwIndex)s.
-where gwIndex is 0 unless there are more individuals with the same forename and surname"""),)
-        self.configOptions += (('imageFormatCase', 'str', '', """Should the filenames (from \"imageFormat\") be converted?
-Possible values: \"\" - don't convert
-                 \"upper\" - convert all characters to upper case
-                 \"lower\" - convert all characters to lower case (use this for geneweb export)
-"""),)
-        self.configOptions += (('imageFormatGeneweb', 'bool', 'False', """Convert some special characters in the imagefilename
-to find pictures of geneweb (also set imageFormatCase to lower for geneweb images)
-"""),)
-
-        self.configOptions += (('nodeLabelImage', 'str', Config.nodeLabelImageDefault, """If images is True: label text of nodes.
-Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),)
-
-        self.configOptions += (('nodeLabelPlain', 'str', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"', """If images is False: label text of nodes.
-Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),)
-
-        self.configOptions += (('edgeInvisibleRed', 'bool', 'False', "Invisible edges: red for debugging or really invisible?"),)
-        self.configOptions += (('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),)
-        self.configOptions += (('layoutMaxDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations to show."),)
-
-        # TODO: implement 'parameter-copy' Default: same as layoutMaxDepth
-        self.configOptions += (('layoutMaxSiblingDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),)
-        self.configOptions += (('layoutMaxSiblingFamilyDepth', 'int', '1', """Number of anchester generations, where also sibling families are shown.
-It's 1 by default, as values >= 2 causes edges to overlap each other in general."""),)
-
-        self.configOptions += (('indiBlacklist', 'str', '', """Comma-sepated list of individual ID's to hide from the output for debugging.
-Example: \"P526, P525\""""),)
-
-        self.configOptions += (('layout', 'str', '', "Currently supported: \"\" or Descendants"),)
-
-        self.configOptions += (('inputEncoding', 'str', 'UTF-8', """encoding of the gedcom
-example \"UTF-8\" or \"ISO 8859-15\""""),)
-
-        self.configOptions += (('outputEncoding', 'str', 'UTF-8', """encoding of the output file
-should be UTF-8 for dot-files"""),)
         self.parse()
 
-    def parse(self):  # type: ignore
+    def parse(self) -> None:
         path = None
 
         if type(self.configDict) == list:
-            args = self.configDict
+            args = cast(List, self.configDict)
             if len(args):
                 path = args[0]
             else:
@@ -909,8 +864,8 @@ should be UTF-8 for dot-files"""),)
             self.parser.read_dict(self.configDict)
         else:
             self.parser.read(path)
-        self.option = {}  # type: ignore
-        for entry in self.configOptions:
+        self.option: Dict[str, Any] = {}
+        for entry in configOptions:
             if (entry[1] == 'str'):
                 self.option[entry[0]] = self.get(entry[0], entry[2])
             elif (entry[1] == 'int'):
@@ -918,21 +873,21 @@ should be UTF-8 for dot-files"""),)
             elif (entry[1] == 'bool'):
                 self.option[entry[0]] = (self.get(entry[0], entry[2]).lower() == "true")
 
-    def usage(self):  # type: ignore
+    def usage(self) -> None:
         sys.stderr.write("\n -- Sample config file below --\n")
         sys.stderr.write("    Un-comment all options where the given default does not fit your needs\n")
         sys.stderr.write("    and either save as \"ged2dotrc\" or provide the filename as first argument\n")
 
         sys.stderr.write("\n--------\n")
         sys.stderr.write("[ged2dot]\n")
-        for entry in self.configOptions:
+        for entry in configOptions:
             for l in entry[3].split('\n'):
                 sys.stderr.write("#%s\n" % l)
             sys.stderr.write("#type: %s\n" % entry[1])
             sys.stderr.write("#%s = %s\n\n" % (entry[0], entry[2]))
         sys.stderr.write("--------\n")
 
-    def __getattr__(self, attr):  # type: ignore
+    def __getattr__(self, attr: str) -> Any:
         if attr in self.__dict__:
             return self.__dict__[attr]
         else:
@@ -941,13 +896,61 @@ should be UTF-8 for dot-files"""),)
             else:
                 return None
 
-    def get(self, what, fallback=configparser._UNSET):  # type: ignore
+    def get(self, what: str, fallback: str = configparser._UNSET) -> str:  # type: ignore  # This is incompatible with MutableMapping, says configparser.pyi
         return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
+
+
+# (name, type, default, description)
+configOptions = (
+    ('input', 'str', "test.ged", "Input filename (GEDCOM file)"),
+    ('rootFamily', 'str', Config.rootFamilyDefault, "Starting from family with this identifier"),
+
+    ('considerAgeDead', 'int', "120", "Consider someone dead at this age: put a question mark if death date is missing."),
+    ('anonMode', 'bool', 'False', "Anonymous mode: avoid any kind of sensitive data in the output."),
+    ('images', 'bool', 'True', "Should the output contain images?"),
+    ('imageFormat', 'str', 'images/%(forename)s %(surname)s %(birt)s.jpg', """If images is True: format of the image paths.
+Use a path relative to \"input\" document here!
+Possible variables: %(forename)s, %(surname)s, %(birt)s and %(gwIndex)s.
+where gwIndex is 0 unless there are more individuals with the same forename and surname"""),
+    ('imageFormatCase', 'str', '', """Should the filenames (from \"imageFormat\") be converted?
+Possible values: \"\" - don't convert
+                 \"upper\" - convert all characters to upper case
+                 \"lower\" - convert all characters to lower case (use this for geneweb export)
+"""),
+    ('imageFormatGeneweb', 'bool', 'False', """Convert some special characters in the imagefilename
+to find pictures of geneweb (also set imageFormatCase to lower for geneweb images)
+"""),
+
+    ('nodeLabelImage', 'str', Config.nodeLabelImageDefault, """If images is True: label text of nodes.
+Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),
+
+    ('nodeLabelPlain', 'str', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"', """If images is False: label text of nodes.
+Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),
+
+    ('edgeInvisibleRed', 'bool', 'False', "Invisible edges: red for debugging or really invisible?"),
+    ('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),
+    ('layoutMaxDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations to show."),
+
+    ('layoutMaxSiblingDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),
+    ('layoutMaxSiblingFamilyDepth', 'int', '1', """Number of anchester generations, where also sibling families are shown.
+It's 1 by default, as values >= 2 causes edges to overlap each other in general."""),
+
+    ('indiBlacklist', 'str', '', """Comma-sepated list of individual ID's to hide from the output for debugging.
+Example: \"P526, P525\"."""),
+
+    ('layout', 'str', '', "Currently supported: \"\" or Descendants"),
+
+    ('inputEncoding', 'str', 'UTF-8', """encoding of the gedcom
+example \"UTF-8\" or \"ISO 8859-15\"."""),
+
+    ('outputEncoding', 'str', 'UTF-8', """encoding of the output file
+should be UTF-8 for dot-files"""),
+)
 
 
 def main() -> None:
     try:
-        config = Config(sys.argv[1:])  # type: ignore
+        config = Config(sys.argv[1:])
     except (BaseException) as be:
         print("Configuration invalid? %s" % (str(be)))
         config.usage()

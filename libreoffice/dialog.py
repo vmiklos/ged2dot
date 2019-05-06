@@ -29,7 +29,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
                 'input': ged,
             }
         }
-        config = ged2dot.Config(configDict)  # type: ignore
+        config = ged2dot.Config(configDict)
         model = ged2dot.Model(config)
         model.load(config.input)
         self.familyDict = {}  # type: ignore
