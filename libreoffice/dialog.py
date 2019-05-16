@@ -20,7 +20,7 @@ from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL
 
 class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):  # type: ignore
     def __init__(self, context, _dialogArgs):  # type: ignore
-        base.GedcomBase.__init__(self, context)  # type: ignore
+        base.GedcomBase.__init__(self, context)
 
     def __extractFamilies(self):  # type: ignore
         ged = unohelper.fileUrlToSystemPath(self.props['URL'])

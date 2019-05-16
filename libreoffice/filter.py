@@ -27,7 +27,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
     type = "draw_GEDCOM"
 
     def __init__(self, context):  # type: ignore
-        base.GedcomBase.__init__(self, context)  # type: ignore
+        base.GedcomBase.__init__(self, context)
 
     def __toSvg(self, ged):  # type: ignore
         rootFamily = ged2dot.Config.rootFamilyDefault
