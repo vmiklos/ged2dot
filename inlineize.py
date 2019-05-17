@@ -8,6 +8,8 @@
 import base64
 import sys
 import xml.etree.ElementTree as ElementTree
+from typing import Union
+from typing import IO
 
 namespaces = {
     'svg': 'http://www.w3.org/2000/svg',
@@ -15,7 +17,7 @@ namespaces = {
 }
 
 
-def inlineize(fro: str, to: str) -> None:
+def inlineize(fro: Union[str, IO[bytes]], to: Union[str, IO[bytes]]) -> None:
     ElementTree.register_namespace('', namespaces['svg'])
     ElementTree.register_namespace('xlink', namespaces['xlink'])
     tree = ElementTree.ElementTree()

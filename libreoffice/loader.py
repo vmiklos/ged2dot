@@ -9,9 +9,9 @@ try:
     import sys
     import traceback
 
-    import uno  # type: ignore
-    import unohelper  # type: ignore
-    from com.sun.star.beans import PropertyValue  # type: ignore
+    import uno  # type: ignore  # Cannot find module named 'uno'
+    import unohelper  # type: ignore  # Cannot find module named 'unohelper'
+    from com.sun.star.beans import PropertyValue  # type: ignore  # Cannot find module named 'com.sun.star.beans'
 
     # Insert our own directory into sys.path. Normally that's already done, and
     # even if it's not, __file__ is defined, so it's trivial to do so. But
