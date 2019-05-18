@@ -5,24 +5,30 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+from typing import Any
+from typing import Dict
+from typing import Iterable
+from typing import Optional
+from typing import Tuple
+
 import ged2dot
 import base
 
-import unohelper  # type: ignore
-from com.sun.star.beans import XPropertyAccess  # type: ignore
-from com.sun.star.ui.dialogs import XExecutableDialog  # type: ignore
-from com.sun.star.document import XImporter  # type: ignore
-from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as ExecutableDialogResults_CANCEL  # type: ignore
+import unohelper  # type: ignore  # Cannot find module named 'unohelper'
+from com.sun.star.beans import XPropertyAccess  # type: ignore  # Cannot find module named 'com.sun.star.beans'
+from com.sun.star.ui.dialogs import XExecutableDialog  # type: ignore  # Cannot find module named 'com.sun.star.ui.dialogs'
+from com.sun.star.document import XImporter  # type: ignore  # Cannot find module named 'com.sun.star.document'
+from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as ExecutableDialogResults_CANCEL  # type: ignore  # Cannot find module named 'com.sun.star.ui.dialogs.ExecutableDialogResults'
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK as ExecutableDialogResults_OK
-from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK  # type: ignore
+from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK  # type: ignore  # Cannot find module named 'com.sun.star.awt.PushButtonType'
 from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL
 
 
-class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):  # type: ignore
-    def __init__(self, context, _dialogArgs):  # type: ignore
+class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):  # type: ignore  # Class cannot subclass
+    def __init__(self, context: Any, _dialogArgs: Any) -> None:
         base.GedcomBase.__init__(self, context)
 
-    def __extractFamilies(self):  # type: ignore
+    def __extractFamilies(self) -> None:
         ged = unohelper.fileUrlToSystemPath(self.props['URL'])
         configDict = {
             'ged2dot': {
@@ -32,7 +38,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         config = ged2dot.Config(configDict)
         model = ged2dot.Model(config)
         model.load(config.input)
-        self.familyDict = {}  # type: ignore
+        self.familyDict: Dict[str, ged2dot.Family] = {}
         for i in model.families:
             help = ""
             if i.husb and i.husb.surname:
@@ -43,8 +49,8 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             key = "%s (%s)" % (i.id, help)
             self.familyDict[key] = i
 
-    def __createControl(self, xParent, type, id, tabIndex, left, top, width, height,  # type: ignore
-                        value=None, buttonType=None):
+    def __createControl(self, xParent: Any, type: str, id: str, tabIndex: int, left: int, top: int, width: int, height: int,
+                        value: Optional[str] = None, buttonType: Optional[int] = None) -> Any:
         control = xParent.createInstance("com.sun.star.awt.UnoControl%sModel" % type)
         control.PositionX = left
         control.PositionY = top
@@ -74,7 +80,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         xParent.insertByName(id, control)
         return control
 
-    def __execDialog(self):  # type: ignore
+    def __execDialog(self) -> Any:
         # .ui files can't be used in extensions ATM, so just to have some guidelines, here are the basics:
         # 1) Control width: 50, 100, etc -- based on demand.
         # 2) Control height, padding: 10
@@ -115,23 +121,25 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         return ret
 
     # XPropertyAccess
-    def getPropertyValues(self):  # type: ignore
+    def getPropertyValues(self) -> Tuple[Any, ...]:
         try:
             return self.toTuple(self.props)
         except Exception:
             self.printTraceback()
 
-    def setPropertyValues(self, props):  # type: ignore
+        return ()
+
+    def setPropertyValues(self, props: Iterable[Any]) -> None:
         try:
             self.props = self.toDict(props)
         except Exception:
             self.printTraceback()
 
     # XExecutableDialog
-    def setTitle(self, title):  # type: ignore
+    def setTitle(self, title: str) -> None:
         pass
 
-    def execute(self):  # type: ignore
+    def execute(self) -> Any:
         try:
             self.__extractFamilies()
             ret = self.__execDialog()
@@ -147,7 +155,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             return ExecutableDialogResults_CANCEL
 
     # XImporter
-    def setTargetDocument(self, xDstDoc):  # type: ignore
+    def setTargetDocument(self, xDstDoc: Any) -> None:
         self.xDstDoc = xDstDoc
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
