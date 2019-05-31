@@ -38,11 +38,9 @@ Its dependencies:
 
   * For Linux, use your package manager to install the `graphviz` package (2.28 is tested).
 
-  * For Mac, http://www.graphviz.org/Download_macos.php[get it here] (2.36 is tested).
+  * For macOS, http://www.graphviz.org/Download_macos.php[get it here] (2.36 is tested).
 
-- We depend on LibreOffice >= 4.2 RC1 because
-  https://bugs.freedesktop.org/show_bug.cgi?id=39206[fdo#39206] is not fixed in
-  earlier versions.
+- LibreOffice >= 6.1
 
 Features:
 
@@ -53,7 +51,7 @@ Features:
 - Internally reuses the excellent SVG import filter of LibreOffice, contributed
   by Fridrich Strba and Thorsten Behrens, so the result can be manually
   fine-tuned if necessary.
-- Runs on Windows and Linux.
+- Runs on Windows and Linux and macOS.
 
 You can grap a release binary at the
 http://extensions.libreoffice.org/extension-center/gedcom[LibreOffice
