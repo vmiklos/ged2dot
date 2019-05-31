@@ -62,8 +62,11 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         if sys.platform.startswith("win"):
             pattern = os.environ['PROGRAMFILES'] + '\\Graphviz*\\bin\\dot.exe'
             dotPaths = glob.glob(pattern)
+            if not len(dotPaths) and 'PROGRAMFILES(x86)' in os.environ.keys():
+                pattern = os.environ['PROGRAMFILES(x86)'] + '\\Graphviz*\\bin\\dot.exe'
+                dotPaths = glob.glob(pattern)
             if not len(dotPaths):
-                raise Exception("No dot.exe found at '%s', please download it from <http://www.graphviz.org/Download_windows.php>." % pattern)
+                raise Exception("No dot.exe found at '%s', please download it from <https://graphviz.gitlab.io/_pages/Download/Download_windows.html>." % pattern)
             dotPath = dotPaths[-1]
         else:
             dotPath = "dot"

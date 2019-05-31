@@ -33,7 +33,8 @@ Its dependencies:
 - It uses Graphviz to process the `dot` format. In case you don't have Graphviz
   installed:
 
-  * For Windows, http://www.graphviz.org/Download_windows.php[get it here] (2.34 is tested).
+  * For Windows,
+    https://graphviz.gitlab.io/_pages/Download/Download_windows.html[get it here] (2.38 is tested).
 
   * For Linux, use your package manager to install the `graphviz` package (2.28 is tested).
 
