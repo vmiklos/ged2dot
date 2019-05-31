@@ -48,11 +48,11 @@ class Individual:
     def __init__(self, model: 'Model') -> None:
         self.model = model
         self.id = ""
-        self.sex: Optional[str] = None
+        self.sex = None  # type: Optional[str]
         self.forename = ""  # John
         self.surname = ""  # Smith
-        self.famc: Any = None  # str or Family
-        self.fams: Any = None  # str or Family
+        self.famc = None  # type: Any  # str or Family
+        self.fams = None  # type: Any  # str or Family
         self.birt = ""
         self.deat = ""
         # Horizontal order is ensured by order deps. Any order dep starting from this node?
@@ -183,10 +183,10 @@ class Family:
 
     def __init__(self, model: 'Model') -> None:
         self.model = model
-        self.id: Optional[str] = None
-        self.husb: Any = None  # str or Individual
-        self.wife: Any = None  # str or Individual
-        self.chil: List[str] = []
+        self.id = None  # type: Optional[str]
+        self.husb = None  # type: Any  # str or Individual
+        self.wife = None  # type: Any  # str or Individual
+        self.chil = []  # type: List[str]
         self.depth = 0
 
     def __str__(self) -> str:
@@ -253,9 +253,9 @@ class Model:
     def __init__(self, config: 'Config') -> None:
         self.config = config
         # List of all individuals.
-        self.individuals: List[Individual] = []
+        self.individuals = []  # type: List[Individual]
         # List of all families.
-        self.families: List[Family] = []
+        self.families = []  # type: List[Family]
 
     def getIndividual(self, id: str) -> Optional[Individual]:
         for i in self.individuals:
@@ -373,7 +373,7 @@ class Subgraph:
     def __init__(self, name: str, model: Model) -> None:
         self.name = name
         self.model = model
-        self.elements: List[Renderable] = []
+        self.elements = []  # type: List[Renderable]
         self.start = Subgraph.Start(name)
 
     def prepend(self, element: Renderable) -> None:
@@ -436,9 +436,9 @@ class Layout:
     def __init__(self, model: Model, out: TextIO) -> None:
         self.model = model
         self.out = out
-        self.subgraphs: List[Subgraph] = []
+        self.subgraphs = []  # type: List[Subgraph]
         # List of families, which are directly interesting for us.
-        self.filteredFamilies: List[Family] = []
+        self.filteredFamilies = []  # type: List[Family]
 
     def append(self, subgraph: Subgraph) -> None:
         self.subgraphs.append(subgraph)
@@ -476,7 +476,7 @@ class Layout:
         while depth < self.model.config.layoutMaxDepth:
             nextPendings = []
             for pending in pendings:
-                children: List[str] = []
+                children = []  # type: List[str]
                 for indi in ('husb', 'wife'):
                     if getattr(pending, indi):
                         indiFamily = getattr(pending, indi).famc
@@ -702,7 +702,7 @@ class Layout:
         siblingFamilies = self.filterFamilies()
 
         # Children from generation N are nodes in the N+1th generation.
-        pendingChildNodes: List[Renderable] = []
+        pendingChildNodes = []  # type: List[Renderable]
         for depth in reversed(list(range(-1, self.model.config.layoutMaxDepth + 1))):
             # Draw two subgraphs for each generation. The first contains the real nodes.
             pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes)
@@ -746,7 +746,7 @@ class DescendantsLayout(Layout):
     def calc(self) -> None:
         self.filterFamilies()
 
-        pendingChildNodes: List[Renderable] = []
+        pendingChildNodes = []  # type: List[Renderable]
         for depth in range(self.model.config.layoutMaxDepth + 1):
             pendingChildNodes = self.buildSubgraph(depth, pendingChildNodes, descendants=True)
             self.buildConnectorSubgraph(depth)
@@ -759,8 +759,8 @@ class GedcomImport:
     def __init__(self, inf: BinaryIO, model: Model) -> None:
         self.inf = inf
         self.model = model
-        self.indi: Optional[Individual] = None
-        self.family: Optional[Family] = None
+        self.indi = None  # type: Optional[Individual]
+        self.family = None  # type: Optional[Family]
         self.inBirt = False
         self.inDeat = False
 
@@ -864,7 +864,7 @@ class Config:
             self.parser.read_dict(self.configDict)
         else:
             self.parser.read(path)
-        self.option: Dict[str, Any] = {}
+        self.option = {}  # type: Dict[str, Any]
         for entry in configOptions:
             if (entry[1] == 'str'):
                 self.option[entry[0]] = self.get(entry[0], entry[2])

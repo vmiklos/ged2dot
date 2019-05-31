@@ -38,7 +38,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         config = ged2dot.Config(configDict)
         model = ged2dot.Model(config)
         model.load(config.input)
-        self.familyDict: Dict[str, ged2dot.Family] = {}
+        self.familyDict = {}  # type: Dict[str, ged2dot.Family]
         for i in model.families:
             help = ""
             if i.husb and i.husb.surname:

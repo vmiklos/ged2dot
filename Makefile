@@ -15,8 +15,8 @@ test-noinline.svg: test.dot
 test.dot: test.ged ged2dot.py ged2dotrc Makefile
 	./ged2dot.py > test.dot
 
-%.mypy : %.py
-	mypy --strict $< && touch $@
+%.mypy : %.py Makefile
+	mypy --python-version 3.5 --strict $< && touch $@
 
 check: check-type
 	cd test && PYTHONPATH=$(PWD) ./test.py
