@@ -20,12 +20,11 @@ from typing import Optional
 from typing import TextIO
 from typing import Tuple
 from typing import cast
-from typing_extensions import Protocol
 
 
 # Protocols
 
-class Renderable(Protocol):
+class Renderable:
     def render(self, _out: TextIO) -> None:
         ...
 
@@ -313,7 +312,7 @@ class Model:
 
 # Layout (view)
 
-class Edge:
+class Edge(Renderable):
     """A graph edge."""
     def __init__(self, model: Model, fro: str, to: str, invisible: bool = False, comment: Optional[str] = None) -> None:
         self.fro = fro
@@ -334,7 +333,7 @@ class Edge:
         out.write("%s -> %s %s\n" % (self.fro, self.to, self.rest))
 
 
-class Node:
+class Node(Renderable):
     """A graph node."""
     def __init__(self, id: str, rest: str = "", point: bool = False, visiblePoint: bool = False, comment: str = "") -> None:
         self.id = id
@@ -365,7 +364,7 @@ class Subgraph:
             out.write("subgraph %s {\n" % self.name)
             out.write("rank = same\n")
 
-    class End:
+    class End(Renderable):
         """Special end node that acts like a node/edge."""
         def render(self, out: TextIO) -> None:
             out.write("}\n")
