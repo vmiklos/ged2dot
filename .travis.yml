@@ -6,6 +6,6 @@ python:
 install:
   - pip install pycodestyle
   - pip install pylint
-  - pip install mypy==0.590
+  - pip install mypy==0.670
   - pip install typing-extensions==3.7.2
 script: make check

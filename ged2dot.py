@@ -851,7 +851,7 @@ class Config:
         path = None
 
         if type(self.configDict) == list:
-            args = cast(List, self.configDict)
+            args = cast(List[str], self.configDict)
             if len(args):
                 path = args[0]
             else:
