@@ -5,9 +5,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+import traceback
 try:
     import sys
-    import traceback
 
     import uno  # type: ignore  # Cannot find module named 'uno'
     import unohelper  # type: ignore  # Cannot find module named 'unohelper'
