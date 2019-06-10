@@ -306,7 +306,8 @@ class Model:
         layout.calc()
         layout.render()
 
-    def escape(self, s: str) -> str:
+    @staticmethod
+    def escape(s: str) -> str:
         return s.replace("-", "_")
 
 
