@@ -124,6 +124,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
     def getPropertyValues(self) -> Tuple[Any, ...]:
         try:
             return self.toTuple(self.props)
+        # pylint: disable=broad-except
         except Exception:
             self.printTraceback()
 
@@ -132,6 +133,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
     def setPropertyValues(self, props: Iterable[Any]) -> None:
         try:
             self.props = self.toDict(props)
+        # pylint: disable=broad-except
         except Exception:
             self.printTraceback()
 
@@ -150,6 +152,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
                     'nodeLabelImage': self.nodeLabelImage
                 })
             return ret
+        # pylint: disable=broad-except
         except Exception:
             self.printTraceback()
             return ExecutableDialogResults_CANCEL
