@@ -12,7 +12,7 @@ from typing import Any
 
 
 class Test(unittest.TestCase):
-    def convert(self, name: str, configDict: Any = {}) -> ged2dot.Model:
+    def convert(self, name: str, configDict: Any) -> ged2dot.Model:
         if len(configDict):
             config = ged2dot.Config(configDict)
         else:
@@ -101,10 +101,10 @@ class Test(unittest.TestCase):
     def test_screenshot(self) -> None:
         # This is the demo input from the README, make sure it works.
         # Also, this time use a config file path, to test that as well.
-        self.convert('screenshot')
+        self.convert('screenshot', {})
 
     def test_descendants(self) -> None:
-        self.convert('descendants')
+        self.convert('descendants', {})
 
 
 if __name__ == '__main__':
