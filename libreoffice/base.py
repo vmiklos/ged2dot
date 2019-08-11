@@ -8,15 +8,15 @@
 import os
 import sys
 import traceback
-from com.sun.star.beans import PropertyValue  # type: ignore  # Cannot find module named 'com.sun.star.beans'
-import uno  # type: ignore  # Cannot find module named 'uno'
 from typing import Any
 from typing import Dict
 from typing import Iterable
 from typing import Tuple
+import uno  # type: ignore  # Cannot find module named 'uno'
+from com.sun.star.beans import PropertyValue  # type: ignore  # Cannot find module named 'com.sun.star.beans'
 
 
-class GedcomBase(object):
+class GedcomBase:
     def __init__(self, context: Any) -> None:
         self.context = context
 

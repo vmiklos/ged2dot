@@ -951,6 +951,7 @@ should be UTF-8 for dot-files"""),
 def main() -> None:
     try:
         config = Config(sys.argv[1:])
+    # pylint: disable=broad-except
     except (BaseException) as be:
         print("Configuration invalid? %s" % (str(be)))
         config.usage()

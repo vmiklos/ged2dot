@@ -11,9 +11,6 @@ from typing import Iterable
 from typing import Optional
 from typing import Tuple
 
-import ged2dot
-import base
-
 import unohelper  # type: ignore  # Cannot find module named 'unohelper'
 from com.sun.star.beans import XPropertyAccess  # type: ignore  # Cannot find module named 'com.sun.star.beans'
 from com.sun.star.ui.dialogs import XExecutableDialog  # type: ignore  # Cannot find module named 'com.sun.star.ui.dialogs'
@@ -23,9 +20,13 @@ from com.sun.star.ui.dialogs.ExecutableDialogResults import OK as ExecutableDial
 from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK  # type: ignore  # Cannot find module named 'com.sun.star.awt.PushButtonType'
 from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL
 
+import ged2dot
+import base
+
 
 class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):  # type: ignore  # Class cannot subclass
     def __init__(self, context: Any, _dialogArgs: Any) -> None:
+        unohelper.Base.__init__(self)
         base.GedcomBase.__init__(self, context)
 
     def __extractFamilies(self) -> None:

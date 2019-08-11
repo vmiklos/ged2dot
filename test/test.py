@@ -7,8 +7,8 @@
 
 import os
 import unittest
-import ged2dot
 from typing import Any
+import ged2dot
 
 
 class Test(unittest.TestCase):
