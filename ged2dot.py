@@ -145,14 +145,13 @@ class Individual:
                 'birt': birt,
                 'deat': deat
             }
-        else:
-            return format % {
-                'picture': picture,
-                'surname': surname,
-                'forename': forename,
-                'birt': self.birt,
-                'deat': self.deat
-            }
+        return format % {
+            'picture': picture,
+            'surname': surname,
+            'forename': forename,
+            'birt': self.birt,
+            'deat': self.deat
+        }
 
     def getColor(self) -> str:
         if self.sex is None:
@@ -400,7 +399,7 @@ class Subgraph:
                 n = cast(Node, e)
                 if family.wife and n.id == family.wife.id:
                     return (family.wife.id, count)
-                elif family.husb and n.id == family.husb.id:
+                if family.husb and n.id == family.husb.id:
                     return (family.husb.id, count)
             count += 1
         return ("", 0)
@@ -890,11 +889,9 @@ class Config:
     def __getattr__(self, attr: str) -> Any:
         if attr in self.__dict__:
             return self.__dict__[attr]
-        else:
-            if attr in self.__dict__["option"]:
-                return self.__dict__["option"][attr]
-            else:
-                return None
+        if attr in self.__dict__["option"]:
+            return self.__dict__["option"][attr]
+        return None
 
     def get(self, what: str, fallback: str = configparser._UNSET) -> str:  # type: ignore  # This is incompatible with MutableMapping, says configparser.pyi
         return self.parser.get('ged2dot', what, fallback=fallback).split('#')[0]
