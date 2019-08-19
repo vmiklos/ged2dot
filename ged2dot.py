@@ -126,11 +126,11 @@ class Individual:
         except ImportError:
             pass
 
-        format = ""
+        format_string = ""
         if self.model.config.images:
-            format = self.model.config.nodeLabelImage
+            format_string = self.model.config.nodeLabelImage
         else:
-            format = self.model.config.nodeLabelPlain
+            format_string = self.model.config.nodeLabelPlain
         if self.model.config.anonMode:
             birt = self.birt
             if len(birt) > 1:
@@ -138,14 +138,14 @@ class Individual:
             deat = self.deat
             if len(deat) > 1:
                 deat = "YYYY"
-            return format % {
+            return format_string % {
                 'picture': picture,
                 'surname': self.id[0],
                 'forename': self.id[1:],
                 'birt': birt,
                 'deat': deat
             }
-        return format % {
+        return format_string % {
             'picture': picture,
             'surname': surname,
             'forename': forename,
@@ -255,9 +255,9 @@ class Model:
         # List of all families.
         self.families = []  # type: List[Family]
 
-    def getIndividual(self, id: str) -> Optional[Individual]:
+    def getIndividual(self, id_string: str) -> Optional[Individual]:
         for i in self.individuals:
-            if i.id == id:
+            if i.id == id_string:
                 return i
         return None
 
@@ -269,13 +269,13 @@ class Model:
         myList.sort()
         return myList.index(searchId)
 
-    def getFamily(self, id: str, familySet: Optional[List[Family]] = None) -> Optional[Family]:
+    def getFamily(self, id_string: str, familySet: Optional[List[Family]] = None) -> Optional[Family]:
         if familySet:
             families = familySet
         else:
             families = self.families
         for i in families:
-            if i.id == id:
+            if i.id == id_string:
                 return i
         return None
 
@@ -335,8 +335,8 @@ class Edge(Renderable):
 
 class Node(Renderable):
     """A graph node."""
-    def __init__(self, id: str, rest: str = "", point: bool = False, visiblePoint: bool = False, comment: str = "") -> None:
-        self.id = id
+    def __init__(self, id_string: str, rest: str = "", point: bool = False, visiblePoint: bool = False, comment: str = "") -> None:
+        self.id = id_string
         self.rest = rest
         if point:
             self.rest += "[ shape = point, width = 0 ]"
@@ -449,9 +449,9 @@ class Layout:
             i.render(self.out)
         self.out.write("}\n")
 
-    def getSubgraph(self, id: str) -> Optional[Subgraph]:
+    def getSubgraph(self, id_string: str) -> Optional[Subgraph]:
         for s in self.subgraphs:
-            if s.name == id:
+            if s.name == id_string:
                 return s
         return None
 
@@ -784,8 +784,8 @@ class GedcomImport:
                     self.family = None
 
                 if rest.startswith("@") and rest.endswith("INDI"):
-                    id = rest[1:-6]
-                    if id not in self.model.config.indiBlacklist:
+                    id_string = rest[1:-6]
+                    if id_string not in self.model.config.indiBlacklist:
                         self.indi = Individual(self.model)
                         self.indi.id = rest[1:-6]
                 elif rest.startswith("@") and rest.endswith("FAM"):
@@ -821,8 +821,8 @@ class GedcomImport:
                 elif rest.startswith("WIFE") and self.family:
                     self.family.wife = rest[6:-1]
                 elif rest.startswith("CHIL") and self.family:
-                    id = rest[6:-1]
-                    if id not in self.model.config.indiBlacklist:
+                    id_string = rest[6:-1]
+                    if id_string not in self.model.config.indiBlacklist:
                         self.family.chil.append(rest[6:-1])
 
             elif level == 2:

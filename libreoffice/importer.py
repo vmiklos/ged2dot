@@ -127,10 +127,10 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
     # XExtendedFilterDetection
     def detect(self, args: Iterable[Any]) -> Tuple[str, Iterable[Any]]:
         try:
-            dict = self.toDict(args)
-            if self.__detect(dict["InputStream"]):
-                dict["TypeName"] = GedcomImport.type
-                return GedcomImport.type, self.toTuple(dict)
+            dictionary = self.toDict(args)
+            if self.__detect(dictionary["InputStream"]):
+                dictionary["TypeName"] = GedcomImport.type
+                return GedcomImport.type, self.toTuple(dictionary)
         # pylint: disable=broad-except
         except Exception:
             self.printTraceback()

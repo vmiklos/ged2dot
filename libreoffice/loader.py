@@ -32,11 +32,11 @@ try:
     sys.path.insert(0, path)
 
     import dialog
-    import filter
+    import importer
 
     g_ImplementationHelper = unohelper.ImplementationHelper()
     g_ImplementationHelper.addImplementation(dialog.GedcomDialog, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog", ("com.sun.star.ui.dialogs.FilterOptionsDialog",))
-    g_ImplementationHelper.addImplementation(filter.GedcomImport, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter", ("com.sun.star.document.ImportFilter",))
+    g_ImplementationHelper.addImplementation(importer.GedcomImport, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter", ("com.sun.star.document.ImportFilter",))
 # pylint: disable=broad-except
 except Exception:
     traceback.print_exc(file=sys.stderr)

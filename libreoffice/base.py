@@ -43,9 +43,9 @@ class GedcomBase:
             xPathSubstitution = self.context.ServiceManager.createInstance("com.sun.star.util.PathSubstitution")
             user = xPathSubstitution.getSubstituteVariableValue("user")
             path = uno.fileUrlToSystemPath(user + "/Scripts/python/log.txt")
-            dir = os.path.dirname(path)
-            if not os.path.exists(dir):
-                os.makedirs(dir)
+            directory = os.path.dirname(path)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
             sock = open(path, "a")
             traceback.print_exc(file=sock)
             sock.close()

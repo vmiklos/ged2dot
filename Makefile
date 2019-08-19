@@ -1,5 +1,5 @@
 SHELL := bash
-PYFILES := ged2dot.py inlineize.py test/test.py libreoffice/base.py libreoffice/loader.py libreoffice/filter.py libreoffice/dialog.py
+PYFILES := ged2dot.py inlineize.py test/test.py libreoffice/base.py libreoffice/loader.py libreoffice/importer.py libreoffice/dialog.py
 
 check-type: $(patsubst %.py,%.mypy,$(PYFILES))
 
@@ -23,7 +23,7 @@ test.dot: test.ged ged2dot.py ged2dotrc Makefile
 %.lint : %.py Makefile
 	pylint \
 		--max-line-length=120 \
-		--disable=import-error,redefined-builtin,unidiomatic-typecheck,pointless-statement,too-many-instance-attributes,attribute-defined-outside-init,missing-docstring,no-self-use,invalid-name,too-many-branches,too-many-statements,fixme,len-as-condition,line-too-long,superfluous-parens,too-many-arguments,unused-import,protected-access,too-few-public-methods,too-many-locals \
+		--disable=import-error,unidiomatic-typecheck,pointless-statement,too-many-instance-attributes,attribute-defined-outside-init,missing-docstring,no-self-use,invalid-name,too-many-branches,too-many-statements,fixme,len-as-condition,line-too-long,superfluous-parens,too-many-arguments,unused-import,protected-access,too-few-public-methods,too-many-locals \
 		$< && touch $@
 
 check: check-type check-lint
