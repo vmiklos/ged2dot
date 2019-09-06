@@ -80,10 +80,10 @@ class Individual:
         else:
             surname = ""
 
-        if (self.model.config.imageFormatCase.lower() == 'lower'):
+        if self.model.config.imageFormatCase.lower() == 'lower':
             forename = forename.lower()
             surname = surname.lower()
-        elif (self.model.config.imageFormatCase.lower() == 'upper'):
+        elif self.model.config.imageFormatCase.lower() == 'upper':
             forename = forename.upper()
             surname = surname.upper()
 
@@ -94,7 +94,7 @@ class Individual:
             'birt': self.birt
         }
 
-        if (self.model.config.imageFormatGeneweb):
+        if self.model.config.imageFormatGeneweb:
             import unicodedata
             path = unicodedata.normalize('NFKD', path).encode('ascii', 'ignore').decode('ascii')
             path = path.translate(dict({ord("-"): "_"}))
@@ -865,11 +865,11 @@ class Config:
             self.parser.read(path)
         self.option = {}  # type: Dict[str, Any]
         for entry in configOptions:
-            if (entry[1] == 'str'):
+            if entry[1] == 'str':
                 self.option[entry[0]] = self.get(entry[0], entry[2])
-            elif (entry[1] == 'int'):
+            elif entry[1] == 'int':
                 self.option[entry[0]] = int(self.get(entry[0], entry[2]))
-            elif (entry[1] == 'bool'):
+            elif entry[1] == 'bool':
                 self.option[entry[0]] = (self.get(entry[0], entry[2]).lower() == "true")
 
     def usage(self) -> None:
@@ -959,7 +959,7 @@ def main() -> None:
     except (BaseException) as be:
         config.usage()
         raise be
-    if (sys.version_info[0] < 3):
+    if sys.version_info[0] < 3:
         sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
     model.save(sys.stdout)
 

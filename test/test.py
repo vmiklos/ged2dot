@@ -47,7 +47,7 @@ class Test(unittest.TestCase):
         model = self.convert('partial-name', configDict)
         indi = model.getIndividual("P48")
         assert indi
-        assert("None" not in indi.getLabel())
+        self.assertTrue("None" not in indi.getLabel())
 
     def test_husbcousin(self) -> None:
         # Layout failed when handling cousins on the left edge of the layout.
