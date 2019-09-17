@@ -164,12 +164,12 @@ class Individual:
         return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))
 
     def setBirt(self, birt: str) -> None:
-        if not len(birt):
+        if not birt:
             return
         self.birt = birt
         try:
             if time.localtime().tm_year - int(birt) > self.model.config.considerAgeDead:
-                if not len(self.deat):
+                if not self.deat:
                     self.deat = "?"
         except ValueError:
             pass
@@ -296,7 +296,7 @@ class Model:
 
         # Support multiple layouts.
         layoutName = "Layout"
-        if len(self.config.layout):
+        if self.config.layout:
             layoutName = self.config.layout + layoutName
             layout = globals()[layoutName](self, out)
         else:
@@ -342,7 +342,7 @@ class Node(Renderable):
             self.rest += "[ shape = point, width = 0 ]"
         elif visiblePoint:
             self.rest += "[ shape = point ]"
-        if len(comment):
+        if comment:
             self.rest += " // %s" % comment
 
     def render(self, out: TextIO) -> None:
@@ -565,7 +565,7 @@ class Layout:
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
             marriage = Marriage(family)
             children = family.chil[:]
-            if not (len(children) % 2 == 1 or len(children) == 0):
+            if not (len(children) % 2 == 1 or not children):
                 # If there is no middle child, then insert a fake node here, so
                 # marriage can connect to that one.
                 half = int(len(children) / 2)
@@ -598,7 +598,7 @@ class Layout:
                     subgraph.append(self.makeEdge("%sConnect" % prevChild, "%sConnect" % child, invisible=True))
                     prevChild = None
                 count += 1
-            if len(children):
+            if children:
                 prevChild = children[-1]
         subgraph.end()
         for dep in pendingDeps:
@@ -645,13 +645,13 @@ class Layout:
         subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
         assert subgraph
         prevParent = subgraph.getPrevOf(family.husb)
-        if (not prevParent) or (not prevParent.fams) or (not len(prevParent.fams.chil)):
+        if not prevParent or not prevParent.fams or not prevParent.fams.chil:
             # TODO: handle cousins in this case
             # TODO: handle None prevParent.fams
             return
         if not prevParent.fams:
             return
-        if len(prevParent.fams.chil) == 0:
+        if not prevParent.fams.chil:
             sys.stderr.write("prevParent.fams.chil should not be empty?\n")
             return
         lastChild = prevParent.fams.chil[-1]
@@ -713,7 +713,7 @@ class Layout:
             self.__addSiblingSpouses(f)
 
             # Any children to take care of?
-            if len(f.chil):
+            if f.chil:
                 self.__addSiblingChildren(f)
 
 
@@ -851,7 +851,7 @@ class Config:
 
         if type(self.configDict) == list:
             args = cast(List[str], self.configDict)
-            if len(args):
+            if args:
                 path = args[0]
             else:
                 path = "ged2dotrc"
