@@ -849,7 +849,7 @@ class Config:
     def parse(self) -> None:
         path = None
 
-        if type(self.configDict) == list:
+        if isinstance(self.configDict, list):
             args = cast(List[str], self.configDict)
             if args:
                 path = args[0]
