@@ -254,6 +254,7 @@ class Model:
         self.individuals = []  # type: List[Individual]
         # List of all families.
         self.families = []  # type: List[Family]
+        self.basedir = ""
 
     def getIndividual(self, id_string: str) -> Optional[Individual]:
         for i in self.individuals:

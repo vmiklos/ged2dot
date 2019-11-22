@@ -28,6 +28,12 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
     def __init__(self, context: Any, _dialogArgs: Any) -> None:
         unohelper.Base.__init__(self)
         base.GedcomBase.__init__(self, context)
+        self.familyDict = {}  # type: Dict[str, ged2dot.Family]
+        self.rootFamily = None  # type: Optional[str]
+        self.layoutMax = 0
+        self.nodeLabelImage = ""
+        self.props = {}  # type: Dict[str, Any]
+        self.xDstDoc = None
 
     def __extractFamilies(self) -> None:
         ged = unohelper.fileUrlToSystemPath(self.props['URL'])
@@ -39,7 +45,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         config = ged2dot.Config(configDict)
         model = ged2dot.Model(config)
         model.load(config.input)
-        self.familyDict = {}  # type: Dict[str, ged2dot.Family]
+        self.familyDict = {}
         for i in model.families:
             help_string = ""
             if i.husb and i.husb.surname:

@@ -33,6 +33,8 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
     def __init__(self, context: Any) -> None:
         unohelper.Base.__init__(self)
         base.GedcomBase.__init__(self, context)
+        self.props = {}  # type: Dict[str, Any]
+        self.xDstDoc = None
 
     def __toSvg(self, ged: str) -> bytes:
         rootFamily = ged2dot.Config.rootFamilyDefault
