@@ -12,7 +12,8 @@ import ged2dot
 
 
 class Test(unittest.TestCase):
-    def convert(self, name: str, configDict: Any) -> ged2dot.Model:
+    @staticmethod
+    def convert(name: str, configDict: Any) -> ged2dot.Model:
         if configDict:
             config = ged2dot.Config(configDict)
         else:

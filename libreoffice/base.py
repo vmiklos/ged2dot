@@ -23,13 +23,15 @@ class GedcomBase:
     def createUnoService(self, name: str) -> Any:
         return self.context.ServiceManager.createInstanceWithContext("com.sun.star.%s" % name, self.context)
 
-    def toDict(self, args: Iterable[Any]) -> Dict[str, Any]:
+    @staticmethod
+    def toDict(args: Iterable[Any]) -> Dict[str, Any]:
         ret = {}
         for i in args:
             ret[i.Name] = i.Value
         return ret
 
-    def toTuple(self, args: Dict[str, Any]) -> Tuple[Any, ...]:
+    @staticmethod
+    def toTuple(args: Dict[str, Any]) -> Tuple[Any, ...]:
         ret = []
         for k, v in args.items():
             value = PropertyValue()

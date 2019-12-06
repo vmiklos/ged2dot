@@ -89,7 +89,8 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         inline.seek(0)
         return inline.read()
 
-    def __detect(self, xInputStream: Any) -> bool:
+    @staticmethod
+    def __detect(xInputStream: Any) -> bool:
         byteSequence = uno.ByteSequence(bytes())
         # Input with and without UTF-8 BOM is OK.
         for i in ["0 HEAD", "\ufeff0 HEAD"]:

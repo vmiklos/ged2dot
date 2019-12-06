@@ -25,6 +25,7 @@ from typing import cast
 # Protocols
 
 class Renderable:
+    # pylint: disable=no-self-use
     def render(self, _out: TextIO) -> None:
         ...
 
@@ -873,7 +874,8 @@ class Config:
             elif entry[1] == 'bool':
                 self.option[entry[0]] = (self.get(entry[0], entry[2]).lower() == "true")
 
-    def usage(self) -> None:
+    @staticmethod
+    def usage() -> None:
         sys.stderr.write("\n -- Sample config file below --\n")
         sys.stderr.write("    Un-comment all options where the given default does not fit your needs\n")
         sys.stderr.write("    and either save as \"ged2dotrc\" or provide the filename as first argument\n")
