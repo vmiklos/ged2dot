@@ -1,1 +1,4 @@
 - P165 in test/husb-cousin.ged could be included, ATM it's ignored
+
+- test/nosex.py should be finished. the nosex.ged is created, but the glue
+-  to run the test and check the return error line is not finished
