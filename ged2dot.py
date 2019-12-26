@@ -766,8 +766,11 @@ class GedcomImport:
         self.inDeat = False
 
     def load(self) -> None:
+        linecount = 0
+
         for i in self.inf.readlines():
             line = i.strip().decode(self.model.config.inputEncoding)
+            linecount += 1
             tokens = line.split(' ')
 
             firstToken = tokens[0]
@@ -777,64 +780,70 @@ class GedcomImport:
 
             level = int(firstToken)
             rest = " ".join(tokens[1:])
-            if level == 0:
-                if self.indi:
-                    self.model.individuals.append(self.indi)
-                    self.indi = None
-                if self.family:
-                    self.model.families.append(self.family)
-                    self.family = None
+            # try to identify lines with errors
+            try:
+                if level == 0:
+                    if self.indi:
+                        self.model.individuals.append(self.indi)
+                        self.indi = None
+                    if self.family:
+                        self.model.families.append(self.family)
+                        self.family = None
 
-                if rest.startswith("@") and rest.endswith("INDI"):
-                    id_string = rest[1:-6]
-                    if id_string not in self.model.config.indiBlacklist:
-                        self.indi = Individual(self.model)
-                        self.indi.id = rest[1:-6]
-                elif rest.startswith("@") and rest.endswith("FAM"):
-                    self.family = Family(self.model)
-                    self.family.id = rest[1:-5]
+                    if rest.startswith("@") and rest.endswith("INDI"):
+                        id_string = rest[1:-6]
+                        if id_string not in self.model.config.indiBlacklist:
+                            self.indi = Individual(self.model)
+                            self.indi.id = rest[1:-6]
+                    elif rest.startswith("@") and rest.endswith("FAM"):
+                        self.family = Family(self.model)
+                        self.family.id = rest[1:-5]
 
-            elif level == 1:
-                if self.inBirt:
-                    self.inBirt = False
-                elif self.inDeat:
-                    self.inDeat = False
-
-                if rest.startswith("SEX") and self.indi:
-                    self.indi.sex = rest.split(' ')[1]
-                elif rest.startswith("NAME") and self.indi:
-                    rest = rest[5:]
-                    tokens = rest.split('/')
-                    self.indi.forename = tokens[0].strip()
-                    if len(tokens) > 1:
-                        self.indi.surname = tokens[1].strip()
-                elif rest.startswith("FAMC") and self.indi:
-                    # Child in multiple families? That's crazy...
-                    if not self.indi.famc:
-                        self.indi.famc = rest[6:-1]
-                elif rest.startswith("FAMS") and self.indi:
-                    self.indi.fams = rest[6:-1]
-                elif rest.startswith("BIRT"):
-                    self.inBirt = True
-                elif rest.startswith("DEAT"):
-                    self.inDeat = True
-                elif rest.startswith("HUSB") and self.family:
-                    self.family.husb = rest[6:-1]
-                elif rest.startswith("WIFE") and self.family:
-                    self.family.wife = rest[6:-1]
-                elif rest.startswith("CHIL") and self.family:
-                    id_string = rest[6:-1]
-                    if id_string not in self.model.config.indiBlacklist:
-                        self.family.chil.append(rest[6:-1])
-
-            elif level == 2:
-                if rest.startswith("DATE") and self.indi:
-                    year = rest.split(' ')[-1]
+                elif level == 1:
                     if self.inBirt:
-                        self.indi.setBirt(year)
+                        self.inBirt = False
                     elif self.inDeat:
-                        self.indi.deat = year
+                        self.inDeat = False
 
+                    if rest.startswith("SEX") and self.indi:
+                        self.indi.sex = rest.split(' ')[1]
+                    elif rest.startswith("NAME") and self.indi:
+                        rest = rest[5:]
+                        tokens = rest.split('/')
+                        self.indi.forename = tokens[0].strip()
+                        if len(tokens) > 1:
+                            self.indi.surname = tokens[1].strip()
+                    elif rest.startswith("FAMC") and self.indi:
+                        # Child in multiple families? That's crazy...
+                        if not self.indi.famc:
+                            self.indi.famc = rest[6:-1]
+                    elif rest.startswith("FAMS") and self.indi:
+                        self.indi.fams = rest[6:-1]
+                    elif rest.startswith("BIRT"):
+                        self.inBirt = True
+                    elif rest.startswith("DEAT"):
+                        self.inDeat = True
+                    elif rest.startswith("HUSB") and self.family:
+                        self.family.husb = rest[6:-1]
+                    elif rest.startswith("WIFE") and self.family:
+                        self.family.wife = rest[6:-1]
+                    elif rest.startswith("CHIL") and self.family:
+                        id_string = rest[6:-1]
+                        if id_string not in self.model.config.indiBlacklist:
+                            self.family.chil.append(rest[6:-1])
+
+                elif level == 2:
+                    if rest.startswith("DATE") and self.indi:
+                        year = rest.split(' ')[-1]
+                        if self.inBirt:
+                            self.indi.setBirt(year)
+                        elif self.inDeat:
+                            self.indi.deat = year
+
+            except Exception as e:
+                print("Encountered parsing error in .ged: " + str(e))
+                print("line (%d): %s" % (linecount, line))
+                sys.exit(1)
 
 # Configuration handling
 
@@ -949,18 +958,22 @@ should be UTF-8 for dot-files"""),
 
 
 def main() -> None:
+    if not os.path.exists("ged2dotrc"):
+        sys.stderr.write("Fatal: ged2dotrc configuration file doesn't exist.\nCreate a config file similar to test/screenshotrc, name it ged2dotrc and continue.\n")
+        sys.exit(1)
     try:
         config = Config(sys.argv[1:])
     # pylint: disable=broad-except
     except (BaseException) as be:
         print("Configuration invalid? %s" % (str(be)))
-        config.usage()
+        #config.usage()
         sys.exit(1)
     model = Model(config)
     try:
         model.load(config.input)
     except (BaseException) as be:
-        config.usage()
+        sys.stderr.write("error in tree file:\n")
+        #config.usage()
         raise be
     if sys.version_info[0] < 3:
         sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
