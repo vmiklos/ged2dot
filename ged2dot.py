@@ -162,7 +162,7 @@ class Individual:
         return {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
     def getNode(self) -> 'Node':
-        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s ]' % (self.getLabel(), self.getColor()))
+        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s,\npenwidth=%s ]' % (self.getLabel(), self.getColor(), self.model.config.nodeBorderWidth))
 
     def setBirt(self, birt: str) -> None:
         if not birt:
@@ -445,7 +445,7 @@ class Layout:
         self.subgraphs.append(subgraph)
 
     def render(self) -> None:
-        self.out.write("digraph {\n")
+        self.out.write("digraph tree {\n")
         self.out.write("splines = ortho\n")
         for i in self.subgraphs:
             i.render(self.out)
@@ -840,7 +840,6 @@ class GedcomImport:
                         elif self.inDeat:
                             self.indi.deat = year
 
-            # pylint: disable=broad-except
             except Exception as e:
                 print("Encountered parsing error in .ged: " + str(e))
                 print("line (%d): %s" % (linecount, line))
@@ -852,6 +851,7 @@ class GedcomImport:
 class Config:
     layoutMaxDepthDefault = '5'
     rootFamilyDefault = 'F1'
+    nodeBorderWidthDefault = '1.0'
     nodeLabelImageDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
     nodeLabelImageSwappedDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
 
@@ -887,18 +887,18 @@ class Config:
 
     @staticmethod
     def usage() -> None:
-        sys.stderr.write("\n -- Sample config file below --\n")
-        sys.stderr.write("    Un-comment all options where the given default does not fit your needs\n")
-        sys.stderr.write("    and either save as \"ged2dotrc\" or provide the filename as first argument\n")
+        sys.stdout.write("\n -- Sample config file below --\n")
+        sys.stdout.write("    Un-comment all options where the given default does not fit your needs\n")
+        sys.stdout.write("    and either save as \"ged2dotrc\" or provide the filename as first argument\n")
 
-        sys.stderr.write("\n--------\n")
-        sys.stderr.write("[ged2dot]\n")
+        sys.stdout.write("\n--------\n")
+        sys.stdout.write("[ged2dot]\n")
         for entry in configOptions:
             for l in entry[3].split('\n'):
-                sys.stderr.write("#%s\n" % l)
-            sys.stderr.write("#type: %s\n" % entry[1])
-            sys.stderr.write("#%s = %s\n\n" % (entry[0], entry[2]))
-        sys.stderr.write("--------\n")
+                sys.stdout.write("#%s\n" % l)
+            sys.stdout.write("#type: %s\n" % entry[1])
+            sys.stdout.write("#%s = %s\n\n" % (entry[0], entry[2]))
+        sys.stdout.write("--------\n")
 
     def __getattr__(self, attr: str) -> Any:
         if attr in self.__dict__:
@@ -937,6 +937,7 @@ Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."
 
     ('nodeLabelPlain', 'str', '"%(forename)s\\n%(surname)s\\n%(birt)s-%(deat)s"', """If images is False: label text of nodes.
 Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."""),
+    ('nodeBorderWidth', 'str', Config.nodeBorderWidthDefault, """The box pencil thickness on individual person boxes. It should resemble a floating point number. Default=1.0"""),
 
     ('edgeInvisibleRed', 'bool', 'False', "Invisible edges: red for debugging or really invisible?"),
     ('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),
@@ -968,14 +969,17 @@ def main() -> None:
     # pylint: disable=broad-except
     except (BaseException) as be:
         print("Configuration invalid? %s" % (str(be)))
-        # config.usage()
         sys.exit(1)
+
+    if len(sys.argv) > 1 and (sys.argv[1] == "--help" or sys.argv[1] == "-h"):
+        config.usage()
+        sys.exit(0)
+
     model = Model(config)
     try:
         model.load(config.input)
     except (BaseException) as be:
         sys.stderr.write("error in tree file:\n")
-        # config.usage()
         raise be
     if sys.version_info[0] < 3:
         sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
