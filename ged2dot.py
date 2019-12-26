@@ -840,12 +840,14 @@ class GedcomImport:
                         elif self.inDeat:
                             self.indi.deat = year
 
+            # pylint: disable=broad-except
             except Exception as e:
                 print("Encountered parsing error in .ged: " + str(e))
                 print("line (%d): %s" % (linecount, line))
                 sys.exit(1)
 
 # Configuration handling
+
 
 class Config:
     layoutMaxDepthDefault = '5'
@@ -966,14 +968,14 @@ def main() -> None:
     # pylint: disable=broad-except
     except (BaseException) as be:
         print("Configuration invalid? %s" % (str(be)))
-        #config.usage()
+        # config.usage()
         sys.exit(1)
     model = Model(config)
     try:
         model.load(config.input)
     except (BaseException) as be:
         sys.stderr.write("error in tree file:\n")
-        #config.usage()
+        # config.usage()
         raise be
     if sys.version_info[0] < 3:
         sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
