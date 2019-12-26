@@ -12,6 +12,9 @@ families to graph edges, then `dot` takes care of the rest. What's unique about
 `ged2dot` is that it allows more than showing ancestors and descendants of a
 single individual (what you can easily do with random family editor software).
 
+You need to have a working ged2dotrc for the tool to process your .ged file. 
+See the example in test/screenshotrc for a very complete list of options
+
 == Layouts
 
 - The default layout allows to show ancestors of a family (both husband and
