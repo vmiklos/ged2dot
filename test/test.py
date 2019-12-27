@@ -50,6 +50,16 @@ class Test(unittest.TestCase):
         assert indi
         self.assertTrue("None" not in indi.getLabel())
 
+    def test_nosex(self) -> None:
+        # if there is no sex, this should fail and indicate line number
+        configDict = {
+            'ged2dot': {
+                'input': 'nosex.ged',
+                'rootFamily': 'F1'
+            }
+        }
+        self.convert('nosex', configDict)
+
     def test_husbcousin(self) -> None:
         # Layout failed when handling cousins on the left edge of the layout.
         configDict = {
