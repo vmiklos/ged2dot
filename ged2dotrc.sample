@@ -1,0 +1,14 @@
+[ged2dot]
+# Input GEDCOM file.
+input = mytree.ged
+# Root family.
+rootFamily = F12
+# generations
+layoutMaxDepth = 5
+# use plain text labels
+images = False
+nodeLabelPlain = "%(forename)s\n%(surname)s\n%(birt)s-%(deat)s"
+# emphasized border width of boxes around people
+nodeBorderWidth = 2.0
+# siblings
+layoutMaxSiblingFamilyDepth = 0
