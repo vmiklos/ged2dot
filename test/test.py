@@ -5,10 +5,20 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+import io
 import os
 import unittest
+import unittest.mock
 from typing import Any
+from typing import List
 import ged2dot
+
+
+def mock_sys_exit(ret: List[int]) -> Any:
+    """Mocks sys.exit()."""
+    def mock(code: int) -> None:
+        ret.append(code)
+    return mock
 
 
 class Test(unittest.TestCase):
@@ -51,15 +61,24 @@ class Test(unittest.TestCase):
         self.assertTrue("None" not in indi.getLabel())
 
     def test_nosex(self) -> None:
-        # Disable this till this actually passes.
-        """# if there is no sex, this should fail and indicate line number
-        configDict = {
-            'ged2dot': {
-                'input': 'nosex.ged',
-                'rootFamily': 'F1'
-            }
-        }
-        self.convert('nosex', configDict)"""
+        # Capture standard output.
+        buf = io.StringIO()
+        with unittest.mock.patch('sys.stdout', buf):
+            ret = []  # type: List[int]
+            with unittest.mock.patch('sys.exit', mock_sys_exit(ret)):
+                # if there is no sex, this should fail and indicate line number
+                configDict = {
+                    'ged2dot': {
+                        'input': 'nosex.ged',
+                        'rootFamily': 'F1'
+                    }
+                }
+                self.convert('nosex', configDict)
+                self.assertEqual(ret, [1])
+                buf.seek(0)
+                expected = "Encountered parsing error in .ged: list index out of range\n"
+                expected += "line (12): 1 SEX\n"
+                self.assertEqual(buf.read(), expected)
 
     def test_husbcousin(self) -> None:
         # Layout failed when handling cousins on the left edge of the layout.
