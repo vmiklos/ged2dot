@@ -840,6 +840,7 @@ class GedcomImport:
                         elif self.inDeat:
                             self.indi.deat = year
 
+            # pylint: disable=broad-except
             except Exception as e:
                 print("Encountered parsing error in .ged: " + str(e))
                 print("line (%d): %s" % (linecount, line))
