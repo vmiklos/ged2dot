@@ -488,7 +488,7 @@ class Layout:
                             children += indiFamily.chil
 
                 # Also collect children's family.
-                if depth < self.model.config.layoutMaxSiblingDepth + 1:
+                if depth < self.model.config.layoutMaxSiblingSpouseDepth + 1:
                     # +1, because children are in the previous generation.
                     for chil in children:
                         individual = self.model.getIndividual(chil)
@@ -944,7 +944,7 @@ Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."
     ('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),
     ('layoutMaxDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations to show."),
 
-    ('layoutMaxSiblingDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),
+    ('layoutMaxSiblingSpouseDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),
     ('layoutMaxSiblingFamilyDepth', 'int', '1', """Number of anchester generations, where also sibling families are shown.
 It's 1 by default, as values >= 2 causes edges to overlap each other in general."""),
 
