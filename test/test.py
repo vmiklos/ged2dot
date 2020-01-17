@@ -7,10 +7,12 @@
 
 import io
 import os
+import sys
 import unittest
 import unittest.mock
 from typing import Any
 from typing import List
+from typing import cast
 import ged2dot
 
 
@@ -136,6 +138,31 @@ class Test(unittest.TestCase):
 
     def test_descendants(self) -> None:
         self.convert('descendants', {})
+
+    def test_layout_max_sibling_depth(self) -> None:
+        """
+        Test that in case siblings are hidden in all ancestor generations, then P9 (Greg) doesn't
+        show up in the output. Without the explicit layoutMaxSiblingDepth=0, layoutMaxDepth=1 would
+        pull that in.
+        """
+        configDict = {
+            'ged2dot': {
+                'input': 'layout-max-sibling-depth.ged',
+                'rootFamily': 'F1',
+                'layoutMaxDepth': 1,
+                'layoutMaxSiblingDepth': 0
+            }
+        }
+        config = ged2dot.Config(configDict)
+        model = ged2dot.Model(config)
+        model.load(config.input)
+        layout = ged2dot.Layout(model, sys.stdout)
+        layout.calc()
+        for subgraph in layout.subgraphs:
+            for element in subgraph.elements:
+                if element.__class__ == ged2dot.Node:
+                    node = cast(ged2dot.Node, element)
+                    self.assertTrue(node.id != "p9")
 
 
 if __name__ == '__main__':

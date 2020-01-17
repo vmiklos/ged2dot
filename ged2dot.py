@@ -537,6 +537,8 @@ class Layout:
             subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
             for familyChild in family.chil:
                 individual = self.model.getIndividual(familyChild)
+                if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filteredFamilies:
+                    continue
                 if not individual:
                     raise NoSuchIndividualException("Can't find individual '%s' in the input file." % familyChild)
                 pendingChildNodes.append(individual.getNode())
@@ -575,6 +577,8 @@ class Layout:
             for child in children:
                 individual = self.model.getIndividual(child)
                 if individual:
+                    if family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filteredFamilies:
+                        continue
                     subgraph.append(Node("%sConnect" % child, point=True, comment=individual.getFullName()))
                 else:
                     subgraph.append(Node("%sConnect" % child, point=True))
@@ -583,6 +587,8 @@ class Layout:
             count = 0
             for child in children:
                 individual = self.model.getIndividual(child)
+                if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filteredFamilies:
+                    continue
                 if count < middle:
                     if not individual:
                         raise NoSuchIndividualException("Can't find individual '%s' in the input file." % child)
@@ -944,6 +950,7 @@ Possible values: %(picture)s, %(surname)s, %(forename)s, %(birt)s and %(deat)s."
     ('edgeVisibleDirected', 'bool', 'False', "Visible edges: show direction for debugging?"),
     ('layoutMaxDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations to show."),
 
+    ('layoutMaxSiblingDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also siblings are shown."),
     ('layoutMaxSiblingSpouseDepth', 'int', Config.layoutMaxDepthDefault, "Number of ancestor generations, where also sibling spouses are shown."),
     ('layoutMaxSiblingFamilyDepth', 'int', '1', """Number of anchester generations, where also sibling families are shown.
 It's 1 by default, as values >= 2 causes edges to overlap each other in general."""),

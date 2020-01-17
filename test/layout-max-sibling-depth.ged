@@ -1,0 +1,51 @@
+0 HEAD
+0 @p1@ INDI
+1 NAME Alice /A/
+1 SEX F
+1 FAMS @F1@
+1 FAMC @F2@
+0 @p2@ INDI
+1 NAME Bob /B/
+1 SEX M
+1 FAMS @F1@
+0 @p3@ INDI
+1 NAME Casey /C/
+1 SEX M
+1 FAMS @F1@
+0 @P4@ INDI
+1 NAME Alex /A/
+1 SEX M
+1 FAMS @F1@
+0 @p5@ INDI
+1 NAME Tracy /T/
+1 SEX M
+1 FAMS @F1@
+0 @p6@ INDI
+1 NAME Billy /B/
+1 SEX F
+1 FAMC @F1@
+0 @P7@ INDI
+1 NAME Margert /M/
+1 SEX F
+1 FAMS @F2@
+0 @p8@ INDI
+1 NAME William /W/
+1 SEX M
+1 FAMS @F2@
+0 @p9@ INDI
+1 NAME Greg /G/
+1 SEX M
+1 FAMC @F2@
+0 @F1@ FAM
+1 HUSB @p2@
+1 WIFE @p1@
+1 CHIL @p3@
+1 CHIL @P4@
+1 CHIL @p5@
+1 CHIL @p6@
+0 @F2@ FAM
+1 HUSB @p8@
+1 WIFE @P7@
+1 CHIL @p1@
+1 CHIL @p9@
+0 TRLR
