@@ -768,8 +768,8 @@ class GedcomImport:
         self.model = model
         self.indi = None  # type: Optional[Individual]
         self.family = None  # type: Optional[Family]
-        self.inBirt = False
-        self.inDeat = False
+        self.in_birt = False
+        self.in_deat = False
 
     def load(self) -> None:
         linecount = 0
@@ -779,12 +779,12 @@ class GedcomImport:
             linecount += 1
             tokens = line.split(' ')
 
-            firstToken = tokens[0]
+            first_token = tokens[0]
             # Ignore UTF-8 BOM, if there is one at the begining of the line.
-            if firstToken.startswith("\ufeff"):
-                firstToken = firstToken[1:]
+            if first_token.startswith("\ufeff"):
+                first_token = first_token[1:]
 
-            level = int(firstToken)
+            level = int(first_token)
             rest = " ".join(tokens[1:])
             # try to identify lines with errors
             try:
@@ -806,10 +806,10 @@ class GedcomImport:
                         self.family.id = rest[1:-5]
 
                 elif level == 1:
-                    if self.inBirt:
-                        self.inBirt = False
-                    elif self.inDeat:
-                        self.inDeat = False
+                    if self.in_birt:
+                        self.in_birt = False
+                    elif self.in_deat:
+                        self.in_deat = False
 
                     if rest.startswith("SEX") and self.indi:
                         self.indi.sex = rest.split(' ')[1]
@@ -826,9 +826,9 @@ class GedcomImport:
                     elif rest.startswith("FAMS") and self.indi:
                         self.indi.fams = rest[6:-1]
                     elif rest.startswith("BIRT"):
-                        self.inBirt = True
+                        self.in_birt = True
                     elif rest.startswith("DEAT"):
-                        self.inDeat = True
+                        self.in_deat = True
                     elif rest.startswith("HUSB") and self.family:
                         self.family.husb = rest[6:-1]
                     elif rest.startswith("WIFE") and self.family:
@@ -841,14 +841,14 @@ class GedcomImport:
                 elif level == 2:
                     if rest.startswith("DATE") and self.indi:
                         year = rest.split(' ')[-1]
-                        if self.inBirt:
+                        if self.in_birt:
                             self.indi.setBirt(year)
-                        elif self.inDeat:
+                        elif self.in_deat:
                             self.indi.deat = year
 
             # pylint: disable=broad-except
-            except Exception as e:
-                print("Encountered parsing error in .ged: " + str(e))
+            except Exception as exc:
+                print("Encountered parsing error in .ged: " + str(exc))
                 print("line (%d): %s" % (linecount, line))
                 sys.exit(1)
 
@@ -862,15 +862,15 @@ class Config:
     nodeLabelImageDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(forename)s<br/>%(surname)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
     nodeLabelImageSwappedDefault = '<<table border="0" cellborder="0"><tr><td><img src="%(picture)s"/></td></tr><tr><td>%(surname)s<br/>%(forename)s<br/>%(birt)s-%(deat)s</td></tr></table>>'
 
-    def __init__(self, configDict: Any) -> None:
-        self.configDict = configDict
+    def __init__(self, config_dict: Any) -> None:
+        self.config_dict = config_dict
         self.parse()
 
     def parse(self) -> None:
         path = None
 
-        if isinstance(self.configDict, list):
-            args = cast(List[str], self.configDict)
+        if isinstance(self.config_dict, list):
+            args = cast(List[str], self.config_dict)
             if args:
                 path = args[0]
             else:
@@ -880,11 +880,11 @@ class Config:
 
         self.parser = configparser.RawConfigParser()
         if not path:
-            self.parser.read_dict(self.configDict)
+            self.parser.read_dict(self.config_dict)
         else:
             self.parser.read(path)
         self.option = {}  # type: Dict[str, Any]
-        for entry in configOptions:
+        for entry in CONFIG_OPTIONS:
             if entry[1] == 'str':
                 self.option[entry[0]] = self.get(entry[0], entry[2])
             elif entry[1] == 'int':
@@ -900,9 +900,9 @@ class Config:
 
         sys.stdout.write("\n--------\n")
         sys.stdout.write("[ged2dot]\n")
-        for entry in configOptions:
-            for l in entry[3].split('\n'):
-                sys.stdout.write("#%s\n" % l)
+        for entry in CONFIG_OPTIONS:
+            for i in entry[3].split('\n'):
+                sys.stdout.write("#%s\n" % i)
             sys.stdout.write("#type: %s\n" % entry[1])
             sys.stdout.write("#%s = %s\n\n" % (entry[0], entry[2]))
         sys.stdout.write("--------\n")
@@ -919,7 +919,7 @@ class Config:
 
 
 # (name, type, default, description)
-configOptions = (
+CONFIG_OPTIONS = (
     ('input', 'str', "test.ged", "Input filename (GEDCOM file)"),
     ('rootFamily', 'str', Config.rootFamilyDefault, "Starting from family with this identifier"),
 
@@ -975,8 +975,8 @@ def main() -> None:
     try:
         config = Config(sys.argv[1:])
     # pylint: disable=broad-except
-    except (BaseException) as be:
-        print("Configuration invalid? %s" % (str(be)))
+    except (BaseException) as base_exception:
+        print("Configuration invalid? %s" % (str(base_exception)))
         sys.exit(1)
 
     if len(sys.argv) > 1 and (sys.argv[1] == "--help" or sys.argv[1] == "-h"):
@@ -986,9 +986,9 @@ def main() -> None:
     model = Model(config)
     try:
         model.load(config.input)
-    except (BaseException) as be:
+    except (BaseException) as base_exception:
         sys.stderr.write("error in tree file:\n")
-        raise be
+        raise base_exception
     if sys.version_info[0] < 3:
         sys.stdout = codecs.getwriter(config.outputEncoding)(sys.stdout)
     model.save(sys.stdout)
