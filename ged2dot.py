@@ -679,34 +679,34 @@ class Layout:
             half = int(len(children) / 2)
             children.insert(half, marriage.getName())
 
-        prevChild = lastChild
-        for c in children:
-            if prevChild not in children:
-                subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c, invisible=True))
+        prev_child = lastChild
+        for chil in children:
+            if prev_child not in children:
+                subgraphConnect.prepend(self.makeEdge("%sConnect" % prev_child, "%sConnect" % chil, invisible=True))
             else:
-                subgraphConnect.prepend(self.makeEdge("%sConnect" % prevChild, "%sConnect" % c))
-            subgraphConnect.prepend(Node("%sConnect" % c, point=True))
-            prevChild = c
+                subgraphConnect.prepend(self.makeEdge("%sConnect" % prev_child, "%sConnect" % chil))
+            subgraphConnect.prepend(Node("%sConnect" % chil, point=True))
+            prev_child = chil
 
         # Then, add the real nodes.
         subgraphChild = self.getSubgraph(self.model.escape("Depth%s" % (depth - 1)))
         assert subgraphChild
-        prevChild = lastChild
-        for c in family.chil:
-            subgraphChild.prepend(self.makeEdge(prevChild, c, invisible=True))
-            individual = self.model.getIndividual(c)
+        prev_child = lastChild
+        for chil in family.chil:
+            subgraphChild.prepend(self.makeEdge(prev_child, chil, invisible=True))
+            individual = self.model.getIndividual(chil)
             if not individual:
                 raise NoSuchIndividualException("Can't find individual '%s' in the input file." % individual)
             subgraphChild.prepend(individual.getNode())
-            subgraphChild.append(self.makeEdge("%sConnect" % c, c))
-            prevChild = c
+            subgraphChild.append(self.makeEdge("%sConnect" % chil, chil))
+            prev_child = chil
 
     def calc(self) -> None:
         """Tries the arrange nodes on a logical grid. Only logical order is
         defined, the exact positions and sizes are still determined by
         graphviz."""
 
-        siblingFamilies = self.filterFamilies()
+        sibling_families = self.filterFamilies()
 
         # Children from generation N are nodes in the N+1th generation.
         pending_child_nodes = []  # type: List[Renderable]
@@ -717,7 +717,7 @@ class Layout:
             self.buildConnectorSubgraph(depth)
 
         # Now add the side-families.
-        for family in siblingFamilies:
+        for family in sibling_families:
             self.__addSiblingSpouses(family)
 
             # Any children to take care of?
