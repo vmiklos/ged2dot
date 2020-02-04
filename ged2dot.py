@@ -652,25 +652,25 @@ class Layout:
 
         subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
         assert subgraph
-        prevParent = subgraph.getPrevOf(family.husb)
-        if not prevParent or not prevParent.fams or not prevParent.fams.chil:
+        prev_parent = subgraph.getPrevOf(family.husb)
+        if not prev_parent or not prev_parent.fams or not prev_parent.fams.chil:
             # TODO: handle cousins in this case
-            # TODO: handle None prevParent.fams
+            # TODO: handle None prev_parent.fams
             return
-        if not prevParent.fams:
+        if not prev_parent.fams:
             return
-        if not prevParent.fams.chil:
-            sys.stderr.write("prevParent.fams.chil should not be empty?\n")
+        if not prev_parent.fams.chil:
+            sys.stderr.write("prev_parent.fams.chil should not be empty?\n")
             return
-        lastChild = prevParent.fams.chil[-1]
+        last_child = prev_parent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
-        subgraphConnect = self.getSubgraph(self.model.escape("Depth%sConnects" % depth))
-        assert subgraphConnect
+        subgraph_connect = self.getSubgraph(self.model.escape("Depth%sConnects" % depth))
+        assert subgraph_connect
 
         marriage = Marriage(family)
-        subgraphConnect.prepend(Node("%sConnect" % marriage.getName(), point=True))
-        subgraphConnect.append(self.makeEdge(marriage.getName(), "%sConnect" % marriage.getName()))
+        subgraph_connect.prepend(Node("%sConnect" % marriage.getName(), point=True))
+        subgraph_connect.append(self.makeEdge(marriage.getName(), "%sConnect" % marriage.getName()))
 
         children = family.chil[:]
         if not len(children) % 2 == 1:
@@ -679,26 +679,26 @@ class Layout:
             half = int(len(children) / 2)
             children.insert(half, marriage.getName())
 
-        prev_child = lastChild
+        prev_child = last_child
         for chil in children:
             if prev_child not in children:
-                subgraphConnect.prepend(self.makeEdge("%sConnect" % prev_child, "%sConnect" % chil, invisible=True))
+                subgraph_connect.prepend(self.makeEdge("%sConnect" % prev_child, "%sConnect" % chil, invisible=True))
             else:
-                subgraphConnect.prepend(self.makeEdge("%sConnect" % prev_child, "%sConnect" % chil))
-            subgraphConnect.prepend(Node("%sConnect" % chil, point=True))
+                subgraph_connect.prepend(self.makeEdge("%sConnect" % prev_child, "%sConnect" % chil))
+            subgraph_connect.prepend(Node("%sConnect" % chil, point=True))
             prev_child = chil
 
         # Then, add the real nodes.
-        subgraphChild = self.getSubgraph(self.model.escape("Depth%s" % (depth - 1)))
-        assert subgraphChild
-        prev_child = lastChild
+        subgraph_child = self.getSubgraph(self.model.escape("Depth%s" % (depth - 1)))
+        assert subgraph_child
+        prev_child = last_child
         for chil in family.chil:
-            subgraphChild.prepend(self.makeEdge(prev_child, chil, invisible=True))
+            subgraph_child.prepend(self.makeEdge(prev_child, chil, invisible=True))
             individual = self.model.getIndividual(chil)
             if not individual:
                 raise NoSuchIndividualException("Can't find individual '%s' in the input file." % individual)
-            subgraphChild.prepend(individual.getNode())
-            subgraphChild.append(self.makeEdge("%sConnect" % chil, chil))
+            subgraph_child.prepend(individual.getNode())
+            subgraph_child.append(self.makeEdge("%sConnect" % chil, chil))
             prev_child = chil
 
     def calc(self) -> None:
