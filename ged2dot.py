@@ -543,7 +543,7 @@ class Layout:
                     raise NoSuchIndividualException("Can't find individual '%s' in the input file." % familyChild)
                 pending_child_nodes.append(individual.getNode())
                 if prevChil:
-                    # In case familyChild is female and has a husb, then link prevChild to husb, not to familyChild.
+                    # In case familyChild is female and has a husb, then link prev_child to husb, not to familyChild.
                     handled = False
                     familyChildIndi = self.model.getIndividual(familyChild)
                     if descendants and familyChildIndi.sex == 'F':
@@ -565,7 +565,7 @@ class Layout:
         """Does the same as buildSubgraph(), but deals with connector nodes."""
         subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)
         pendingDeps = []
-        prevChild = None
+        prev_child = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
             marriage = Marriage(family)
             children = family.chil[:]
@@ -602,48 +602,48 @@ class Layout:
                     if not individual:
                         raise NoSuchIndividualException("Can't find individual '%s' in the input file." % child)
                     subgraph.append(self.makeEdge("%sConnect" % children[count - 1], "%sConnect" % child, comment=individual.getFullName()))
-                if prevChild:
-                    subgraph.append(self.makeEdge("%sConnect" % prevChild, "%sConnect" % child, invisible=True))
-                    prevChild = None
+                if prev_child:
+                    subgraph.append(self.makeEdge("%sConnect" % prev_child, "%sConnect" % child, invisible=True))
+                    prev_child = None
                 count += 1
             if children:
-                prevChild = children[-1]
+                prev_child = children[-1]
         subgraph.end()
         for dep in pendingDeps:
             subgraph.append(dep)
         self.append(subgraph)
 
-    def __addSiblingSpouses(self, family: Family) -> None:
+    def __add_sibling_spouses(self, family: Family) -> None:
         """Add husb and wife from a family to the layout."""
         depth = family.depth
         subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
         assert subgraph
-        existingIndi, existingPos = subgraph.findFamily(family)
-        newIndi = None
-        if family.wife and existingIndi == family.wife.id:
-            newIndi = family.husb
+        existing_indi, existing_pos = subgraph.findFamily(family)
+        new_indi = None
+        if family.wife and existing_indi == family.wife.id:
+            new_indi = family.husb
         else:
-            newIndi = family.wife
-        if not newIndi:
+            new_indi = family.wife
+        if not new_indi:
             # No spouse, probably has children. Ignore for now.
             return
         found = False
-        for e in subgraph.elements:
-            if existingIndi == family.wife.id and e.__class__ == Edge and cast(Edge, e).to == existingIndi:
-                cast(Edge, e).to = newIndi.id
-            elif existingIndi == family.husb.id and e.__class__ == Edge and cast(Edge, e).fro == existingIndi:
-                cast(Edge, e).fro = newIndi.id
+        for element in subgraph.elements:
+            if existing_indi == family.wife.id and element.__class__ == Edge and cast(Edge, element).to == existing_indi:
+                cast(Edge, element).to = new_indi.id
+            elif existing_indi == family.husb.id and element.__class__ == Edge and cast(Edge, element).fro == existing_indi:
+                cast(Edge, element).fro = new_indi.id
             found = True
         assert found
-        subgraph.elements.insert(existingPos, newIndi.getNode())
+        subgraph.elements.insert(existing_pos, new_indi.getNode())
 
         marriage = Marriage(family)
-        subgraph.elements.insert(existingPos, marriage.getNode())
+        subgraph.elements.insert(existing_pos, marriage.getNode())
 
         subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
         subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
 
-    def __addSiblingChildren(self, family: Family) -> None:
+    def __add_sibling_children(self, family: Family) -> None:
         """Add children from a sibling family to the layout."""
         depth = family.depth
 
@@ -718,11 +718,11 @@ class Layout:
 
         # Now add the side-families.
         for family in sibling_families:
-            self.__addSiblingSpouses(family)
+            self.__add_sibling_spouses(family)
 
             # Any children to take care of?
             if family.chil:
-                self.__addSiblingChildren(family)
+                self.__add_sibling_children(family)
 
 
 class DescendantsLayout(Layout):
