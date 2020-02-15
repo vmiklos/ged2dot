@@ -520,43 +520,44 @@ class Layout:
             subgraph.append(child)
         pending_child_nodes = []
 
-        pendingChildrenDeps = []
-        prevWife = None
+        pending_children_deps = []
+        prev_wife = None
         prev_chil = None
         for family in [f for f in self.filteredFamilies if f.depth == depth]:
             husb = family.getHusb()
             subgraph.append(husb.getNode())
-            if prevWife:
-                subgraph.append(self.makeEdge(prevWife.id, family.husb.id, invisible=True))
+            if prev_wife:
+                subgraph.append(self.makeEdge(prev_wife.id, family.husb.id, invisible=True))
             wife = family.getWife()
             subgraph.append(wife.getNode())
-            prevWife = family.wife
+            prev_wife = family.wife
             marriage = Marriage(family)
             subgraph.append(marriage.getNode())
             subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
             subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
-            for familyChild in family.chil:
-                individual = self.model.getIndividual(familyChild)
+            for family_child in family.chil:
+                individual = self.model.getIndividual(family_child)
                 if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filteredFamilies:
                     continue
                 if not individual:
-                    raise NoSuchIndividualException("Can't find individual '%s' in the input file." % familyChild)
+                    raise NoSuchIndividualException("Can't find individual '%s' in the input file." % family_child)
                 pending_child_nodes.append(individual.getNode())
                 if prev_chil:
-                    # In case familyChild is female and has a husb, then link prev_child to husb, not to familyChild.
+                    # In case family_child is female and has a husb, then link prev_child to husb,
+                    # not to family_child.
                     handled = False
-                    familyChildIndi = self.model.getIndividual(familyChild)
-                    if descendants and familyChildIndi.sex == 'F':
-                        family_child_family = familyChildIndi.fams
+                    family_child_indi = self.model.getIndividual(family_child)
+                    if descendants and family_child_indi.sex == 'F':
+                        family_child_family = family_child_indi.fams
                         if family_child_family and family_child_family.husb:
                             pending_child_nodes.append(self.makeEdge(prev_chil, family_child_family.husb.id, invisible=True))
                             handled = True
                     if not handled:
-                        pending_child_nodes.append(self.makeEdge(prev_chil, familyChild, invisible=True))
-                prev_chil = familyChild
-                pendingChildrenDeps.append(self.makeEdge("%sConnect" % familyChild, familyChild, comment=individual.getFullName()))
+                        pending_child_nodes.append(self.makeEdge(prev_chil, family_child, invisible=True))
+                prev_chil = family_child
+                pending_children_deps.append(self.makeEdge("%sConnect" % family_child, family_child, comment=individual.getFullName()))
         subgraph.end()
-        for i in pendingChildrenDeps:
+        for i in pending_children_deps:
             subgraph.append(i)
         self.append(subgraph)
         return pending_child_nodes
@@ -654,8 +655,7 @@ class Layout:
         assert subgraph
         prev_parent = subgraph.getPrevOf(family.husb)
         if not prev_parent or not prev_parent.fams or not prev_parent.fams.chil:
-            # TODO: handle cousins in this case
-            # TODO: handle None prev_parent.fams
+            # TODO: handle cousins in this case; handle None prev_parent.fams
             return
         if not prev_parent.fams:
             return
