@@ -475,17 +475,17 @@ class Layout:
         # family, B is in filteredFamilies, and A is a sibling of B.
         siblingFamilies = []
         while depth < self.model.config.layoutMaxDepth:
-            nextPendings = []
+            next_pendings = []
             for pending in pendings:
                 children = []  # type: List[str]
                 for indi in ('husb', 'wife'):
                     if getattr(pending, indi):
-                        indiFamily = getattr(pending, indi).famc
-                        if indiFamily:
-                            indiFamily.depth = depth + 1
-                            self.filteredFamilies.append(indiFamily)
-                            nextPendings.append(indiFamily)
-                            children += indiFamily.chil
+                        indi_family = getattr(pending, indi).famc
+                        if indi_family:
+                            indi_family.depth = depth + 1
+                            self.filteredFamilies.append(indi_family)
+                            next_pendings.append(indi_family)
+                            children += indi_family.chil
 
                 # Also collect children's family.
                 if depth < self.model.config.layoutMaxSiblingSpouseDepth + 1:
@@ -494,12 +494,12 @@ class Layout:
                         individual = self.model.getIndividual(chil)
                         if not individual:
                             raise NoSuchIndividualException("Can't find individual '%s' in the input file." % chil)
-                        chilFamily = individual.fams
-                        if not chilFamily or self.model.getFamily(chilFamily.id, self.filteredFamilies):
+                        chil_family = individual.fams
+                        if not chil_family or self.model.getFamily(chil_family.id, self.filteredFamilies):
                             continue
-                        chilFamily.depth = depth
-                        siblingFamilies.append(chilFamily)
-            pendings = nextPendings
+                        chil_family.depth = depth
+                        siblingFamilies.append(chil_family)
+            pendings = next_pendings
             depth += 1
 
         for i in self.filteredFamilies:
@@ -507,7 +507,7 @@ class Layout:
 
         return siblingFamilies
 
-    def buildSubgraph(self, depth: int, pending_child_nodes: List[Renderable], descendants: bool = False) -> List[Renderable]:
+    def build_subgraph(self, depth: int, pending_child_nodes: List[Renderable], descendants: bool = False) -> List[Renderable]:
         """Builds a subgraph, that contains the real nodes for a generation.
         This consists of:
 
@@ -563,7 +563,7 @@ class Layout:
         return pending_child_nodes
 
     def build_connector_subgraph(self, depth: int) -> None:
-        """Does the same as buildSubgraph(), but deals with connector nodes."""
+        """Does the same as build_subgraph(), but deals with connector nodes."""
         subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)
         pending_deps = []
         prev_child = None
@@ -712,7 +712,7 @@ class Layout:
         pending_child_nodes = []  # type: List[Renderable]
         for depth in reversed(list(range(-1, self.model.config.layoutMaxDepth + 1))):
             # Draw two subgraphs for each generation. The first contains the real nodes.
-            pending_child_nodes = self.buildSubgraph(depth, pending_child_nodes)
+            pending_child_nodes = self.build_subgraph(depth, pending_child_nodes)
             # The other contains the connector nodes.
             self.build_connector_subgraph(depth)
 
@@ -755,7 +755,7 @@ class DescendantsLayout(Layout):
 
         pending_child_nodes = []  # type: List[Renderable]
         for depth in range(self.model.config.layoutMaxDepth + 1):
-            pending_child_nodes = self.buildSubgraph(depth, pending_child_nodes, descendants=True)
+            pending_child_nodes = self.build_subgraph(depth, pending_child_nodes, descendants=True)
             self.build_connector_subgraph(depth)
 
 
