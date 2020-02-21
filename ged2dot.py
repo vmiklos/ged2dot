@@ -457,10 +457,10 @@ class Layout:
                 return s
         return None
 
-    def makeEdge(self, fro: str, to: str, invisible: bool = False, comment: Optional[str] = None) -> Edge:
-        return Edge(self.model, fro, to, invisible=invisible, comment=comment)
+    def make_edge(self, from_id: str, to_id: str, invisible: bool = False, comment: Optional[str] = None) -> Edge:
+        return Edge(self.model, from_id, to_id, invisible=invisible, comment=comment)
 
-    def filterFamilies(self) -> List[Family]:
+    def filter_families(self) -> List[Family]:
         """Iterate over all families, find out directly interesting and sibling
         families. Populates filteredFamilies, returns sibling ones."""
 
@@ -473,7 +473,7 @@ class Layout:
         pendings = [family]
         # List of families, which are interesting for us, as A is in the
         # family, B is in filteredFamilies, and A is a sibling of B.
-        siblingFamilies = []
+        sibling_families = []
         while depth < self.model.config.layoutMaxDepth:
             next_pendings = []
             for pending in pendings:
@@ -498,14 +498,14 @@ class Layout:
                         if not chil_family or self.model.getFamily(chil_family.id, self.filteredFamilies):
                             continue
                         chil_family.depth = depth
-                        siblingFamilies.append(chil_family)
+                        sibling_families.append(chil_family)
             pendings = next_pendings
             depth += 1
 
         for i in self.filteredFamilies:
             i.sortChildren(self.filteredFamilies)
 
-        return siblingFamilies
+        return sibling_families
 
     def build_subgraph(self, depth: int, pending_child_nodes: List[Renderable], descendants: bool = False) -> List[Renderable]:
         """Builds a subgraph, that contains the real nodes for a generation.
@@ -527,14 +527,14 @@ class Layout:
             husb = family.getHusb()
             subgraph.append(husb.getNode())
             if prev_wife:
-                subgraph.append(self.makeEdge(prev_wife.id, family.husb.id, invisible=True))
+                subgraph.append(self.make_edge(prev_wife.id, family.husb.id, invisible=True))
             wife = family.getWife()
             subgraph.append(wife.getNode())
             prev_wife = family.wife
             marriage = Marriage(family)
             subgraph.append(marriage.getNode())
-            subgraph.append(self.makeEdge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
-            subgraph.append(self.makeEdge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
+            subgraph.append(self.make_edge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
+            subgraph.append(self.make_edge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
             for family_child in family.chil:
                 individual = self.model.getIndividual(family_child)
                 if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filteredFamilies:
@@ -550,12 +550,12 @@ class Layout:
                     if descendants and family_child_indi.sex == 'F':
                         family_child_family = family_child_indi.fams
                         if family_child_family and family_child_family.husb:
-                            pending_child_nodes.append(self.makeEdge(prev_chil, family_child_family.husb.id, invisible=True))
+                            pending_child_nodes.append(self.make_edge(prev_chil, family_child_family.husb.id, invisible=True))
                             handled = True
                     if not handled:
-                        pending_child_nodes.append(self.makeEdge(prev_chil, family_child, invisible=True))
+                        pending_child_nodes.append(self.make_edge(prev_chil, family_child, invisible=True))
                 prev_chil = family_child
-                pending_children_deps.append(self.makeEdge("%sConnect" % family_child, family_child, comment=individual.getFullName()))
+                pending_children_deps.append(self.make_edge("%sConnect" % family_child, family_child, comment=individual.getFullName()))
         subgraph.end()
         for i in pending_children_deps:
             subgraph.append(i)
@@ -593,18 +593,18 @@ class Layout:
                 if count < middle:
                     if not individual:
                         raise NoSuchIndividualException("Can't find individual '%s' in the input file." % child)
-                    subgraph.append(self.makeEdge("%sConnect" % child, "%sConnect" % children[count + 1], comment=individual.getFullName()))
+                    subgraph.append(self.make_edge("%sConnect" % child, "%sConnect" % children[count + 1], comment=individual.getFullName()))
                 elif count == middle:
                     if individual:
-                        pending_deps.append(self.makeEdge(marriage.getName(), "%sConnect" % child, comment=individual.getFullName()))
+                        pending_deps.append(self.make_edge(marriage.getName(), "%sConnect" % child, comment=individual.getFullName()))
                     else:
-                        pending_deps.append(self.makeEdge(marriage.getName(), "%sConnect" % child))
+                        pending_deps.append(self.make_edge(marriage.getName(), "%sConnect" % child))
                 elif count > middle:
                     if not individual:
                         raise NoSuchIndividualException("Can't find individual '%s' in the input file." % child)
-                    subgraph.append(self.makeEdge("%sConnect" % children[count - 1], "%sConnect" % child, comment=individual.getFullName()))
+                    subgraph.append(self.make_edge("%sConnect" % children[count - 1], "%sConnect" % child, comment=individual.getFullName()))
                 if prev_child:
-                    subgraph.append(self.makeEdge("%sConnect" % prev_child, "%sConnect" % child, invisible=True))
+                    subgraph.append(self.make_edge("%sConnect" % prev_child, "%sConnect" % child, invisible=True))
                     prev_child = None
                 count += 1
             if children:
@@ -641,8 +641,8 @@ class Layout:
         marriage = Marriage(family)
         subgraph.elements.insert(existing_pos, marriage.getNode())
 
-        subgraph.append(self.makeEdge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
-        subgraph.append(self.makeEdge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
+        subgraph.append(self.make_edge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
+        subgraph.append(self.make_edge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
 
     def __add_sibling_children(self, family: Family) -> None:
         """Add children from a sibling family to the layout."""
@@ -670,7 +670,7 @@ class Layout:
 
         marriage = Marriage(family)
         subgraph_connect.prepend(Node("%sConnect" % marriage.getName(), point=True))
-        subgraph_connect.append(self.makeEdge(marriage.getName(), "%sConnect" % marriage.getName()))
+        subgraph_connect.append(self.make_edge(marriage.getName(), "%sConnect" % marriage.getName()))
 
         children = family.chil[:]
         if not len(children) % 2 == 1:
@@ -682,9 +682,9 @@ class Layout:
         prev_child = last_child
         for chil in children:
             if prev_child not in children:
-                subgraph_connect.prepend(self.makeEdge("%sConnect" % prev_child, "%sConnect" % chil, invisible=True))
+                subgraph_connect.prepend(self.make_edge("%sConnect" % prev_child, "%sConnect" % chil, invisible=True))
             else:
-                subgraph_connect.prepend(self.makeEdge("%sConnect" % prev_child, "%sConnect" % chil))
+                subgraph_connect.prepend(self.make_edge("%sConnect" % prev_child, "%sConnect" % chil))
             subgraph_connect.prepend(Node("%sConnect" % chil, point=True))
             prev_child = chil
 
@@ -693,12 +693,12 @@ class Layout:
         assert subgraph_child
         prev_child = last_child
         for chil in family.chil:
-            subgraph_child.prepend(self.makeEdge(prev_child, chil, invisible=True))
+            subgraph_child.prepend(self.make_edge(prev_child, chil, invisible=True))
             individual = self.model.getIndividual(chil)
             if not individual:
                 raise NoSuchIndividualException("Can't find individual '%s' in the input file." % individual)
             subgraph_child.prepend(individual.getNode())
-            subgraph_child.append(self.makeEdge("%sConnect" % chil, chil))
+            subgraph_child.append(self.make_edge("%sConnect" % chil, chil))
             prev_child = chil
 
     def calc(self) -> None:
@@ -706,7 +706,7 @@ class Layout:
         defined, the exact positions and sizes are still determined by
         graphviz."""
 
-        sibling_families = self.filterFamilies()
+        sibling_families = self.filter_families()
 
         # Children from generation N are nodes in the N+1th generation.
         pending_child_nodes = []  # type: List[Renderable]
@@ -727,7 +727,7 @@ class Layout:
 
 class DescendantsLayout(Layout):
     """A layout that shows all descendants of a root family."""
-    def filterFamilies(self) -> List[Family]:
+    def filter_families(self) -> List[Family]:
         family = self.model.getFamily(self.model.config.rootFamily)
         assert family
         self.filteredFamilies = [family]
@@ -751,7 +751,7 @@ class DescendantsLayout(Layout):
         return []
 
     def calc(self) -> None:
-        self.filterFamilies()
+        self.filter_families()
 
         pending_child_nodes = []  # type: List[Renderable]
         for depth in range(self.model.config.layoutMaxDepth + 1):
