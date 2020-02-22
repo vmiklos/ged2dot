@@ -161,7 +161,7 @@ class Individual:
             sex = self.sex.upper()
         return {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
-    def getNode(self) -> 'Node':
+    def get_node(self) -> 'Node':
         return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s,\npenwidth=%s ]' % (self.getLabel(), self.getColor(), self.model.config.nodeBorderWidth))
 
     def setBirt(self, birt: str) -> None:
@@ -196,7 +196,7 @@ class Family:
         self.husb = self.model.getIndividual(self.husb)
         self.wife = self.model.getIndividual(self.wife)
 
-    def sortChildren(self, filteredFamilies: List['Family']) -> None:
+    def sortChildren(self, filtered_families: List['Family']) -> None:
         """Sort children, based on filtered families of the layout."""
         def compareChildren(x: str, y: str) -> int:
             # For now just try to produce a traditional "husb left, wife right"
@@ -209,13 +209,13 @@ class Family:
             if not yObj:
                 raise NoSuchIndividualException("Can't find individual '%s' in the input file." % y)
 
-            if xObj.sex == "M" and xObj.fams and self.model.getFamily(xObj.fams.id, filteredFamilies):
+            if xObj.sex == "M" and xObj.fams and self.model.getFamily(xObj.fams.id, filtered_families):
                 return 1
-            if yObj.sex == "M" and yObj.fams and self.model.getFamily(yObj.fams.id, filteredFamilies):
+            if yObj.sex == "M" and yObj.fams and self.model.getFamily(yObj.fams.id, filtered_families):
                 return -1
-            if xObj.sex == "F" and xObj.fams and self.model.getFamily(xObj.fams.id, filteredFamilies):
+            if xObj.sex == "F" and xObj.fams and self.model.getFamily(xObj.fams.id, filtered_families):
                 return -1
-            if yObj.sex == "F" and yObj.fams and self.model.getFamily(yObj.fams.id, filteredFamilies):
+            if yObj.sex == "F" and yObj.fams and self.model.getFamily(yObj.fams.id, filtered_families):
                 return 1
             return 0
         self.chil.sort(key=cmp_to_key(compareChildren))
@@ -422,13 +422,13 @@ class Marriage:
     def __init__(self, family: Family) -> None:
         self.family = family
 
-    def getName(self) -> str:
+    def get_name(self) -> str:
         return "%sAnd%s" % (self.family.getHusb().id, self.family.getWife().id)
 
-    def getNode(self) -> Node:
+    def get_node(self) -> Node:
         husb = self.family.getHusb().getFullName()
         wife = self.family.getWife().getFullName()
-        return Node(self.getName(), visiblePoint=True, comment="%s, %s" % (husb, wife))
+        return Node(self.get_name(), visiblePoint=True, comment="%s, %s" % (husb, wife))
 
 
 class Layout:
@@ -439,7 +439,7 @@ class Layout:
         self.out = out
         self.subgraphs = []  # type: List[Subgraph]
         # List of families, which are directly interesting for us.
-        self.filteredFamilies = []  # type: List[Family]
+        self.filtered_families = []  # type: List[Family]
 
     def append(self, subgraph: Subgraph) -> None:
         self.subgraphs.append(subgraph)
@@ -451,10 +451,10 @@ class Layout:
             i.render(self.out)
         self.out.write("}\n")
 
-    def getSubgraph(self, id_string: str) -> Optional[Subgraph]:
-        for s in self.subgraphs:
-            if s.name == id_string:
-                return s
+    def get_subgraph(self, id_string: str) -> Optional[Subgraph]:
+        for subgraph in self.subgraphs:
+            if subgraph.name == id_string:
+                return subgraph
         return None
 
     def make_edge(self, from_id: str, to_id: str, invisible: bool = False, comment: Optional[str] = None) -> Edge:
@@ -462,17 +462,17 @@ class Layout:
 
     def filter_families(self) -> List[Family]:
         """Iterate over all families, find out directly interesting and sibling
-        families. Populates filteredFamilies, returns sibling ones."""
+        families. Populates filtered_families, returns sibling ones."""
 
         family = self.model.getFamily(self.model.config.rootFamily)
         if not family:
             raise NoSuchFamilyException("Can't find family '%s' in the input file." % self.model.config.rootFamily)
-        self.filteredFamilies = [family]
+        self.filtered_families = [family]
 
         depth = 0
         pendings = [family]
         # List of families, which are interesting for us, as A is in the
-        # family, B is in filteredFamilies, and A is a sibling of B.
+        # family, B is in filtered_families, and A is a sibling of B.
         sibling_families = []
         while depth < self.model.config.layoutMaxDepth:
             next_pendings = []
@@ -483,7 +483,7 @@ class Layout:
                         indi_family = getattr(pending, indi).famc
                         if indi_family:
                             indi_family.depth = depth + 1
-                            self.filteredFamilies.append(indi_family)
+                            self.filtered_families.append(indi_family)
                             next_pendings.append(indi_family)
                             children += indi_family.chil
 
@@ -495,15 +495,15 @@ class Layout:
                         if not individual:
                             raise NoSuchIndividualException("Can't find individual '%s' in the input file." % chil)
                         chil_family = individual.fams
-                        if not chil_family or self.model.getFamily(chil_family.id, self.filteredFamilies):
+                        if not chil_family or self.model.getFamily(chil_family.id, self.filtered_families):
                             continue
                         chil_family.depth = depth
                         sibling_families.append(chil_family)
             pendings = next_pendings
             depth += 1
 
-        for i in self.filteredFamilies:
-            i.sortChildren(self.filteredFamilies)
+        for i in self.filtered_families:
+            i.sortChildren(self.filtered_families)
 
         return sibling_families
 
@@ -523,25 +523,25 @@ class Layout:
         pending_children_deps = []
         prev_wife = None
         prev_chil = None
-        for family in [f for f in self.filteredFamilies if f.depth == depth]:
+        for family in [f for f in self.filtered_families if f.depth == depth]:
             husb = family.getHusb()
-            subgraph.append(husb.getNode())
+            subgraph.append(husb.get_node())
             if prev_wife:
                 subgraph.append(self.make_edge(prev_wife.id, family.husb.id, invisible=True))
             wife = family.getWife()
-            subgraph.append(wife.getNode())
+            subgraph.append(wife.get_node())
             prev_wife = family.wife
             marriage = Marriage(family)
-            subgraph.append(marriage.getNode())
-            subgraph.append(self.make_edge(family.getHusb().id, marriage.getName(), comment=family.getHusb().getFullName()))
-            subgraph.append(self.make_edge(marriage.getName(), family.getWife().id, comment=family.getWife().getFullName()))
+            subgraph.append(marriage.get_node())
+            subgraph.append(self.make_edge(family.getHusb().id, marriage.get_name(), comment=family.getHusb().getFullName()))
+            subgraph.append(self.make_edge(marriage.get_name(), family.getWife().id, comment=family.getWife().getFullName()))
             for family_child in family.chil:
                 individual = self.model.getIndividual(family_child)
-                if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filteredFamilies:
+                if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filtered_families:
                     continue
                 if not individual:
                     raise NoSuchIndividualException("Can't find individual '%s' in the input file." % family_child)
-                pending_child_nodes.append(individual.getNode())
+                pending_child_nodes.append(individual.get_node())
                 if prev_chil:
                     # In case family_child is female and has a husb, then link prev_child to husb,
                     # not to family_child.
@@ -567,18 +567,18 @@ class Layout:
         subgraph = Subgraph(self.model.escape("Depth%sConnects" % depth), self.model)
         pending_deps = []
         prev_child = None
-        for family in [f for f in self.filteredFamilies if f.depth == depth]:
+        for family in [f for f in self.filtered_families if f.depth == depth]:
             marriage = Marriage(family)
             children = family.chil[:]
             if not (len(children) % 2 == 1 or not children):
                 # If there is no middle child, then insert a fake node here, so
                 # marriage can connect to that one.
                 half = int(len(children) / 2)
-                children.insert(half, marriage.getName())
+                children.insert(half, marriage.get_name())
             for child in children:
                 individual = self.model.getIndividual(child)
                 if individual:
-                    if family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filteredFamilies:
+                    if family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filtered_families:
                         continue
                     subgraph.append(Node("%sConnect" % child, point=True, comment=individual.getFullName()))
                 else:
@@ -588,7 +588,7 @@ class Layout:
             count = 0
             for child in children:
                 individual = self.model.getIndividual(child)
-                if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filteredFamilies:
+                if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filtered_families:
                     continue
                 if count < middle:
                     if not individual:
@@ -596,9 +596,9 @@ class Layout:
                     subgraph.append(self.make_edge("%sConnect" % child, "%sConnect" % children[count + 1], comment=individual.getFullName()))
                 elif count == middle:
                     if individual:
-                        pending_deps.append(self.make_edge(marriage.getName(), "%sConnect" % child, comment=individual.getFullName()))
+                        pending_deps.append(self.make_edge(marriage.get_name(), "%sConnect" % child, comment=individual.getFullName()))
                     else:
-                        pending_deps.append(self.make_edge(marriage.getName(), "%sConnect" % child))
+                        pending_deps.append(self.make_edge(marriage.get_name(), "%sConnect" % child))
                 elif count > middle:
                     if not individual:
                         raise NoSuchIndividualException("Can't find individual '%s' in the input file." % child)
@@ -617,7 +617,7 @@ class Layout:
     def __add_sibling_spouses(self, family: Family) -> None:
         """Add husb and wife from a family to the layout."""
         depth = family.depth
-        subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
+        subgraph = self.get_subgraph(self.model.escape("Depth%s" % depth))
         assert subgraph
         existing_indi, existing_pos = subgraph.findFamily(family)
         new_indi = None
@@ -636,13 +636,13 @@ class Layout:
                 cast(Edge, element).fro = new_indi.id
             found = True
         assert found
-        subgraph.elements.insert(existing_pos, new_indi.getNode())
+        subgraph.elements.insert(existing_pos, new_indi.get_node())
 
         marriage = Marriage(family)
-        subgraph.elements.insert(existing_pos, marriage.getNode())
+        subgraph.elements.insert(existing_pos, marriage.get_node())
 
-        subgraph.append(self.make_edge(family.husb.id, marriage.getName(), comment=family.husb.getFullName()))
-        subgraph.append(self.make_edge(marriage.getName(), family.wife.id, comment=family.wife.getFullName()))
+        subgraph.append(self.make_edge(family.husb.id, marriage.get_name(), comment=family.husb.getFullName()))
+        subgraph.append(self.make_edge(marriage.get_name(), family.wife.id, comment=family.wife.getFullName()))
 
     def __add_sibling_children(self, family: Family) -> None:
         """Add children from a sibling family to the layout."""
@@ -651,7 +651,7 @@ class Layout:
         if depth > self.model.config.layoutMaxSiblingFamilyDepth:
             return
 
-        subgraph = self.getSubgraph(self.model.escape("Depth%s" % depth))
+        subgraph = self.get_subgraph(self.model.escape("Depth%s" % depth))
         assert subgraph
         prev_parent = subgraph.getPrevOf(family.husb)
         if not prev_parent or not prev_parent.fams or not prev_parent.fams.chil:
@@ -665,19 +665,19 @@ class Layout:
         last_child = prev_parent.fams.chil[-1]
 
         # First, add connect nodes and their deps.
-        subgraph_connect = self.getSubgraph(self.model.escape("Depth%sConnects" % depth))
+        subgraph_connect = self.get_subgraph(self.model.escape("Depth%sConnects" % depth))
         assert subgraph_connect
 
         marriage = Marriage(family)
-        subgraph_connect.prepend(Node("%sConnect" % marriage.getName(), point=True))
-        subgraph_connect.append(self.make_edge(marriage.getName(), "%sConnect" % marriage.getName()))
+        subgraph_connect.prepend(Node("%sConnect" % marriage.get_name(), point=True))
+        subgraph_connect.append(self.make_edge(marriage.get_name(), "%sConnect" % marriage.get_name()))
 
         children = family.chil[:]
         if not len(children) % 2 == 1:
             # If there is no middle child, then insert a fake node here, so
             # marriage can connect to that one.
             half = int(len(children) / 2)
-            children.insert(half, marriage.getName())
+            children.insert(half, marriage.get_name())
 
         prev_child = last_child
         for chil in children:
@@ -689,7 +689,7 @@ class Layout:
             prev_child = chil
 
         # Then, add the real nodes.
-        subgraph_child = self.getSubgraph(self.model.escape("Depth%s" % (depth - 1)))
+        subgraph_child = self.get_subgraph(self.model.escape("Depth%s" % (depth - 1)))
         assert subgraph_child
         prev_child = last_child
         for chil in family.chil:
@@ -697,7 +697,7 @@ class Layout:
             individual = self.model.getIndividual(chil)
             if not individual:
                 raise NoSuchIndividualException("Can't find individual '%s' in the input file." % individual)
-            subgraph_child.prepend(individual.getNode())
+            subgraph_child.prepend(individual.get_node())
             subgraph_child.append(self.make_edge("%sConnect" % chil, chil))
             prev_child = chil
 
@@ -730,7 +730,7 @@ class DescendantsLayout(Layout):
     def filter_families(self) -> List[Family]:
         family = self.model.getFamily(self.model.config.rootFamily)
         assert family
-        self.filteredFamilies = [family]
+        self.filtered_families = [family]
 
         depth = 0
         pendings = [family]
@@ -743,7 +743,7 @@ class DescendantsLayout(Layout):
                     indi_family = individual.fams
                     if indi_family:
                         indi_family.depth = depth + 1
-                        self.filteredFamilies.append(indi_family)
+                        self.filtered_families.append(indi_family)
                         next_pendings.append(indi_family)
             pendings = next_pendings
             depth += 1
