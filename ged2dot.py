@@ -392,25 +392,25 @@ class Subgraph:
             i.render(out)
         out.write("\n")
 
-    def findFamily(self, family: Family) -> Tuple[str, int]:
+    def find_family(self, family: Family) -> Tuple[str, int]:
         """Find the wife or husb or a family in this subgraph.
         If any of them are found, return the individual's ID and pos."""
         count = 0
-        for e in self.elements:
-            if e.__class__ == Node:
-                n = cast(Node, e)
-                if family.wife and n.id == family.wife.id:
+        for element in self.elements:
+            if element.__class__ == Node:
+                node = cast(Node, element)
+                if family.wife and node.id == family.wife.id:
                     return (family.wife.id, count)
-                if family.husb and n.id == family.husb.id:
+                if family.husb and node.id == family.husb.id:
                     return (family.husb.id, count)
             count += 1
         return ("", 0)
 
-    def getPrevOf(self, individual: Individual) -> Optional[Individual]:
+    def get_prev_of(self, individual: Individual) -> Optional[Individual]:
         """The passed individual follows the returned ID in this subgraph."""
-        for e in self.elements:
-            if e.__class__ == Edge:
-                edge = cast(Edge, e)
+        for element in self.elements:
+            if element.__class__ == Edge:
+                edge = cast(Edge, element)
                 if hasattr(individual, 'id') and edge.to == individual.id:
                     return self.model.getIndividual(edge.fro)
 
@@ -619,7 +619,7 @@ class Layout:
         depth = family.depth
         subgraph = self.get_subgraph(self.model.escape("Depth%s" % depth))
         assert subgraph
-        existing_indi, existing_pos = subgraph.findFamily(family)
+        existing_indi, existing_pos = subgraph.find_family(family)
         new_indi = None
         if family.wife and existing_indi == family.wife.id:
             new_indi = family.husb
@@ -653,7 +653,7 @@ class Layout:
 
         subgraph = self.get_subgraph(self.model.escape("Depth%s" % depth))
         assert subgraph
-        prev_parent = subgraph.getPrevOf(family.husb)
+        prev_parent = subgraph.get_prev_of(family.husb)
         if not prev_parent or not prev_parent.fams or not prev_parent.fams.chil:
             # TODO: handle cousins in this case; handle None prev_parent.fams
             return
