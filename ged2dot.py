@@ -63,8 +63,8 @@ class Individual:
 
     def resolve(self) -> None:
         """Replaces family reference strings with references to objects."""
-        self.famc = self.model.getFamily(self.famc)
-        self.fams = self.model.getFamily(self.fams)
+        self.famc = self.model.get_family(self.famc)
+        self.fams = self.model.get_family(self.fams)
 
     def getFullName(self) -> str:
         """Full name of the individual. Only used as comments in the output
@@ -209,13 +209,13 @@ class Family:
             if not yObj:
                 raise NoSuchIndividualException("Can't find individual '%s' in the input file." % y)
 
-            if xObj.sex == "M" and xObj.fams and self.model.getFamily(xObj.fams.id, filtered_families):
+            if xObj.sex == "M" and xObj.fams and self.model.get_family(xObj.fams.id, filtered_families):
                 return 1
-            if yObj.sex == "M" and yObj.fams and self.model.getFamily(yObj.fams.id, filtered_families):
+            if yObj.sex == "M" and yObj.fams and self.model.get_family(yObj.fams.id, filtered_families):
                 return -1
-            if xObj.sex == "F" and xObj.fams and self.model.getFamily(xObj.fams.id, filtered_families):
+            if xObj.sex == "F" and xObj.fams and self.model.get_family(xObj.fams.id, filtered_families):
                 return -1
-            if yObj.sex == "F" and yObj.fams and self.model.getFamily(yObj.fams.id, filtered_families):
+            if yObj.sex == "F" and yObj.fams and self.model.get_family(yObj.fams.id, filtered_families):
                 return 1
             return 0
         self.chil.sort(key=cmp_to_key(compareChildren))
@@ -264,16 +264,16 @@ class Model:
         return None
 
     def getIndividualGeneWebIndex(self, searchId: str, forename: str, surname: str) -> int:
-        myList = []
+        my_list = []
         for i in self.individuals:
             if (i.forename == forename) and (i.surname == surname):
-                myList.append(i.id)
-        myList.sort()
-        return myList.index(searchId)
+                my_list.append(i.id)
+        my_list.sort()
+        return my_list.index(searchId)
 
-    def getFamily(self, id_string: str, familySet: Optional[List[Family]] = None) -> Optional[Family]:
-        if familySet:
-            families = familySet
+    def get_family(self, id_string: str, family_set: Optional[List[Family]] = None) -> Optional[Family]:
+        if family_set:
+            families = family_set
         else:
             families = self.families
         for i in families:
@@ -297,10 +297,10 @@ class Model:
             out = sys.stdout
 
         # Support multiple layouts.
-        layoutName = "Layout"
+        layout_name = "Layout"
         if self.config.layout:
-            layoutName = self.config.layout + layoutName
-            layout = globals()[layoutName](self, out)
+            layout_name = self.config.layout + layout_name
+            layout = globals()[layout_name](self, out)
         else:
             layout = Layout(self, out)
 
@@ -308,17 +308,17 @@ class Model:
         layout.render()
 
     @staticmethod
-    def escape(s: str) -> str:
-        return s.replace("-", "_")
+    def escape(string: str) -> str:
+        return string.replace("-", "_")
 
 
 # Layout (view)
 
 class Edge(Renderable):
     """A graph edge."""
-    def __init__(self, model: Model, fro: str, to: str, invisible: bool = False, comment: Optional[str] = None) -> None:
-        self.fro = fro
-        self.to = to
+    def __init__(self, model: Model, from_node: str, to_node: str, invisible: bool = False, comment: Optional[str] = None) -> None:
+        self.from_node = from_node
+        self.to_node = to_node
         self.rest = ""
         if invisible:
             if model.config.edgeInvisibleRed:
@@ -332,13 +332,13 @@ class Edge(Renderable):
             self.rest += "// %s" % comment
 
     def render(self, out: TextIO) -> None:
-        out.write("%s -> %s %s\n" % (self.fro, self.to, self.rest))
+        out.write("%s -> %s %s\n" % (self.from_node, self.to_node, self.rest))
 
 
 class Node(Renderable):
     """A graph node."""
     def __init__(self, id_string: str, rest: str = "", point: bool = False, visiblePoint: bool = False, comment: str = "") -> None:
-        self.id = id_string
+        self.node_id = id_string
         self.rest = rest
         if point:
             self.rest += "[ shape = point, width = 0 ]"
@@ -348,7 +348,7 @@ class Node(Renderable):
             self.rest += " // %s" % comment
 
     def render(self, out: TextIO) -> None:
-        out.write("%s %s\n" % (self.id, self.rest))
+        out.write("%s %s\n" % (self.node_id, self.rest))
 
 
 class Subgraph:
@@ -399,9 +399,9 @@ class Subgraph:
         for element in self.elements:
             if element.__class__ == Node:
                 node = cast(Node, element)
-                if family.wife and node.id == family.wife.id:
+                if family.wife and node.node_id == family.wife.id:
                     return (family.wife.id, count)
-                if family.husb and node.id == family.husb.id:
+                if family.husb and node.node_id == family.husb.id:
                     return (family.husb.id, count)
             count += 1
         return ("", 0)
@@ -411,8 +411,8 @@ class Subgraph:
         for element in self.elements:
             if element.__class__ == Edge:
                 edge = cast(Edge, element)
-                if hasattr(individual, 'id') and edge.to == individual.id:
-                    return self.model.getIndividual(edge.fro)
+                if hasattr(individual, 'id') and edge.to_node == individual.id:
+                    return self.model.getIndividual(edge.from_node)
 
         return None
 
@@ -464,7 +464,7 @@ class Layout:
         """Iterate over all families, find out directly interesting and sibling
         families. Populates filtered_families, returns sibling ones."""
 
-        family = self.model.getFamily(self.model.config.rootFamily)
+        family = self.model.get_family(self.model.config.rootFamily)
         if not family:
             raise NoSuchFamilyException("Can't find family '%s' in the input file." % self.model.config.rootFamily)
         self.filtered_families = [family]
@@ -495,7 +495,7 @@ class Layout:
                         if not individual:
                             raise NoSuchIndividualException("Can't find individual '%s' in the input file." % chil)
                         chil_family = individual.fams
-                        if not chil_family or self.model.getFamily(chil_family.id, self.filtered_families):
+                        if not chil_family or self.model.get_family(chil_family.id, self.filtered_families):
                             continue
                         chil_family.depth = depth
                         sibling_families.append(chil_family)
@@ -630,10 +630,10 @@ class Layout:
             return
         found = False
         for element in subgraph.elements:
-            if existing_indi == family.wife.id and element.__class__ == Edge and cast(Edge, element).to == existing_indi:
-                cast(Edge, element).to = new_indi.id
-            elif existing_indi == family.husb.id and element.__class__ == Edge and cast(Edge, element).fro == existing_indi:
-                cast(Edge, element).fro = new_indi.id
+            if existing_indi == family.wife.id and element.__class__ == Edge and cast(Edge, element).from_node == existing_indi:
+                cast(Edge, element).to_node = new_indi.id
+            elif existing_indi == family.husb.id and element.__class__ == Edge and cast(Edge, element).from_node == existing_indi:
+                cast(Edge, element).from_node = new_indi.id
             found = True
         assert found
         subgraph.elements.insert(existing_pos, new_indi.get_node())
@@ -728,7 +728,7 @@ class Layout:
 class DescendantsLayout(Layout):
     """A layout that shows all descendants of a root family."""
     def filter_families(self) -> List[Family]:
-        family = self.model.getFamily(self.model.config.rootFamily)
+        family = self.model.get_family(self.model.config.rootFamily)
         assert family
         self.filtered_families = [family]
 

@@ -162,7 +162,7 @@ class Test(unittest.TestCase):
             for element in subgraph.elements:
                 if element.__class__ == ged2dot.Node:
                     node = cast(ged2dot.Node, element)
-                    self.assertTrue(node.id != "p9")
+                    self.assertTrue(node.node_id != "p9")
 
 
 if __name__ == '__main__':
