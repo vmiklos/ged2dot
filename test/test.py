@@ -58,9 +58,9 @@ class Test(unittest.TestCase):
             }
         }
         model = self.convert('partial-name', configDict)
-        indi = model.getIndividual("P48")
+        indi = model.get_individual("P48")
         assert indi
-        self.assertTrue("None" not in indi.getLabel())
+        self.assertTrue("None" not in indi.get_label())
 
     def test_nosex(self) -> None:
         # Capture standard output.
