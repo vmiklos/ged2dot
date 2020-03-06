@@ -630,7 +630,7 @@ class Layout:
             return
         found = False
         for element in subgraph.elements:
-            if existing_indi == family.wife.id and element.__class__ == Edge and cast(Edge, element).from_node == existing_indi:
+            if existing_indi == family.wife.id and element.__class__ == Edge and cast(Edge, element).to_node == existing_indi:
                 cast(Edge, element).to_node = new_indi.id
             elif existing_indi == family.husb.id and element.__class__ == Edge and cast(Edge, element).from_node == existing_indi:
                 cast(Edge, element).from_node = new_indi.id
