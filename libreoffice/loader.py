@@ -34,9 +34,11 @@ try:
     import dialog
     import importer
 
-    IMPLEMENTATION_HELPER = unohelper.ImplementationHelper()
-    IMPLEMENTATION_HELPER.addImplementation(dialog.GedcomDialog, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog", ("com.sun.star.ui.dialogs.FilterOptionsDialog",))
-    IMPLEMENTATION_HELPER.addImplementation(importer.GedcomImport, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter", ("com.sun.star.document.ImportFilter",))
+    # pythonloader.py has this name hardcoded
+    # pylint: disable=invalid-name
+    g_ImplementationHelper = unohelper.ImplementationHelper()
+    g_ImplementationHelper.addImplementation(dialog.GedcomDialog, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog", ("com.sun.star.ui.dialogs.FilterOptionsDialog",))
+    g_ImplementationHelper.addImplementation(importer.GedcomImport, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter", ("com.sun.star.document.ImportFilter",))
 # pylint: disable=broad-except
 except Exception:
     traceback.print_exc(file=sys.stderr)
