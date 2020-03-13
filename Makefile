@@ -23,7 +23,7 @@ test.dot: test.ged ged2dot.py ged2dotrc Makefile
 %.lint : %.py Makefile
 	pylint \
 		--max-line-length=120 \
-		--disable=import-error,too-many-instance-attributes,missing-docstring,invalid-name,too-many-branches,too-many-statements,fixme,line-too-long,too-many-arguments,protected-access,too-many-locals \
+		--disable=import-error,too-many-instance-attributes,missing-docstring,too-many-branches,too-many-statements,fixme,line-too-long,too-many-arguments,protected-access,too-many-locals \
 		$< && touch $@
 
 check: check-type check-lint

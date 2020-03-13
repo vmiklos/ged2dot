@@ -18,25 +18,25 @@ try:
     # that's not the case here. Seems the only way to do this is to read a
     # configuration value, where %origin% gets replaced with the directory
     # we're interested in.
-    ctx = uno.getComponentContext()
-    configurationProvider = ctx.ServiceManager.createInstance('com.sun.star.configuration.ConfigurationProvider')
-    value = PropertyValue()
-    value.Name = 'nodepath'
-    value.Value = 'hu.vmiklos.libreoffice.Draw.GedcomImportFilter.Settings/Tokens'
-    configurationAccess = configurationProvider.createInstanceWithArguments('com.sun.star.configuration.ConfigurationAccess', (value,))
-    origin = configurationAccess.Origin
+    CTX = uno.getComponentContext()
+    CONFIGURATION_PROVIDER = CTX.ServiceManager.createInstance('com.sun.star.configuration.ConfigurationProvider')
+    VALUE = PropertyValue()
+    VALUE.Name = 'nodepath'
+    VALUE.Value = 'hu.vmiklos.libreoffice.Draw.GedcomImportFilter.Settings/Tokens'
+    CONFIGURATION_ACCESS = CONFIGURATION_PROVIDER.createInstanceWithArguments('com.sun.star.configuration.ConfigurationAccess', (VALUE,))
+    ORIGIN = CONFIGURATION_ACCESS.Origin
     # Actually the returned value still contains 'vnd.sun.star.expand:$UNO_USER_PACKAGES_CACHE', let's expand that.
-    expander = ctx.getValueByName('/singletons/com.sun.star.util.theMacroExpander')
-    url = expander.expandMacros(origin).replace('vnd.sun.star.expand:', '')
-    path = unohelper.fileUrlToSystemPath(url)
-    sys.path.insert(0, path)
+    EXPANDER = CTX.getValueByName('/singletons/com.sun.star.util.theMacroExpander')
+    URL = EXPANDER.expandMacros(ORIGIN).replace('vnd.sun.star.expand:', '')
+    PATH = unohelper.fileUrlToSystemPath(URL)
+    sys.path.insert(0, PATH)
 
     import dialog
     import importer
 
-    g_ImplementationHelper = unohelper.ImplementationHelper()
-    g_ImplementationHelper.addImplementation(dialog.GedcomDialog, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog", ("com.sun.star.ui.dialogs.FilterOptionsDialog",))
-    g_ImplementationHelper.addImplementation(importer.GedcomImport, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter", ("com.sun.star.document.ImportFilter",))
+    IMPLEMENTATION_HELPER = unohelper.ImplementationHelper()
+    IMPLEMENTATION_HELPER.addImplementation(dialog.GedcomDialog, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog", ("com.sun.star.ui.dialogs.FilterOptionsDialog",))
+    IMPLEMENTATION_HELPER.addImplementation(importer.GedcomImport, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter", ("com.sun.star.document.ImportFilter",))
 # pylint: disable=broad-except
 except Exception:
     traceback.print_exc(file=sys.stderr)

@@ -47,7 +47,7 @@ class Individual:
     """An individual is our basic building block, can be part of multiple families (usually two)."""
     def __init__(self, model: 'Model') -> None:
         self.model = model
-        self.id = ""
+        self.iid = ""
         self.sex = None  # type: Optional[str]
         self.forename = ""  # John
         self.surname = ""  # Smith
@@ -59,7 +59,7 @@ class Individual:
         # Set to true on first addition, so that we can avoid redundant deps.
 
     def __str__(self) -> str:
-        return "id: %s, sex: %s, forename: %s, surname: %s: famc: %s, fams: %s, birt: %s, deat: %s" % (self.id, self.sex, self.forename, self.surname, self.famc, self.fams, self.birt, self.deat)
+        return "iid: %s, sex: %s, forename: %s, surname: %s: famc: %s, fams: %s, birt: %s, deat: %s" % (self.iid, self.sex, self.forename, self.surname, self.famc, self.fams, self.birt, self.deat)
 
     def resolve(self) -> None:
         """Replaces family reference strings with references to objects."""
@@ -91,7 +91,7 @@ class Individual:
         path = self.model.config.imageFormat % {
             'forename': forename,
             'surname': surname,
-            'gwIndex': self.model.get_individual_gene_web_index(self.id, self.forename, self.surname),
+            'gwIndex': self.model.get_individual_gene_web_index(self.iid, self.forename, self.surname),
             'birt': self.birt
         }
 
@@ -141,8 +141,8 @@ class Individual:
                 deat = "YYYY"
             return format_string % {
                 'picture': picture,
-                'surname': self.id[0],
-                'forename': self.id[1:],
+                'surname': self.iid[0],
+                'forename': self.iid[1:],
                 'birt': birt,
                 'deat': deat
             }
@@ -162,7 +162,7 @@ class Individual:
         return {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
     def get_node(self) -> 'Node':
-        return Node(self.id, '[ shape = box,\nlabel = %s,\ncolor = %s,\npenwidth=%s ]' % (self.get_label(), self.get_color(), self.model.config.nodeBorderWidth))
+        return Node(self.iid, '[ shape = box,\nlabel = %s,\ncolor = %s,\npenwidth=%s ]' % (self.get_label(), self.get_color(), self.model.config.nodeBorderWidth))
 
     def set_birt(self, birt: str) -> None:
         if not birt:
@@ -182,14 +182,14 @@ class Family:
 
     def __init__(self, model: 'Model') -> None:
         self.model = model
-        self.id = None  # type: Optional[str]
+        self.fid = None  # type: Optional[str]
         self.husb = None  # type: Any  # str or Individual
         self.wife = None  # type: Any  # str or Individual
         self.chil = []  # type: List[str]
         self.depth = 0
 
     def __str__(self) -> str:
-        return "id: %s, husb: %s, wife: %s, chil: %s, depth: %s" % (self.id, self.husb, self.wife, self.chil, self.depth)
+        return "fid: %s, husb: %s, wife: %s, chil: %s, depth: %s" % (self.fid, self.husb, self.wife, self.chil, self.depth)
 
     def resolve(self) -> None:
         """Replaces individual reference strings with references to objects."""
@@ -209,13 +209,13 @@ class Family:
             if not y_obj:
                 raise NoSuchIndividualException("Can't find individual '%s' in the input file." % y_str)
 
-            if x_obj.sex == "M" and x_obj.fams and self.model.get_family(x_obj.fams.id, filtered_families):
+            if x_obj.sex == "M" and x_obj.fams and self.model.get_family(x_obj.fams.fid, filtered_families):
                 return 1
-            if y_obj.sex == "M" and y_obj.fams and self.model.get_family(y_obj.fams.id, filtered_families):
+            if y_obj.sex == "M" and y_obj.fams and self.model.get_family(y_obj.fams.fid, filtered_families):
                 return -1
-            if x_obj.sex == "F" and x_obj.fams and self.model.get_family(x_obj.fams.id, filtered_families):
+            if x_obj.sex == "F" and x_obj.fams and self.model.get_family(x_obj.fams.fid, filtered_families):
                 return -1
-            if y_obj.sex == "F" and y_obj.fams and self.model.get_family(y_obj.fams.id, filtered_families):
+            if y_obj.sex == "F" and y_obj.fams and self.model.get_family(y_obj.fams.fid, filtered_families):
                 return 1
             return 0
         self.chil.sort(key=cmp_to_key(compare_children))
@@ -225,7 +225,7 @@ class Family:
         None, a placeholder individual is created."""
         if not self.husb:
             self.husb = Individual(self.model)
-            self.husb.id = "PH%d" % Family.phCount
+            self.husb.iid = "PH%d" % Family.phCount
             Family.phCount += 1
             self.husb.sex = 'M'
             self.husb.forename = "?"
@@ -238,7 +238,7 @@ class Family:
         """Same as get_husb(), but for wifes."""
         if not self.wife:
             self.wife = Individual(self.model)
-            self.wife.id = "PH%d" % Family.phCount
+            self.wife.iid = "PH%d" % Family.phCount
             Family.phCount += 1
             self.wife.sex = 'F'
             self.wife.forename = "?"
@@ -259,7 +259,7 @@ class Model:
 
     def get_individual(self, id_string: str) -> Optional[Individual]:
         for i in self.individuals:
-            if i.id == id_string:
+            if i.iid == id_string:
                 return i
         return None
 
@@ -267,7 +267,7 @@ class Model:
         my_list = []
         for i in self.individuals:
             if (i.forename == forename) and (i.surname == surname):
-                my_list.append(i.id)
+                my_list.append(i.iid)
         my_list.sort()
         return my_list.index(search_id)
 
@@ -277,7 +277,7 @@ class Model:
         else:
             families = self.families
         for i in families:
-            if i.id == id_string:
+            if i.fid == id_string:
                 return i
         return None
 
@@ -399,10 +399,10 @@ class Subgraph:
         for element in self.elements:
             if element.__class__ == Node:
                 node = cast(Node, element)
-                if family.wife and node.node_id == family.wife.id:
-                    return (family.wife.id, count)
-                if family.husb and node.node_id == family.husb.id:
-                    return (family.husb.id, count)
+                if family.wife and node.node_id == family.wife.iid:
+                    return (family.wife.iid, count)
+                if family.husb and node.node_id == family.husb.iid:
+                    return (family.husb.iid, count)
             count += 1
         return ("", 0)
 
@@ -411,7 +411,7 @@ class Subgraph:
         for element in self.elements:
             if element.__class__ == Edge:
                 edge = cast(Edge, element)
-                if hasattr(individual, 'id') and edge.to_node == individual.id:
+                if hasattr(individual, 'iid') and edge.to_node == individual.iid:
                     return self.model.get_individual(edge.from_node)
 
         return None
@@ -423,7 +423,7 @@ class Marriage:
         self.family = family
 
     def get_name(self) -> str:
-        return "%sAnd%s" % (self.family.get_husb().id, self.family.get_wife().id)
+        return "%sAnd%s" % (self.family.get_husb().iid, self.family.get_wife().iid)
 
     def get_node(self) -> Node:
         husb = self.family.get_husb().get_full_name()
@@ -495,7 +495,7 @@ class Layout:
                         if not individual:
                             raise NoSuchIndividualException("Can't find individual '%s' in the input file." % chil)
                         chil_family = individual.fams
-                        if not chil_family or self.model.get_family(chil_family.id, self.filtered_families):
+                        if not chil_family or self.model.get_family(chil_family.fid, self.filtered_families):
                             continue
                         chil_family.depth = depth
                         sibling_families.append(chil_family)
@@ -527,14 +527,14 @@ class Layout:
             husb = family.get_husb()
             subgraph.append(husb.get_node())
             if prev_wife:
-                subgraph.append(self.make_edge(prev_wife.id, family.husb.id, invisible=True))
+                subgraph.append(self.make_edge(prev_wife.iid, family.husb.iid, invisible=True))
             wife = family.get_wife()
             subgraph.append(wife.get_node())
             prev_wife = family.wife
             marriage = Marriage(family)
             subgraph.append(marriage.get_node())
-            subgraph.append(self.make_edge(family.get_husb().id, marriage.get_name(), comment=family.get_husb().get_full_name()))
-            subgraph.append(self.make_edge(marriage.get_name(), family.get_wife().id, comment=family.get_wife().get_full_name()))
+            subgraph.append(self.make_edge(family.get_husb().iid, marriage.get_name(), comment=family.get_husb().get_full_name()))
+            subgraph.append(self.make_edge(marriage.get_name(), family.get_wife().iid, comment=family.get_wife().get_full_name()))
             for family_child in family.chil:
                 individual = self.model.get_individual(family_child)
                 if individual and family.depth > self.model.config.layoutMaxSiblingDepth and individual.fams not in self.filtered_families:
@@ -550,7 +550,7 @@ class Layout:
                     if descendants and family_child_indi.sex == 'F':
                         family_child_family = family_child_indi.fams
                         if family_child_family and family_child_family.husb:
-                            pending_child_nodes.append(self.make_edge(prev_chil, family_child_family.husb.id, invisible=True))
+                            pending_child_nodes.append(self.make_edge(prev_chil, family_child_family.husb.iid, invisible=True))
                             handled = True
                     if not handled:
                         pending_child_nodes.append(self.make_edge(prev_chil, family_child, invisible=True))
@@ -621,7 +621,7 @@ class Layout:
         assert subgraph
         existing_indi, existing_pos = subgraph.find_family(family)
         new_indi = None
-        if family.wife and existing_indi == family.wife.id:
+        if family.wife and existing_indi == family.wife.iid:
             new_indi = family.husb
         else:
             new_indi = family.wife
@@ -630,10 +630,10 @@ class Layout:
             return
         found = False
         for element in subgraph.elements:
-            if existing_indi == family.wife.id and element.__class__ == Edge and cast(Edge, element).to_node == existing_indi:
-                cast(Edge, element).to_node = new_indi.id
-            elif existing_indi == family.husb.id and element.__class__ == Edge and cast(Edge, element).from_node == existing_indi:
-                cast(Edge, element).from_node = new_indi.id
+            if existing_indi == family.wife.iid and element.__class__ == Edge and cast(Edge, element).to_node == existing_indi:
+                cast(Edge, element).to_node = new_indi.iid
+            elif existing_indi == family.husb.iid and element.__class__ == Edge and cast(Edge, element).from_node == existing_indi:
+                cast(Edge, element).from_node = new_indi.iid
             found = True
         assert found
         subgraph.elements.insert(existing_pos, new_indi.get_node())
@@ -641,8 +641,8 @@ class Layout:
         marriage = Marriage(family)
         subgraph.elements.insert(existing_pos, marriage.get_node())
 
-        subgraph.append(self.make_edge(family.husb.id, marriage.get_name(), comment=family.husb.get_full_name()))
-        subgraph.append(self.make_edge(marriage.get_name(), family.wife.id, comment=family.wife.get_full_name()))
+        subgraph.append(self.make_edge(family.husb.iid, marriage.get_name(), comment=family.husb.get_full_name()))
+        subgraph.append(self.make_edge(marriage.get_name(), family.wife.iid, comment=family.wife.get_full_name()))
 
     def __add_sibling_children(self, family: Family) -> None:
         """Add children from a sibling family to the layout."""
@@ -800,10 +800,10 @@ class GedcomImport:
                         id_string = rest[1:-6]
                         if id_string not in self.model.config.indiBlacklist:
                             self.indi = Individual(self.model)
-                            self.indi.id = rest[1:-6]
+                            self.indi.iid = rest[1:-6]
                     elif rest.startswith("@") and rest.endswith("FAM"):
                         self.family = Family(self.model)
-                        self.family.id = rest[1:-5]
+                        self.family.fid = rest[1:-5]
 
                 elif level == 1:
                     if self.in_birt:

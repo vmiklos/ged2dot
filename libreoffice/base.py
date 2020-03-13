@@ -20,30 +20,30 @@ class GedcomBase:
     def __init__(self, context: Any) -> None:
         self.context = context
 
-    def createUnoService(self, name: str) -> Any:
+    def create_uno_service(self, name: str) -> Any:
         return self.context.ServiceManager.createInstanceWithContext("com.sun.star.%s" % name, self.context)
 
     @staticmethod
-    def toDict(args: Iterable[Any]) -> Dict[str, Any]:
+    def to_dict(args: Iterable[Any]) -> Dict[str, Any]:
         ret = {}
         for i in args:
             ret[i.Name] = i.Value
         return ret
 
     @staticmethod
-    def toTuple(args: Dict[str, Any]) -> Tuple[Any, ...]:
+    def to_tuple(args: Dict[str, Any]) -> Tuple[Any, ...]:
         ret = []
-        for k, v in args.items():
+        for key, value in args.items():
             value = PropertyValue()
-            value.Name = k
-            value.Value = v
+            value.Name = key
+            value.Value = value
             ret.append(value)
         return tuple(ret)
 
-    def printTraceback(self) -> None:
+    def print_traceback(self) -> None:
         if sys.platform.startswith("win"):
-            xPathSubstitution = self.context.ServiceManager.createInstance("com.sun.star.util.PathSubstitution")
-            user = xPathSubstitution.getSubstituteVariableValue("user")
+            path_substitution = self.context.ServiceManager.createInstance("com.sun.star.util.PathSubstitution")
+            user = path_substitution.getSubstituteVariableValue("user")
             path = uno.fileUrlToSystemPath(user + "/Scripts/python/log.txt")
             directory = os.path.dirname(path)
             if not os.path.exists(directory):

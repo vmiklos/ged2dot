@@ -11,24 +11,24 @@ import xml.etree.ElementTree as ElementTree
 from typing import Union
 from typing import IO
 
-namespaces = {
+NAMESPACES = {
     'svg': 'http://www.w3.org/2000/svg',
     'xlink': 'http://www.w3.org/1999/xlink'
 }
 
 
-def inlineize(fro: Union[str, IO[bytes]], to: Union[str, IO[bytes]]) -> None:
-    ElementTree.register_namespace('', namespaces['svg'])
-    ElementTree.register_namespace('xlink', namespaces['xlink'])
+def inlineize(from_path: Union[str, IO[bytes]], to_path: Union[str, IO[bytes]]) -> None:
+    ElementTree.register_namespace('', NAMESPACES['svg'])
+    ElementTree.register_namespace('xlink', NAMESPACES['xlink'])
     tree = ElementTree.ElementTree()
-    tree.parse(fro)
-    for image in tree.findall('.//{%s}image' % namespaces['svg']):
-        xlinkhref = '{%s}href' % namespaces['xlink']
+    tree.parse(from_path)
+    for image in tree.findall('.//{%s}image' % NAMESPACES['svg']):
+        xlinkhref = '{%s}href' % NAMESPACES['xlink']
         href = image.attrib[xlinkhref]
         sock = open(href, 'rb')
         image.attrib[xlinkhref] = "data:image/png;base64,%s" % base64.b64encode(sock.read()).decode('ascii')
         sock.close()
-    tree.write(to)
+    tree.write(to_path)
 
 
 def main() -> None:
