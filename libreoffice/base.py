@@ -33,10 +33,10 @@ class GedcomBase:
     @staticmethod
     def to_tuple(args: Dict[str, Any]) -> Tuple[Any, ...]:
         ret = []
-        for key, value in args.items():
+        for arg_key, arg_value in args.items():
             value = PropertyValue()
-            value.Name = key
-            value.Value = value
+            value.Name = arg_key
+            value.Value = arg_value
             ret.append(value)
         return tuple(ret)
 

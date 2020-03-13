@@ -94,7 +94,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         # The rest is just derived from this.
 
         # Create the dialog model.
-        dialog_model = self.createUnoService("awt.UnoControlDialogModel")
+        dialog_model = self.create_uno_service("awt.UnoControlDialogModel")
         dialog_model.PositionX = 0
         dialog_model.PositionY = 0
         dialog_model.Width = 230
@@ -112,9 +112,9 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         self.__create_control(dialog_model, type_string="Button", id_string="btnCancel", tab_index=7, left=170, top=70, width=50, height=10, button_type=PushButtonType_CANCEL)
 
         # Finally show the dialog.
-        dialog = self.createUnoService("awt.UnoControlDialog")
+        dialog = self.create_uno_service("awt.UnoControlDialog")
         dialog.setModel(dialog_model)
-        toolkit = self.createUnoService("awt.ExtToolkit")
+        toolkit = self.create_uno_service("awt.ExtToolkit")
         dialog.createPeer(toolkit, None)
         ret = dialog.execute()
         if ret == ExecutableDialogResults_OK:
@@ -134,16 +134,16 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             return self.to_tuple(self.props)
         # pylint: disable=broad-except
         except Exception:
-            self.printTraceback()
+            self.print_traceback()
 
         return ()
 
     def setPropertyValues(self, props: Iterable[Any]) -> None:
         try:
-            self.props = self.toDict(props)
+            self.props = self.to_dict(props)
         # pylint: disable=broad-except
         except Exception:
-            self.printTraceback()
+            self.print_traceback()
 
     # XExecutableDialog
     def setTitle(self, title: str) -> None:
@@ -156,13 +156,13 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             if ret == ExecutableDialogResults_OK:
                 self.props['FilterData'] = self.to_tuple({
                     'rootFamily': self.root_family,
-                    'layoutMaxDepth': self.layoutMax,
+                    'layoutMaxDepth': self.layout_max,
                     'nodeLabelImage': self.node_label_image
                 })
             return ret
         # pylint: disable=broad-except
         except Exception:
-            self.printTraceback()
+            self.print_traceback()
             return ExecutableDialogResults_CANCEL
 
     # XImporter

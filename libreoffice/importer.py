@@ -41,7 +41,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         layout_max_depth = ged2dot.Config.layoutMaxDepthDefault
         node_label_image = ged2dot.Config.nodeLabelImageDefault
         if "FilterData" in self.props.keys():
-            filter_data = self.toDict(self.props["FilterData"])
+            filter_data = self.to_dict(self.props["FilterData"])
             if "rootFamily" in filter_data.keys():
                 root_family = filter_data["rootFamily"]
             if "layoutMaxDepth" in filter_data.keys():
@@ -104,13 +104,13 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
     # XFilter
     def filter(self, props: Dict[str, Any]) -> bool:
         try:
-            self.props = self.toDict(props)
+            self.props = self.to_dict(props)
             path = unohelper.fileUrlToSystemPath(self.props["URL"])
             buf = self.__to_svg(path)
-            input_stream = self.createUnoService("io.SequenceInputStream")
+            input_stream = self.create_uno_service("io.SequenceInputStream")
             input_stream.initialize((uno.ByteSequence(buf),))
 
-            svg_filter = self.createUnoService("comp.Draw.SVGFilter")
+            svg_filter = self.create_uno_service("comp.Draw.SVGFilter")
             svg_filter.setTargetDocument(self.dst_doc)
 
             value = PropertyValue()
@@ -120,24 +120,28 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
             return True
         # pylint: disable=broad-except
         except Exception:
-            self.printTraceback()
+            self.print_traceback()
             return False
 
     # XImporter
     # pylint: disable=invalid-name
     def setTargetDocument(self, dst_doc: Any) -> None:
-        self.dst_doc = dst_doc
+        try:
+            self.dst_doc = dst_doc
+        # pylint: disable=broad-except
+        except Exception:
+            self.print_traceback()
 
     # XExtendedFilterDetection
     def detect(self, args: Iterable[Any]) -> Tuple[str, Iterable[Any]]:
         try:
-            dictionary = self.toDict(args)
+            dictionary = self.to_dict(args)
             if self.__detect(dictionary["InputStream"]):
                 dictionary["TypeName"] = GedcomImport.type
-                return GedcomImport.type, self.toTuple(dictionary)
+                return GedcomImport.type, self.to_tuple(dictionary)
         # pylint: disable=broad-except
         except Exception:
-            self.printTraceback()
+            self.print_traceback()
         return "", args
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
