@@ -848,8 +848,8 @@ class GedcomImport:
 
             # pylint: disable=broad-except
             except Exception as exc:
-                print("Encountered parsing error in .ged: " + str(exc))
-                print("line (%d): %s" % (linecount, line))
+                sys.stderr.write("Encountered parsing error in .ged: " + str(exc) + "\n")
+                sys.stderr.write("line (%d): %s\n" % (linecount, line))
                 sys.exit(1)
 
 # Configuration handling
@@ -976,7 +976,7 @@ def main() -> None:
         config = Config(sys.argv[1:])
     # pylint: disable=broad-except
     except (BaseException) as base_exception:
-        print("Configuration invalid? %s" % (str(base_exception)))
+        sys.stderr.write("Configuration invalid? %s\n" % (str(base_exception)))
         sys.exit(1)
 
     if len(sys.argv) > 1 and (sys.argv[1] == "--help" or sys.argv[1] == "-h"):

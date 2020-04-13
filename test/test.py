@@ -65,7 +65,7 @@ class Test(unittest.TestCase):
     def test_nosex(self) -> None:
         # Capture standard output.
         buf = io.StringIO()
-        with unittest.mock.patch('sys.stdout', buf):
+        with unittest.mock.patch('sys.stderr', buf):
             ret = []  # type: List[int]
             with unittest.mock.patch('sys.exit', mock_sys_exit(ret)):
                 # if there is no sex, this should fail and indicate line number
