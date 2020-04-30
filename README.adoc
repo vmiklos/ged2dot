@@ -1,7 +1,6 @@
 = ged2dot, a GEDCOM to Graphviz converter
 
 image:https://travis-ci.org/vmiklos/ged2dot.svg?branch=master["Build Status", link="https://travis-ci.org/vmiklos/ged2dot"]
-image:https://tokei.rs/b1/github/vmiklos/ged2dot?category=code["LoC"]
 
 == What's the problem the tool solves?
 
