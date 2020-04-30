@@ -97,3 +97,7 @@ then the log is printed to the standard error as well.
 Icons are from
 http://www.wpzoom.com/wpzoom/new-freebie-wpzoom-developer-icon-set-154-free-icons/[WPZOOM],
 in case placeholders have to be used for missing images.
+
+== Download
+
+From https://github.com/vmiklos/ged2dot[GitHub].
