@@ -2,6 +2,9 @@
 
 image:https://travis-ci.org/vmiklos/ged2dot.svg?branch=master["Build Status", link="https://travis-ci.org/vmiklos/ged2dot"]
 
+The latest version is v7.0, released on 2020-08-18.  See the
+https://github.com/vmiklos/ged2dot/blob/master/NEWS[release notes].
+
 == What's the problem the tool solves?
 
 `ged2dot` is a script that takes a http://en.wikipedia.org/wiki/GEDCOM[GEDCOM]

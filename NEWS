@@ -1,5 +1,9 @@
 VERSION         DESCRIPTION
 -----------------------------------------------------------------------------
+7.0           - tested with LibreOffice 7.0
+              - pylint fixes
+              - Use sys.stderr.write instead of print to print errors (Colin Chargy)
+              - add better error handling and error out on lack of rc file (Doug Hughes)
 6.0           - fixed to work with 64-bit LibreOffice
 0.8           - fixed to work with LibreOffice 6.1
 0.7           - minor fixes, tested with LibreOffice 5.4
