@@ -4,10 +4,7 @@ language: python
 python:
   - "3.5"
 script: make check
-after_success:
-  - "curl -o /tmp/travis-automerge https://raw.githubusercontent.com/vmiklos/ged2dot/master/tools/travis-automerge"
-  - "chmod a+x /tmp/travis-automerge"
-  - "BRANCHES_TO_MERGE_REGEX='^ci/' BRANCH_TO_MERGE_INTO=master GITHUB_REPO=vmiklos/ged2dot /tmp/travis-automerge"
-env:
-  global:
-    secure: TLq+b9CNfn6WQqQt82TxQDd7/m/AHrI+frvO3W7JRFAE4O7xm13BkqyAQz3FQawR6KXMB2IGU+SbF6Y15m7GB8n3MY0OgfvdT9yiCdTlhtWJ/XyIMniu/7L8Iquwgb4eMLrutDlQoUjDiVveScWunmicvjk07nQot9k1jXqOSwyv+2ReSySBkkFyJTR4XCusKssA//l7xDI2cqBuncuQPDvzVDZyZ2/Qbq6VHYe/w15JCbg8vjE9iVsjl1ZXl6EPGmrImevcS9bmi/BuCkyEHixurPPw0lYymEFNW6SzQYF6SwXGeYn114vN+FmEdiKPlrPAD51T5fXk2UYpnu2vNmK82HYpr8uwXqzTjpH0HoDGCpqfCAdBvxTCD3jO+bXvRY6JbZVh8gWtEA9KB8MfwrzR4X0htu8SK5lSRfMAplTh+TTbbuNydTbY1Kg64ejoA+Rml6sdzO6atUvNKFwIWhrBBP9xeGmBpM/Wzj7ywc6nqxcwbduztTzvS89uH6dHzAaMqqE3ua6+f11jy604f3IoxPPqK6KvFgMIBohkOQIqRlupy8U5WDXqlUYW96ot4/cmm/kZ2d8yAn8uh66SUqzb9gUCpPn48wYDphUxxX7YACykD0gaD+lyNWXcBt1o141cqXemL2hxPPAEe11NzkqUNgEdBswIACgJhYdbfGw=
+branches:
+  except:
+    # build e.g. master, but not private/vmiklos/master
+    - /private\/.*/
