@@ -1,0 +1,15 @@
+name: "Push Notification"
+on: [push, pull_request, create]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: irc push
+        uses: vmiklos/notify-irc@0865d808946daa3003588f3226c51086ac7379a8
+        if: github.event_name == 'push' && github.event.ref == 'refs/heads/master'
+        with:
+          channel: "#ged2dot-dev"
+          nickname: github-ged2dot
+          message: |
+            ${{ toJson(github.event) }}
