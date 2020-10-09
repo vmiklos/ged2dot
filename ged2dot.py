@@ -354,7 +354,7 @@ class Node(Renderable):
 class Subgraph:
     """A subgraph in the layout, contains edges and nodes.
     The special start node is not part of the elements list and it is at the
-    begining.  The special end node is the separator between elements what are
+    beginning.  The special end node is the separator between elements what are
     in the subgraph and what are outside of it."""
 
     class Start:
@@ -780,7 +780,7 @@ class GedcomImport:
             tokens = line.split(' ')
 
             first_token = tokens[0]
-            # Ignore UTF-8 BOM, if there is one at the begining of the line.
+            # Ignore UTF-8 BOM, if there is one at the beginning of the line...
             if first_token.startswith("\ufeff"):
                 first_token = first_token[1:]
 
