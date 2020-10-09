@@ -10,7 +10,7 @@ ones.
 
 It is recommended that you do not install the development version of the
 extension to your system profile, as sooner or later you will screw it up,
-loosing your "production" settings.
+losing your "production" settings.
 
 Instead, set up the official binaries in a separate dir, and create a dedicated profile as documented here:
 
