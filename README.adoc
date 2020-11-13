@@ -1,6 +1,6 @@
 = ged2dot, a GEDCOM to Graphviz converter
 
-image:https://github.com/vmiklos/ged2dot/workflows/Tests/badge.svg["Build Status", link="https://github.com/vmiklos/ged2dot/actions"]
+image:https://github.com/vmiklos/ged2dot/workflows/tests/badge.svg["Build Status", link="https://github.com/vmiklos/ged2dot/actions"]
 
 The latest version is v7.0, released on 2020-08-18.  See the
 https://github.com/vmiklos/ged2dot/blob/master/NEWS[release notes].
