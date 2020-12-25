@@ -1,0 +1,3 @@
+- improve output so it's more on pair with the original ged2dot (colors, birth/death dates, etc)
+- don't hardcode parameters
+- mypy/flake8/doc/coverage/pylint
