@@ -1,0 +1,21 @@
+= Development notes
+
+== How to set up a virtual env
+
+Create it:
+
+----
+python3 -m venv ged2dot-core-env
+----
+
+Activate it:
+
+----
+. ged2dot-core-env/bin/activate
+----
+
+Install requirements:
+
+----
+pip install -r requirements.txt
+----
