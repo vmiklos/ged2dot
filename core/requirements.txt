@@ -1,2 +1,6 @@
+appdirs==1.4.4 # pylint dependency
 flake8==3.8.4
 mypy==0.790
+packaging==20.8 # pylint dependency
+pylint==2.6.0
+six==1.15.0 # pylint dependency
