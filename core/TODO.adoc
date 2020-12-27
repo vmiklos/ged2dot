@@ -1,3 +1,2 @@
-- CI
 - don't hardcode parameters
-- mypy/flake8/doc/coverage/pylint
+- flake8/doc/coverage/pylint
