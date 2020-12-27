@@ -1,2 +1,2 @@
 - don't hardcode parameters
-- flake8/doc/coverage/pylint
+- doc/coverage/pylint

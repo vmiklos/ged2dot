@@ -230,7 +230,14 @@ def export_dot(subgraph: List[Node]) -> None:
                 else:
                     sex = 'u'
                 image_path = os.path.join("..", "placeholder-%s.png" % sex)
-            stream.write("label = <<table border=\"0\" cellborder=\"0\"><tr><td><img src=\"" + image_path + "\"/></td></tr><tr><td>" + individual.surname + "<br/>" + individual.forename + "<br/>" + individual.birth + "-" + individual.death + "</td></tr></table>>\n")
+            label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
+            label += "<img src=\"" + image_path + "\"/>"
+            label += "</td></tr><tr><td>"
+            label += individual.surname + "<br/>"
+            label += individual.forename + "<br/>"
+            label += individual.birth + "-" + individual.death
+            label += "</td></tr></table>"
+            stream.write("label = <" + label + ">\n")
 
             if individual.sex is None:
                 sex = 'U'
