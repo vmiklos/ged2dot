@@ -206,78 +206,91 @@ class Family(Node):
         return self.__dict["husb_id"]
 
 
-def import_gedcom() -> List[Node]:
-    """Imports a gedcom file into a graph."""
-    stream = open("test.ged", "rb")
-    individual = None
-    family = None
-    graph: List[Node] = []
-    in_birt = False
-    in_deat = False
-    for line_bytes in stream.readlines():
-        line = line_bytes.strip().decode("UTF-8")
-        tokens = line.split(" ")
+class GedcomImport:
+    """Builds the graph from GEDCOM."""
+    def __init__(self) -> None:
+        self.individual: Optional[Individual] = None
+        self.family: Optional[Family] = None
+        self.graph: List[Node] = []
+        self.in_birt = False
+        self.in_deat = False
 
-        first_token = tokens[0]
-        # Ignore UTF-8 BOM, if there is one at the begining of the line.
-        if first_token.startswith("\ufeff"):
-            first_token = first_token[1:]
+    def __reset_flags(self) -> None:
+        if self.in_birt:
+            self.in_birt = False
+        elif self.in_deat:
+            self.in_deat = False
 
-        level = int(first_token)
-        rest = " ".join(tokens[1:])
-        if level == 0:
-            if individual:
-                graph.append(individual)
-                individual = None
-            if family:
-                graph.append(family)
-                family = None
+    def __handle_level0(self, line: str) -> None:
+        if self.individual:
+            self.graph.append(self.individual)
+            self.individual = None
+        if self.family:
+            self.graph.append(self.family)
+            self.family = None
 
-            if rest.startswith("@") and rest.endswith("INDI"):
-                individual = Individual()
-                individual.set_identifier(rest[1:-6])
-            elif rest.startswith("@") and rest.endswith("FAM"):
-                family = Family()
-                family.set_identifier(rest[1:-5])
-        elif level == 1:
-            if in_birt:
-                in_birt = False
-            elif in_deat:
-                in_deat = False
+        if line.startswith("@") and line.endswith("INDI"):
+            self.individual = Individual()
+            self.individual.set_identifier(line[1:-6])
+        elif line.startswith("@") and line.endswith("FAM"):
+            self.family = Family()
+            self.family.set_identifier(line[1:-5])
 
-            if rest.startswith("SEX") and individual:
-                individual.set_sex(rest.split(' ')[1])
-            elif rest.startswith("NAME") and individual:
-                rest = rest[5:]
-                tokens = rest.split('/')
-                individual.set_forename(tokens[0].strip())
-                if len(tokens) > 1:
-                    individual.set_surname(tokens[1].strip())
-            elif rest.startswith("FAMC") and individual:
-                # At least <https://www.ancestry.com> sometimes writes multiple FAMC, which doesn't
-                # make sense. Import only the first one.
-                if not individual.get_famc_id():
-                    individual.set_famc_id(rest[6:-1])
-            elif rest.startswith("FAMS") and individual:
-                individual.fams_ids.append(rest[6:-1])
-            elif rest.startswith("BIRT"):
-                in_birt = True
-            elif rest.startswith("DEAT"):
-                in_deat = True
-            elif rest.startswith("HUSB") and family:
-                family.set_husb_id(rest[6:-1])
-            elif rest.startswith("WIFE") and family:
-                family.set_wife_id(rest[6:-1])
-            elif rest.startswith("CHIL") and family:
-                family.child_ids.append(rest[6:-1])
-        elif level == 2:
-            if rest.startswith("DATE") and individual:
-                year = rest.split(' ')[-1]
-                if in_birt:
-                    individual.set_birth(year)
-                elif in_deat:
-                    individual.set_death(year)
-    return graph
+    def __handle_level1(self, line: str) -> None:
+        self.__reset_flags()
+
+        if line.startswith("SEX") and self.individual:
+            self.individual.set_sex(line.split(' ')[1])
+        elif line.startswith("NAME") and self.individual:
+            line = line[5:]
+            tokens = line.split('/')
+            self.individual.set_forename(tokens[0].strip())
+            if len(tokens) > 1:
+                self.individual.set_surname(tokens[1].strip())
+        elif line.startswith("FAMC") and self.individual:
+            # At least <https://www.ancestry.com> sometimes writes multiple FAMC, which doesn't
+            # make sense. Import only the first one.
+            if not self.individual.get_famc_id():
+                self.individual.set_famc_id(line[6:-1])
+        elif line.startswith("FAMS") and self.individual:
+            self.individual.fams_ids.append(line[6:-1])
+        elif line.startswith("BIRT"):
+            self.in_birt = True
+        elif line.startswith("DEAT"):
+            self.in_deat = True
+        elif line.startswith("HUSB") and self.family:
+            self.family.set_husb_id(line[6:-1])
+        elif line.startswith("WIFE") and self.family:
+            self.family.set_wife_id(line[6:-1])
+        elif line.startswith("CHIL") and self.family:
+            self.family.child_ids.append(line[6:-1])
+
+    def load(self) -> List[Node]:
+        """Loads a gedcom file into a graph."""
+        with open("test.ged", "rb") as stream:
+            for line_bytes in stream.readlines():
+                line = line_bytes.strip().decode("UTF-8")
+                tokens = line.split(" ")
+
+                first_token = tokens[0]
+                # Ignore UTF-8 BOM, if there is one at the begining of the line.
+                if first_token.startswith("\ufeff"):
+                    first_token = first_token[1:]
+
+                level = int(first_token)
+                rest = " ".join(tokens[1:])
+                if level == 0:
+                    self.__handle_level0(rest)
+                elif level == 1:
+                    self.__handle_level1(rest)
+                elif level == 2:
+                    if rest.startswith("DATE") and self.individual:
+                        year = rest.split(' ')[-1]
+                        if self.in_birt:
+                            self.individual.set_birth(year)
+                        elif self.in_deat:
+                            self.individual.set_death(year)
+        return self.graph
 
 
 def bfs(root: Node) -> List[Node]:
@@ -365,7 +378,8 @@ def export_dot(subgraph: List[Node]) -> None:
 
 def main() -> None:
     """Commandline interface."""
-    graph = import_gedcom()
+    importer = GedcomImport()
+    graph = importer.load()
     for node in graph:
         node.resolve(graph)
     root_family = graph_find(graph, "F24")
