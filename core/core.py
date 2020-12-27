@@ -9,6 +9,7 @@
 
 import os
 from typing import cast
+from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -56,20 +57,21 @@ def graph_find(graph: List[Node], identifier: str) -> Optional[Node]:
 class Individual(Node):
     """An individual is always a child in a family, and is an adult in 0..* families."""
     def __init__(self) -> None:
-        self.identifier = ""
-        self.famc_id = ""
+        self.__dict: Dict[str, str] = {}
+        self.__dict["identifier"] = ""
+        self.__dict["famc_id"] = ""
         self.famc: Optional[Family] = None
         self.fams_ids: List[str] = []
         self.fams_list: List["Family"] = []
         self.depth = 0
-        self.forename = ""
-        self.surname = ""
-        self.sex = ""
-        self.birth = ""
-        self.death = ""
+        self.__dict["forename"] = ""
+        self.__dict["surname"] = ""
+        self.__dict["sex"] = ""
+        self.__dict["birth"] = ""
+        self.__dict["death"] = ""
 
     def resolve(self, graph: List[Node]) -> None:
-        self.famc = cast(Optional["Family"], graph_find(graph, self.famc_id))
+        self.famc = cast(Optional["Family"], graph_find(graph, self.get_famc_id()))
         for fams_id in self.fams_ids:
             fams = graph_find(graph, fams_id)
             assert fams
@@ -82,14 +84,66 @@ class Individual(Node):
         ret += self.fams_list
         return ret
 
+    def set_identifier(self, identifier: str) -> None:
+        """Sets the ID of this individual."""
+        self.__dict["identifier"] = identifier
+
     def get_identifier(self) -> str:
-        return self.identifier
+        return self.__dict["identifier"]
+
+    def set_sex(self, sex: str) -> None:
+        """Sets the sex of this individual."""
+        self.__dict["sex"] = sex
+
+    def get_sex(self) -> str:
+        """Gets the sex of this individual."""
+        return self.__dict["sex"]
+
+    def set_forename(self, forename: str) -> None:
+        """Sets the first name of this individual."""
+        self.__dict["forename"] = forename
+
+    def get_forename(self) -> str:
+        """Gets the first name of this individual."""
+        return self.__dict["forename"]
+
+    def set_surname(self, surname: str) -> None:
+        """Sets the family name of this individual."""
+        self.__dict["surname"] = surname
+
+    def get_surname(self) -> str:
+        """Gets the family name of this individual."""
+        return self.__dict["surname"]
 
     def set_depth(self, depth: int) -> None:
         self.depth = depth
 
     def get_depth(self) -> int:
         return self.depth
+
+    def set_famc_id(self, famc_id: str) -> None:
+        """Sets the child family ID."""
+        self.__dict["famc_id"] = famc_id
+
+    def get_famc_id(self) -> str:
+        """Gets the child family ID."""
+        return self.__dict["famc_id"]
+
+    def set_birth(self, birth: str) -> None:
+        """Sets the birth date."""
+        self.__dict["birth"] = birth
+
+    def get_birth(self) -> str:
+        """Gets the birth date."""
+        return self.__dict["birth"]
+
+    def set_death(self, death: str) -> None:
+        """Sets the death date."""
+        self.__dict["death"] = death
+
+    def get_death(self) -> str:
+        """Gets the death date."""
+        return self.__dict["death"]
 
 
 class Family(Node):
@@ -160,7 +214,7 @@ def import_gedcom() -> List[Node]:
 
             if rest.startswith("@") and rest.endswith("INDI"):
                 individual = Individual()
-                individual.identifier = rest[1:-6]
+                individual.set_identifier(rest[1:-6])
             elif rest.startswith("@") and rest.endswith("FAM"):
                 family = Family()
                 family.identifier = rest[1:-5]
@@ -171,18 +225,18 @@ def import_gedcom() -> List[Node]:
                 in_deat = False
 
             if rest.startswith("SEX") and individual:
-                individual.sex = rest.split(' ')[1]
+                individual.set_sex(rest.split(' ')[1])
             elif rest.startswith("NAME") and individual:
                 rest = rest[5:]
                 tokens = rest.split('/')
-                individual.forename = tokens[0].strip()
+                individual.set_forename(tokens[0].strip())
                 if len(tokens) > 1:
-                    individual.surname = tokens[1].strip()
+                    individual.set_surname(tokens[1].strip())
             elif rest.startswith("FAMC") and individual:
                 # At least <https://www.ancestry.com> sometimes writes multiple FAMC, which doesn't
                 # make sense. Import only the first one.
-                if not individual.famc_id:
-                    individual.famc_id = rest[6:-1]
+                if not individual.get_famc_id():
+                    individual.set_famc_id(rest[6:-1])
             elif rest.startswith("FAMS") and individual:
                 individual.fams_ids.append(rest[6:-1])
             elif rest.startswith("BIRT"):
@@ -199,9 +253,9 @@ def import_gedcom() -> List[Node]:
             if rest.startswith("DATE") and individual:
                 year = rest.split(' ')[-1]
                 if in_birt:
-                    individual.birth = year
+                    individual.set_birth(year)
                 elif in_deat:
-                    individual.death = year
+                    individual.set_death(year)
     return graph
 
 
@@ -242,26 +296,27 @@ def export_dot(subgraph: List[Node]) -> None:
             individual = cast(Individual, node)
             stream.write(node.get_identifier() + " [shape=box, ")
 
-            image_path = "images/" + individual.forename + " " + individual.surname + " " + individual.birth + ".jpg"
+            image_path = "images/" + individual.get_forename() + " " + individual.get_surname()
+            image_path += " " + individual.get_birth() + ".jpg"
             if not os.path.exists(image_path):
-                if individual.sex:
-                    sex = individual.sex.lower()
+                if individual.get_sex():
+                    sex = individual.get_sex().lower()
                 else:
                     sex = 'u'
                 image_path = os.path.join("..", "placeholder-%s.png" % sex)
             label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
             label += "<img src=\"" + image_path + "\"/>"
             label += "</td></tr><tr><td>"
-            label += individual.surname + "<br/>"
-            label += individual.forename + "<br/>"
-            label += individual.birth + "-" + individual.death
+            label += individual.get_surname() + "<br/>"
+            label += individual.get_forename() + "<br/>"
+            label += individual.get_birth() + "-" + individual.get_death()
             label += "</td></tr></table>"
             stream.write("label = <" + label + ">\n")
 
-            if individual.sex is None:
+            if not individual.get_sex():
                 sex = 'U'
             else:
-                sex = individual.sex.upper()
+                sex = individual.get_sex().upper()
             color = {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
 
             stream.write("color = " + color + "];\n")
@@ -278,11 +333,11 @@ def export_dot(subgraph: List[Node]) -> None:
                 continue
             family = cast(Family, node)
             if family.wife:
-                stream.write(family.wife.identifier + " -> " + family.get_identifier() + " [dir=none];\n")
+                stream.write(family.wife.get_identifier() + " -> " + family.get_identifier() + " [dir=none];\n")
             if family.husb:
-                stream.write(family.husb.identifier + " -> " + family.get_identifier() + " [dir=none];\n")
+                stream.write(family.husb.get_identifier() + " -> " + family.get_identifier() + " [dir=none];\n")
             for child in family.child_list:
-                stream.write(family.get_identifier() + " -> " + child.identifier + " [dir=none];\n")
+                stream.write(family.get_identifier() + " -> " + child.get_identifier() + " [dir=none];\n")
 
         stream.write("}\n")
 
