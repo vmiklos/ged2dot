@@ -149,18 +149,19 @@ class Individual(Node):
 class Family(Node):
     """Family has exactly one wife and husband, 0..* children."""
     def __init__(self) -> None:
-        self.identifier = ""
-        self.wife_id = ""
+        self.__dict: Dict[str, str] = {}
+        self.__dict["identifier"] = ""
+        self.__dict["wife_id"] = ""
         self.wife: Optional["Individual"] = None
-        self.husb_id = ""
+        self.__dict["husb_id"] = ""
         self.husb: Optional["Individual"] = None
         self.child_ids: List[str] = []
         self.child_list: List["Individual"] = []
         self.depth = 0
 
     def resolve(self, graph: List[Node]) -> None:
-        self.wife = cast(Optional["Individual"], graph_find(graph, self.wife_id))
-        self.husb = cast(Optional["Individual"], graph_find(graph, self.husb_id))
+        self.wife = cast(Optional["Individual"], graph_find(graph, self.get_wife_id()))
+        self.husb = cast(Optional["Individual"], graph_find(graph, self.get_husb_id()))
         for child_id in self.child_ids:
             child = graph_find(graph, child_id)
             assert child
@@ -175,14 +176,34 @@ class Family(Node):
         ret += self.child_list
         return ret
 
+    def set_identifier(self, identifier: str) -> None:
+        """Sets the ID of this family."""
+        self.__dict["identifier"] = identifier
+
     def get_identifier(self) -> str:
-        return self.identifier
+        return self.__dict["identifier"]
 
     def set_depth(self, depth: int) -> None:
         self.depth = depth
 
     def get_depth(self) -> int:
         return self.depth
+
+    def set_wife_id(self, wife_id: str) -> None:
+        """Sets the wife ID of this family."""
+        self.__dict["wife_id"] = wife_id
+
+    def get_wife_id(self) -> str:
+        """Gets the wife ID of this family."""
+        return self.__dict["wife_id"]
+
+    def set_husb_id(self, husb_id: str) -> None:
+        """Sets the husband ID of this family."""
+        self.__dict["husb_id"] = husb_id
+
+    def get_husb_id(self) -> str:
+        """Gets the husband ID of this family."""
+        return self.__dict["husb_id"]
 
 
 def import_gedcom() -> List[Node]:
@@ -217,7 +238,7 @@ def import_gedcom() -> List[Node]:
                 individual.set_identifier(rest[1:-6])
             elif rest.startswith("@") and rest.endswith("FAM"):
                 family = Family()
-                family.identifier = rest[1:-5]
+                family.set_identifier(rest[1:-5])
         elif level == 1:
             if in_birt:
                 in_birt = False
@@ -244,9 +265,9 @@ def import_gedcom() -> List[Node]:
             elif rest.startswith("DEAT"):
                 in_deat = True
             elif rest.startswith("HUSB") and family:
-                family.husb_id = rest[6:-1]
+                family.set_husb_id(rest[6:-1])
             elif rest.startswith("WIFE") and family:
-                family.wife_id = rest[6:-1]
+                family.set_wife_id(rest[6:-1])
             elif rest.startswith("CHIL") and family:
                 family.child_ids.append(rest[6:-1])
         elif level == 2:
