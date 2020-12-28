@@ -7,7 +7,7 @@ test.svg: test.dot
 test.dot: core.py test.ged
 	./core.py
 
-check: check-mypy check-flake8 #check-pylint
+check: check-mypy check-flake8 check-pylint
 
 check-mypy: $(patsubst %.py,%.mypy,$(PYTHON_OBJECTS))
 
