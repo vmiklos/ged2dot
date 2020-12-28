@@ -1,2 +1,3 @@
 - don't hardcode parameters
-- doc/coverage/pylint
+- user doc
+- tests
