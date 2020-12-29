@@ -17,28 +17,28 @@ from typing import cast
 
 class Node:
     """Base class for an individual or family."""
-    def get_identifier(self) -> str:
+    def get_identifier(self) -> str:  # pragma: no cover
         """Gets the ID of this node."""
         # pylint: disable=no-self-use
         ...
 
-    def set_depth(self, depth: int) -> None:
+    def set_depth(self, depth: int) -> None:  # pragma: no cover
         """Set the depth of this node, during one graph traversal."""
         # pylint: disable=no-self-use
         # pylint: disable=unused-argument
         ...
 
-    def get_depth(self) -> int:
+    def get_depth(self) -> int:  # pragma: no cover
         """Get the depth of this node, during one graph traversal."""
         # pylint: disable=no-self-use
         ...
 
-    def get_neighbours(self) -> List["Node"]:
+    def get_neighbours(self) -> List["Node"]:  # pragma: no cover
         """Get the neighbour nodes of this node."""
         # pylint: disable=no-self-use
         ...
 
-    def resolve(self, graph: List["Node"]) -> None:
+    def resolve(self, graph: List["Node"]) -> None:  # pragma: no cover
         """Resolve string IDs to node objects."""
         # pylint: disable=no-self-use
         # pylint: disable=unused-argument

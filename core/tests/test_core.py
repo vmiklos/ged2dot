@@ -28,6 +28,22 @@ class TestMain(unittest.TestCase):
         core.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
 
+    def test_bom(self) -> None:
+        """Tests handling of an UTF-8 BOM."""
+        config = {
+            "familyDepth": "4",
+            "input": "tests/bom.ged",
+            "output": "tests/bom.dot",
+            "rootFamily": "F1",
+        }
+        if os.path.exists(config["output"]):
+            os.unlink(config["output"])
+        self.assertFalse(os.path.exists(config["output"]))
+        # Without the accompanying fix in place, this test would have failed with:
+        # ValueError: invalid literal for int() with base 10: '\ufeff0'
+        core.convert(config)
+        self.assertTrue(os.path.exists(config["output"]))
+
 
 if __name__ == '__main__':
     unittest.main()
