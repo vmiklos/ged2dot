@@ -12,6 +12,22 @@ import unittest
 import core
 
 
+class TestIndividual(unittest.TestCase):
+    """Tests Individual."""
+    def test_get_label_nosex(self) -> None:
+        """Tests the no sex case of get_label()."""
+        config = {
+            "familyDepth": "4",
+            "input": "tests/nosex.ged",
+        }
+        importer = core.GedcomImport()
+        graph = importer.load(config)
+        individual = core.graph_find(graph, "P3")
+        assert individual
+        assert isinstance(individual, core.Individual)
+        self.assertIn("placeholder-u", individual.get_label())
+
+
 class TestMain(unittest.TestCase):
     """Tests main()."""
     def test_happy(self) -> None:
