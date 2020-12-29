@@ -165,6 +165,15 @@ class Individual(Node):
         label += "</td></tr></table>"
         return label
 
+    def get_color(self) -> str:
+        """Gets the color around the node."""
+        if not self.get_sex():
+            sex = 'U'
+        else:
+            sex = self.get_sex().upper()
+        color = {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
+        return color
+
 
 class Family(Node):
     """Family has exactly one wife and husband, 0..* children."""
@@ -351,14 +360,7 @@ class DotExport:
             individual = cast(Individual, node)
             stream.write(node.get_identifier() + " [shape=box, ")
             stream.write("label = <" + individual.get_label() + ">\n")
-
-            if not individual.get_sex():
-                sex = 'U'
-            else:
-                sex = individual.get_sex().upper()
-            color = {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
-
-            stream.write("color = " + color + "];\n")
+            stream.write("color = " + individual.get_color() + "];\n")
 
     def __store_family_nodes(self, stream: TextIO) -> None:
         stream.write("\n")

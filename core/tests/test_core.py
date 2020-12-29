@@ -14,8 +14,8 @@ import core
 
 class TestIndividual(unittest.TestCase):
     """Tests Individual."""
-    def test_get_label_nosex(self) -> None:
-        """Tests the no sex case of get_label()."""
+    def test_nosex(self) -> None:
+        """Tests the no sex case."""
         config = {
             "familyDepth": "4",
             "input": "tests/nosex.ged",
@@ -26,6 +26,7 @@ class TestIndividual(unittest.TestCase):
         assert individual
         assert isinstance(individual, core.Individual)
         self.assertIn("placeholder-u", individual.get_label())
+        self.assertEqual(individual.get_color(), "black")
 
 
 class TestMain(unittest.TestCase):
