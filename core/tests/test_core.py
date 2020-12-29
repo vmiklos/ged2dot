@@ -44,6 +44,22 @@ class TestMain(unittest.TestCase):
         core.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
 
+    def test_family_depth(self) -> None:
+        """Tests handling of the familyDepth parameter."""
+        config = {
+            "familyDepth": "0",
+            "input": "tests/happy.ged",
+        }
+        importer = core.GedcomImport()
+        graph = importer.load(config)
+        for node in graph:
+            node.resolve(graph)
+        root_family = core.graph_find(graph, "F1")
+        assert root_family
+        subgraph = core.bfs(root_family, config)
+        # Just 3 nodes: wife, husband and the family node.
+        self.assertEqual(len(subgraph), 3)
+
 
 if __name__ == '__main__':
     unittest.main()
