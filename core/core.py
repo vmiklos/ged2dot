@@ -146,6 +146,25 @@ class Individual(Node):
         """Gets the death date."""
         return self.__dict["death"]
 
+    def get_label(self) -> str:
+        """Gets the graphviz label."""
+        image_path = "images/" + self.get_forename() + " " + self.get_surname()
+        image_path += " " + self.get_birth() + ".jpg"
+        if not os.path.exists(image_path):
+            if self.get_sex():
+                sex = self.get_sex().lower()
+            else:
+                sex = 'u'
+            image_path = os.path.join("..", "placeholder-%s.png" % sex)
+        label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
+        label += "<img src=\"" + image_path + "\"/>"
+        label += "</td></tr><tr><td>"
+        label += self.get_surname() + "<br/>"
+        label += self.get_forename() + "<br/>"
+        label += self.get_birth() + "-" + self.get_death()
+        label += "</td></tr></table>"
+        return label
+
 
 class Family(Node):
     """Family has exactly one wife and husband, 0..* children."""
@@ -241,7 +260,9 @@ class GedcomImport:
         self.__reset_flags()
 
         if line.startswith("SEX") and self.individual:
-            self.individual.set_sex(line.split(' ')[1])
+            tokens = line.split(' ')
+            if len(tokens) > 1:
+                self.individual.set_sex(tokens[1])
         elif line.startswith("NAME") and self.individual:
             line = line[5:]
             tokens = line.split('/')
@@ -329,23 +350,7 @@ class DotExport:
                 continue
             individual = cast(Individual, node)
             stream.write(node.get_identifier() + " [shape=box, ")
-
-            image_path = "images/" + individual.get_forename() + " " + individual.get_surname()
-            image_path += " " + individual.get_birth() + ".jpg"
-            if not os.path.exists(image_path):
-                if individual.get_sex():
-                    sex = individual.get_sex().lower()
-                else:
-                    sex = 'u'
-                image_path = os.path.join("..", "placeholder-%s.png" % sex)
-            label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
-            label += "<img src=\"" + image_path + "\"/>"
-            label += "</td></tr><tr><td>"
-            label += individual.get_surname() + "<br/>"
-            label += individual.get_forename() + "<br/>"
-            label += individual.get_birth() + "-" + individual.get_death()
-            label += "</td></tr></table>"
-            stream.write("label = <" + label + ">\n")
+            stream.write("label = <" + individual.get_label() + ">\n")
 
             if not individual.get_sex():
                 sex = 'U'
