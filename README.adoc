@@ -15,14 +15,14 @@ families to graph edges, then `dot` takes care of the rest. What's unique about
 single individual (what you can easily do with random family editor software).
 
 You need to have a working ged2dotrc for the tool to process your .ged file. 
-See the example in test/screenshotrc for a very complete list of options
+See the example in tests/screenshotrc for a very complete list of options
 
 == Layouts
 
 - The default layout allows to show ancestors of a family (both husband and
 wife), and you can set how many generations do you want to see:
 
-image::test/screenshot.png[]
+image::tests/screenshot.png[]
 
 - There is also a `Descendants` layout, that shows all descendants of a root
   family.

@@ -1,5 +1,5 @@
 SHELL := bash
-PYFILES := ged2dot.py inlineize.py test/test.py libreoffice/base.py libreoffice/loader.py libreoffice/importer.py libreoffice/dialog.py
+PYFILES := ged2dot.py inlineize.py tests/test.py libreoffice/base.py libreoffice/loader.py libreoffice/importer.py libreoffice/dialog.py
 
 check-type: $(patsubst %.py,%.mypy,$(PYFILES))
 
@@ -27,7 +27,7 @@ test.dot: test.ged ged2dot.py ged2dotrc Makefile
 		$< && touch $@
 
 check: check-type check-lint
-	cd test && PYTHONPATH=$(PWD) ./test.py
+	cd tests && PYTHONPATH=$(PWD) ./test.py
 	pycodestyle $(PYFILES)
 
 clean:
@@ -36,8 +36,8 @@ clean:
 # In case ged2dotrc or test.dot is missing, create a copy based on the
 # screenshot sample.
 
-test.ged :| test/screenshot.ged
-	cat test/screenshot.ged > test.ged
+test.ged :| tests/screenshot.ged
+	cat tests/screenshot.ged > test.ged
 
-ged2dotrc :| test/screenshotrc
-	sed 's/screenshot.ged/test.ged/' test/screenshotrc > ged2dotrc
+ged2dotrc :| tests/screenshotrc
+	sed 's/screenshot.ged/test.ged/' tests/screenshotrc > ged2dotrc
