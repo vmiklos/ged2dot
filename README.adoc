@@ -7,25 +7,32 @@ https://github.com/vmiklos/ged2dot/blob/master/NEWS[release notes].
 
 == What's the problem the tool solves?
 
-`ged2dot` is a script that takes a http://en.wikipedia.org/wiki/GEDCOM[GEDCOM]
-file and tries to visualize it using http://www.graphviz.org/[Graphviz]'s `dot`
-tool. The basic idea is that you can map individuals to graph nodes and
-families to graph edges, then `dot` takes care of the rest. What's unique about
-`ged2dot` is that it allows more than showing ancestors and descendants of a
-single individual (what you can easily do with random family editor software).
+`ged2dot` is a script that takes a http://en.wikipedia.org/wiki/GEDCOM[GEDCOM] file and tries to
+visualize it using http://www.graphviz.org/[Graphviz]'s `dot` tool. The basic idea is that you can
+map individuals and families to graph nodes and connections between them to graph edges, then `dot`
+takes care of the rest. What's unique about `ged2dot` is that it allows more than showing ancestors
+and descendants of a single individual (what you can easily do with random family editor software).
 
-You need to have a working ged2dotrc for the tool to process your .ged file. 
-See the example in tests/screenshotrc for a very complete list of options
+You need to have a working ged2dotrc for the tool to process your .ged file.  See the example in
+`ged2dotrc.sample` for the complete list of recognized options. You typically want to customize the
+starting family (who will be at the center of the output) and the graph traversal depth.
 
-== Layouts
+== Layout
 
-- The default layout allows to show ancestors of a family (both husband and
-wife), and you can set how many generations do you want to see:
+The layout does a Breadth First Search (BFS) traversal on the graph, from the starting family:
 
 image::tests/screenshot.png[]
 
-- There is also a `Descendants` layout, that shows all descendants of a root
-  family.
+This has several benefits over explicitly trying to guess which family belongs to which generation.
+Some example more tricky cases, which are handled by `ged2dot`:
+
+- root family -> husband -> sister -> showing her kids
+
+- root family -> wife -> cousin -> showing her kid
+
+- root family -> husband -> grand father -> showing both wives with the matching kids
+
+(ged2dot <= 7.0 allowed multiple layouts, none of them supported the above more tricky cases.)
 
 == LibreOffice Draw GEDCOM import filter
 
@@ -73,7 +80,7 @@ image::libreoffice/screenshot.png[]
 For `ged2dot`, in case a given input results in a runtime crash, it's
 considered a bug. If you have a fix for it,
 https://github.com/vmiklos/ged2dot/pull/new/master[pull requests] on GitHub are
-welcome, especially if the fix comes with a test as well.
+welcome. Make sure to run `make check` before submitting your changes.
 
 For the LibreOffice extension, in case you get an error during opening:
 
