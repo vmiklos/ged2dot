@@ -1,3 +1,3 @@
-- P165 in test/husb-cousin.ged could be included, ATM it's ignored
+- P165 in tests/husb-cousin.ged could be included, ATM it's ignored
 
 - --help should be able to be run without a config file, but currently there's a catch-22

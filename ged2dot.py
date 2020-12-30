@@ -970,7 +970,7 @@ should be UTF-8 for dot-files"""),
 
 def main() -> None:
     if not os.path.exists("ged2dotrc"):
-        sys.stderr.write("Fatal: ged2dotrc configuration file doesn't exist.\nCreate a config file similar to test/screenshotrc, name it ged2dotrc and continue.\n")
+        sys.stderr.write("Fatal: ged2dotrc configuration file doesn't exist.\nCreate a config file similar to tests/screenshotrc, name it ged2dotrc and continue.\n")
         sys.exit(1)
     try:
         config = Config(sys.argv[1:])
