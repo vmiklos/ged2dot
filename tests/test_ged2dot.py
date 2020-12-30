@@ -19,7 +19,7 @@ class TestIndividual(unittest.TestCase):
     def test_nosex(self) -> None:
         """Tests the no sex case."""
         config = {
-            "familyDepth": "4",
+            "familydepth": "4",
             "input": "tests/nosex.ged",
         }
         importer = ged2dot.GedcomImport()
@@ -36,7 +36,7 @@ class TestGedcomImport(unittest.TestCase):
     def test_no_surname(self) -> None:
         """Tests the no surname case."""
         config = {
-            "familyDepth": "4",
+            "familydepth": "4",
             "input": "tests/no_surname.ged",
         }
         importer = ged2dot.GedcomImport()
@@ -50,7 +50,7 @@ class TestGedcomImport(unittest.TestCase):
     def test_level3(self) -> None:
         """Tests that we just ignore a 3rd level (only 0..2 is valid)."""
         config = {
-            "familyDepth": "0",
+            "familydepth": "0",
             "input": "tests/level3.ged",
         }
         importer = ged2dot.GedcomImport()
@@ -65,7 +65,7 @@ class TestGedcomImport(unittest.TestCase):
     def test_unexpected_date(self) -> None:
         """Tests that we just ignore a date which is not birth/death."""
         config = {
-            "familyDepth": "0",
+            "familydepth": "0",
             "input": "tests/unexpected_date.ged",
         }
         importer = ged2dot.GedcomImport()
@@ -83,11 +83,11 @@ class TestMain(unittest.TestCase):
     def test_happy(self) -> None:
         """Tests the happy path."""
         config = {
-            "familyDepth": "4",
+            "familydepth": "4",
             "input": "tests/happy.ged",
             "output": "tests/happy.dot",
-            "rootFamily": "F1",
-            "imageDir": "tests/images",
+            "rootfamily": "F1",
+            "imagedir": "tests/images",
         }
         if os.path.exists(config["output"]):
             os.unlink(config["output"])
@@ -97,13 +97,26 @@ class TestMain(unittest.TestCase):
         with open(config["output"], "r") as stream:
             self.assertIn("images/", stream.read())
 
+    def test_config(self) -> None:
+        """Tests the case when there is a ged2dotrc in the current dir."""
+        pwd = os.getcwd()
+        os.chdir("tests/config")
+        try:
+            if os.path.exists("hello.dot"):
+                os.unlink("hello.dot")
+            self.assertFalse(os.path.exists("hello.dot"))
+            ged2dot.main()
+            self.assertTrue(os.path.exists("hello.dot"))
+        finally:
+            os.chdir(pwd)
+
     def test_no_images(self) -> None:
         """Tests the happy path."""
         config = {
-            "familyDepth": "4",
+            "familydepth": "4",
             "input": "tests/happy.ged",
             "output": "tests/happy.dot",
-            "rootFamily": "F1",
+            "rootfamily": "F1",
         }
         if os.path.exists(config["output"]):
             os.unlink(config["output"])
@@ -116,11 +129,11 @@ class TestMain(unittest.TestCase):
     def test_bom(self) -> None:
         """Tests handling of an UTF-8 BOM."""
         config = {
-            "familyDepth": "4",
+            "familydepth": "4",
             "input": "tests/bom.ged",
             "output": "tests/bom.dot",
-            "rootFamily": "F1",
-            "imageDir": "tests/images",
+            "rootfamily": "F1",
+            "imagedir": "tests/images",
         }
         if os.path.exists(config["output"]):
             os.unlink(config["output"])
@@ -131,9 +144,9 @@ class TestMain(unittest.TestCase):
         self.assertTrue(os.path.exists(config["output"]))
 
     def test_family_depth(self) -> None:
-        """Tests handling of the familyDepth parameter."""
+        """Tests handling of the familydepth parameter."""
         config = {
-            "familyDepth": "0",
+            "familydepth": "0",
             "input": "tests/happy.ged",
         }
         importer = ged2dot.GedcomImport()
@@ -149,7 +162,7 @@ class TestMain(unittest.TestCase):
     def test_no_wife(self) -> None:
         """Tests handling of no wife in a family."""
         config = {
-            "familyDepth": "0",
+            "familydepth": "0",
             "input": "tests/no_wife.ged",
             "output": "tests/no_wife.dot",
         }
@@ -172,7 +185,7 @@ class TestMain(unittest.TestCase):
     def test_no_husband(self) -> None:
         """Tests handling of no husband in a family."""
         config = {
-            "familyDepth": "0",
+            "familydepth": "0",
             "input": "tests/no_husband.ged",
             "output": "tests/no_husband.dot",
         }
@@ -195,13 +208,25 @@ class TestMain(unittest.TestCase):
     def test_default_options(self) -> None:
         """Tests which config options are set by default."""
         def mock_convert(config: Dict[str, str]) -> None:
-            self.assertIn("familyDepth", config)
+            self.assertIn("familydepth", config)
             self.assertIn("input", config)
             self.assertIn("output", config)
-            self.assertIn("rootFamily", config)
-            self.assertIn("imageDir", config)
+            self.assertIn("rootfamily", config)
+            self.assertIn("imagedir", config)
         with unittest.mock.patch('ged2dot.convert', mock_convert):
             ged2dot.main()
+
+
+class TestGetAbspath(unittest.TestCase):
+    """Tests get_abspath()."""
+    def test_happy(self) -> None:
+        """Tests the happy path."""
+        self.assertEqual(ged2dot.get_abspath("foo"), os.path.join(os.getcwd(), "foo"))
+
+    def test_abs(self) -> None:
+        """Tests the case when the input is abs already."""
+        abspath = os.path.join(os.getcwd(), "foo")
+        self.assertEqual(ged2dot.get_abspath(abspath), abspath)
 
 
 if __name__ == '__main__':

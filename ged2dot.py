@@ -7,12 +7,13 @@
 
 """A version of ged2dot that uses breadth-first search to traverse the gedcom graph."""
 
-import os
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import TextIO
 from typing import cast
+import configparser
+import os
 
 
 class Node:
@@ -53,6 +54,14 @@ def graph_find(graph: List[Node], identifier: str) -> Optional[Node]:
     results = [node for node in graph if node.get_identifier() == identifier]
     assert len(results) == 1
     return results[0]
+
+
+def get_abspath(path: str) -> str:
+    """Make a path absolute, taking the repo root as a base dir."""
+    if os.path.isabs(path):
+        return path
+
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
 
 
 class Individual(Node):
@@ -155,7 +164,7 @@ class Individual(Node):
                 sex = self.get_sex().lower()
             else:
                 sex = 'u'
-            image_path = "placeholder-%s.png" % sex
+            image_path = get_abspath("placeholder-%s.png" % sex)
         label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
         label += "<img src=\"" + image_path + "\"/>"
         label += "</td></tr><tr><td>"
@@ -335,7 +344,7 @@ def bfs(root: Node, config: Dict[str, str]) -> List[Node]:
     while queue:
         node = queue.pop(0)
         # Every 2nd node is a family + the root is always a family.
-        family_depth = int(config["familyDepth"])
+        family_depth = int(config["familydepth"])
         if node.get_depth() > family_depth * 2 + 1:
             return ret
         ret.append(node)
@@ -360,7 +369,7 @@ class DotExport:
                 continue
             individual = cast(Individual, node)
             stream.write(node.get_identifier() + " [shape=box, ")
-            stream.write("label = <" + individual.get_label(self.config.get("imageDir", "")) + ">\n")
+            stream.write("label = <" + individual.get_label(self.config.get("imagedir", "")) + ">\n")
             stream.write("color = " + individual.get_color() + "];\n")
 
     def __store_family_nodes(self, stream: TextIO) -> None:
@@ -407,7 +416,7 @@ def convert(config: Dict[str, str]) -> None:
     graph = importer.load(config)
     for node in graph:
         node.resolve(graph)
-    root_family = graph_find(graph, config["rootFamily"])
+    root_family = graph_find(graph, config["rootfamily"])
     assert root_family
     subgraph = bfs(root_family, config)
     exporter = DotExport()
@@ -416,13 +425,22 @@ def convert(config: Dict[str, str]) -> None:
 
 def main() -> None:
     """Commandline interface."""
+    # No fooBar, ConfigParser would noramlize it to foobar anyway.
     config = {
-        "familyDepth": "4",
+        "familydepth": "0",
         "input": "test.ged",
         "output": "test.dot",
-        "rootFamily": "F24",
-        "imageDir": "images",
+        "rootfamily": "F1",
+        "imagedir": "images",
     }
+    if os.path.exists("ged2dotrc"):
+        config_parser = configparser.ConfigParser()
+        config_parser.read("ged2dotrc")
+        for section in config_parser.sections():
+            if section != "ged2dot":
+                continue
+            for option in config_parser.options(section):
+                config[option] = config_parser.get(section, option)
     convert(config)
 
 

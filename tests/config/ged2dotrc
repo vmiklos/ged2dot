@@ -1,0 +1,9 @@
+[ged2dot]
+familydepth = 4
+input = hello.ged
+output = hello.dot
+rootfamily = F1
+imagedir =
+# this is ignored
+[foo]
+bar = baz

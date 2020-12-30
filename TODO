@@ -1,5 +1,4 @@
-- don't hardcode parameters
 - update user doc for the bfs rewrite
 - tests for inlineize.py
-- handle placeholders correctly when the script is not running in the current dir
 - restore the libreoffice extension
+- don't assume P/F prefix for individuals/families
