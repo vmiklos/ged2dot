@@ -27,7 +27,7 @@ class TestIndividual(unittest.TestCase):
         individual = core.graph_find(graph, "P3")
         assert individual
         assert isinstance(individual, core.Individual)
-        self.assertIn("placeholder-u", individual.get_label())
+        self.assertIn("placeholder-u", individual.get_label("images"))
         self.assertEqual(individual.get_color(), "black")
 
 
@@ -40,12 +40,31 @@ class TestMain(unittest.TestCase):
             "input": "tests/happy.ged",
             "output": "tests/happy.dot",
             "rootFamily": "F1",
+            "imageDir": "tests/images",
         }
         if os.path.exists(config["output"]):
             os.unlink(config["output"])
         self.assertFalse(os.path.exists(config["output"]))
         core.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
+        with open(config["output"], "r") as stream:
+            self.assertIn("images/", stream.read())
+
+    def test_no_images(self) -> None:
+        """Tests the happy path."""
+        config = {
+            "familyDepth": "4",
+            "input": "tests/happy.ged",
+            "output": "tests/happy.dot",
+            "rootFamily": "F1",
+        }
+        if os.path.exists(config["output"]):
+            os.unlink(config["output"])
+        self.assertFalse(os.path.exists(config["output"]))
+        core.convert(config)
+        self.assertTrue(os.path.exists(config["output"]))
+        with open(config["output"], "r") as stream:
+            self.assertNotIn("images/", stream.read())
 
     def test_bom(self) -> None:
         """Tests handling of an UTF-8 BOM."""
@@ -54,6 +73,7 @@ class TestMain(unittest.TestCase):
             "input": "tests/bom.ged",
             "output": "tests/bom.dot",
             "rootFamily": "F1",
+            "imageDir": "tests/images",
         }
         if os.path.exists(config["output"]):
             os.unlink(config["output"])
@@ -86,6 +106,7 @@ class TestMain(unittest.TestCase):
             self.assertIn("input", config)
             self.assertIn("output", config)
             self.assertIn("rootFamily", config)
+            self.assertIn("imageDir", config)
         with unittest.mock.patch('core.convert', mock_convert):
             core.main()
 
