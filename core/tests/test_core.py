@@ -6,8 +6,10 @@
 
 """The test_core module covers the core module."""
 
+from typing import Dict
 import os
 import unittest
+import unittest.mock
 
 import core
 
@@ -76,6 +78,16 @@ class TestMain(unittest.TestCase):
         subgraph = core.bfs(root_family, config)
         # Just 3 nodes: wife, husband and the family node.
         self.assertEqual(len(subgraph), 3)
+
+    def test_default_options(self) -> None:
+        """Tests which config options are set by default."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertIn("familyDepth", config)
+            self.assertIn("input", config)
+            self.assertIn("output", config)
+            self.assertIn("rootFamily", config)
+        with unittest.mock.patch('core.convert', mock_convert):
+            core.main()
 
 
 if __name__ == '__main__':
