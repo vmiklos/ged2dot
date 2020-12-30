@@ -1,3 +1,2 @@
 - don't hardcode parameters
 - user doc
-- tests

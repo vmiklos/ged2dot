@@ -27,8 +27,55 @@ class TestIndividual(unittest.TestCase):
         individual = core.graph_find(graph, "P3")
         assert individual
         assert isinstance(individual, core.Individual)
-        self.assertIn("placeholder-u", individual.get_label("images"))
+        self.assertIn("placeholder-u", individual.get_label("tests/images"))
         self.assertEqual(individual.get_color(), "black")
+
+
+class TestGedcomImport(unittest.TestCase):
+    """Tests GedcomImport."""
+    def test_no_surname(self) -> None:
+        """Tests the no surname case."""
+        config = {
+            "familyDepth": "4",
+            "input": "tests/no_surname.ged",
+        }
+        importer = core.GedcomImport()
+        graph = importer.load(config)
+        individual = core.graph_find(graph, "P1")
+        assert individual
+        assert isinstance(individual, core.Individual)
+        self.assertEqual(individual.get_surname(), "")
+        self.assertEqual(individual.get_forename(), "Alice")
+
+    def test_level3(self) -> None:
+        """Tests that we just ignore a 3rd level (only 0..2 is valid)."""
+        config = {
+            "familyDepth": "0",
+            "input": "tests/level3.ged",
+        }
+        importer = core.GedcomImport()
+        graph = importer.load(config)
+        for node in graph:
+            node.resolve(graph)
+        root_family = core.graph_find(graph, "F1")
+        assert root_family
+        subgraph = core.bfs(root_family, config)
+        self.assertEqual(len(subgraph), 3)
+
+    def test_unexpected_date(self) -> None:
+        """Tests that we just ignore a date which is not birth/death."""
+        config = {
+            "familyDepth": "0",
+            "input": "tests/unexpected_date.ged",
+        }
+        importer = core.GedcomImport()
+        graph = importer.load(config)
+        for node in graph:
+            node.resolve(graph)
+        root_family = core.graph_find(graph, "F1")
+        assert root_family
+        subgraph = core.bfs(root_family, config)
+        self.assertEqual(len(subgraph), 3)
 
 
 class TestMain(unittest.TestCase):
@@ -104,6 +151,7 @@ class TestMain(unittest.TestCase):
         config = {
             "familyDepth": "0",
             "input": "tests/no_wife.ged",
+            "output": "tests/no_wife.dot",
         }
         importer = core.GedcomImport()
         graph = importer.load(config)
@@ -116,11 +164,17 @@ class TestMain(unittest.TestCase):
         self.assertEqual(len(neighbours), 1)
         self.assertEqual(neighbours[0].get_identifier(), "P2")
 
+        # Test export of a no-wife model.
+        subgraph = core.bfs(root_family, config)
+        exporter = core.DotExport()
+        exporter.store(subgraph, config)
+
     def test_no_husband(self) -> None:
         """Tests handling of no husband in a family."""
         config = {
             "familyDepth": "0",
             "input": "tests/no_husband.ged",
+            "output": "tests/no_husband.dot",
         }
         importer = core.GedcomImport()
         graph = importer.load(config)
@@ -132,6 +186,11 @@ class TestMain(unittest.TestCase):
         # Just 1 node: wife.
         self.assertEqual(len(neighbours), 1)
         self.assertEqual(neighbours[0].get_identifier(), "P1")
+
+        # Test export of a no-husband model.
+        subgraph = core.bfs(root_family, config)
+        exporter = core.DotExport()
+        exporter.store(subgraph, config)
 
     def test_default_options(self) -> None:
         """Tests which config options are set by default."""
