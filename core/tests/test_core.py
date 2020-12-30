@@ -114,6 +114,24 @@ class TestMain(unittest.TestCase):
         neighbours = root_family.get_neighbours()
         # Just 1 node: husband.
         self.assertEqual(len(neighbours), 1)
+        self.assertEqual(neighbours[0].get_identifier(), "P2")
+
+    def test_no_husband(self) -> None:
+        """Tests handling of no husband in a family."""
+        config = {
+            "familyDepth": "0",
+            "input": "tests/no_husband.ged",
+        }
+        importer = core.GedcomImport()
+        graph = importer.load(config)
+        for node in graph:
+            node.resolve(graph)
+        root_family = core.graph_find(graph, "F1")
+        assert root_family
+        neighbours = root_family.get_neighbours()
+        # Just 1 node: wife.
+        self.assertEqual(len(neighbours), 1)
+        self.assertEqual(neighbours[0].get_identifier(), "P1")
 
     def test_default_options(self) -> None:
         """Tests which config options are set by default."""
