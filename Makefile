@@ -1,43 +1,36 @@
-SHELL := bash
-PYFILES := ged2dot.py inlineize.py tests/test.py libreoffice/base.py libreoffice/loader.py libreoffice/importer.py libreoffice/dialog.py
+PYTHON_SAFE_OBJECTS = \
+	ged2dot.py \
 
-check-type: $(patsubst %.py,%.mypy,$(PYFILES))
+PYTHON_TEST_OBJECTS = \
+	tests/test_ged2dot.py \
 
-check-lint: $(patsubst %.py,%.lint,$(PYFILES))
+PYTHON_OBJECTS = \
+	$(PYTHON_SAFE_OBJECTS) \
+	$(PYTHON_TEST_OBJECTS) \
 
-test.png: test.dot
-	dot -Tpng -o test.png test.dot
+test.svg: test.dot
+	dot -Tsvg -o test.svg test.dot
 
-test.svg: test-noinline.svg inlineize.py
-	./inlineize.py test-noinline.svg test.svg
+test.dot: ged2dot.py test.ged
+	./ged2dot.py
 
-test-noinline.svg: test.dot
-	dot -Tsvg -o test-noinline.svg test.dot
+check: check-mypy check-flake8 check-pylint check-unit
 
-test.dot: test.ged ged2dot.py ged2dotrc Makefile
-	./ged2dot.py > test.dot
+check-mypy: $(patsubst %.py,%.mypy,$(PYTHON_OBJECTS))
 
-%.mypy : %.py Makefile
-	mypy --python-version 3.5 --strict $< && touch $@
+check-flake8: $(patsubst %.py,%.flake8,$(PYTHON_OBJECTS))
 
-%.lint : %.py Makefile
-	pylint \
-		--max-line-length=120 \
-		--disable=import-error,too-many-instance-attributes,missing-docstring,too-many-branches,too-many-statements,fixme,line-too-long,too-many-arguments,protected-access,too-many-locals \
-		$< && touch $@
+check-pylint: $(patsubst %.py,%.pylint,$(PYTHON_OBJECTS))
 
-check: check-type check-lint
-	cd tests && PYTHONPATH=$(PWD) ./test.py
-	pycodestyle $(PYFILES)
+check-unit:
+	env PYTHONPATH=.:tests coverage run --branch --module unittest $(PYTHON_TEST_OBJECTS)
+	env PYTHONPATH=.:tests coverage report --show-missing --fail-under=100 $(PYTHON_SAFE_OBJECTS)
 
-clean:
-	rm -f $(patsubst %.py,%.mypy,$(PYFILES))
+%.mypy: %.py Makefile
+	mypy --python-version 3.6 --strict --no-error-summary $< && touch $@
 
-# In case ged2dotrc or test.dot is missing, create a copy based on the
-# screenshot sample.
+%.flake8: %.py Makefile
+	flake8 $< && touch $@
 
-test.ged :| tests/screenshot.ged
-	cat tests/screenshot.ged > test.ged
-
-ged2dotrc :| tests/screenshotrc
-	sed 's/screenshot.ged/test.ged/' tests/screenshotrc > ged2dotrc
+%.pylint : %.py Makefile .pylintrc
+	env PYTHONPATH=. pylint $< && touch $@

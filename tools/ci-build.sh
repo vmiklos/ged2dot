@@ -12,8 +12,4 @@
 pip install -r requirements.txt
 make -j$(getconf _NPROCESSORS_ONLN) check
 
-cd core
-pip install -r requirements.txt
-make -j$(getconf _NPROCESSORS_ONLN) check
-
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
