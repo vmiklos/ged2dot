@@ -99,6 +99,22 @@ class TestMain(unittest.TestCase):
         # Just 3 nodes: wife, husband and the family node.
         self.assertEqual(len(subgraph), 3)
 
+    def test_no_wife(self) -> None:
+        """Tests handling of no wife in a family."""
+        config = {
+            "familyDepth": "0",
+            "input": "tests/no_wife.ged",
+        }
+        importer = core.GedcomImport()
+        graph = importer.load(config)
+        for node in graph:
+            node.resolve(graph)
+        root_family = core.graph_find(graph, "F1")
+        assert root_family
+        neighbours = root_family.get_neighbours()
+        # Just 1 node: husband.
+        self.assertEqual(len(neighbours), 1)
+
     def test_default_options(self) -> None:
         """Tests which config options are set by default."""
         def mock_convert(config: Dict[str, str]) -> None:

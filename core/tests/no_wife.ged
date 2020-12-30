@@ -1,0 +1,8 @@
+0 HEAD
+0 @P2@ INDI 
+1 NAME Bob /B/
+1 SEX M
+1 FAMS @F1@
+0 @F1@ FAM 
+1 HUSB @P2@
+0 TRLR
