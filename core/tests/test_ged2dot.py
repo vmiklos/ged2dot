@@ -4,14 +4,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-"""The test_core module covers the core module."""
+"""The test_ged2dot module covers the ged2dot module."""
 
 from typing import Dict
 import os
 import unittest
 import unittest.mock
 
-import core
+import ged2dot
 
 
 class TestIndividual(unittest.TestCase):
@@ -22,11 +22,11 @@ class TestIndividual(unittest.TestCase):
             "familyDepth": "4",
             "input": "tests/nosex.ged",
         }
-        importer = core.GedcomImport()
+        importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        individual = core.graph_find(graph, "P3")
+        individual = ged2dot.graph_find(graph, "P3")
         assert individual
-        assert isinstance(individual, core.Individual)
+        assert isinstance(individual, ged2dot.Individual)
         self.assertIn("placeholder-u", individual.get_label("tests/images"))
         self.assertEqual(individual.get_color(), "black")
 
@@ -39,11 +39,11 @@ class TestGedcomImport(unittest.TestCase):
             "familyDepth": "4",
             "input": "tests/no_surname.ged",
         }
-        importer = core.GedcomImport()
+        importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        individual = core.graph_find(graph, "P1")
+        individual = ged2dot.graph_find(graph, "P1")
         assert individual
-        assert isinstance(individual, core.Individual)
+        assert isinstance(individual, ged2dot.Individual)
         self.assertEqual(individual.get_surname(), "")
         self.assertEqual(individual.get_forename(), "Alice")
 
@@ -53,13 +53,13 @@ class TestGedcomImport(unittest.TestCase):
             "familyDepth": "0",
             "input": "tests/level3.ged",
         }
-        importer = core.GedcomImport()
+        importer = ged2dot.GedcomImport()
         graph = importer.load(config)
         for node in graph:
             node.resolve(graph)
-        root_family = core.graph_find(graph, "F1")
+        root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
-        subgraph = core.bfs(root_family, config)
+        subgraph = ged2dot.bfs(root_family, config)
         self.assertEqual(len(subgraph), 3)
 
     def test_unexpected_date(self) -> None:
@@ -68,13 +68,13 @@ class TestGedcomImport(unittest.TestCase):
             "familyDepth": "0",
             "input": "tests/unexpected_date.ged",
         }
-        importer = core.GedcomImport()
+        importer = ged2dot.GedcomImport()
         graph = importer.load(config)
         for node in graph:
             node.resolve(graph)
-        root_family = core.graph_find(graph, "F1")
+        root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
-        subgraph = core.bfs(root_family, config)
+        subgraph = ged2dot.bfs(root_family, config)
         self.assertEqual(len(subgraph), 3)
 
 
@@ -92,7 +92,7 @@ class TestMain(unittest.TestCase):
         if os.path.exists(config["output"]):
             os.unlink(config["output"])
         self.assertFalse(os.path.exists(config["output"]))
-        core.convert(config)
+        ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
         with open(config["output"], "r") as stream:
             self.assertIn("images/", stream.read())
@@ -108,7 +108,7 @@ class TestMain(unittest.TestCase):
         if os.path.exists(config["output"]):
             os.unlink(config["output"])
         self.assertFalse(os.path.exists(config["output"]))
-        core.convert(config)
+        ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
         with open(config["output"], "r") as stream:
             self.assertNotIn("images/", stream.read())
@@ -127,7 +127,7 @@ class TestMain(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         # Without the accompanying fix in place, this test would have failed with:
         # ValueError: invalid literal for int() with base 10: '\ufeff0'
-        core.convert(config)
+        ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
 
     def test_family_depth(self) -> None:
@@ -136,13 +136,13 @@ class TestMain(unittest.TestCase):
             "familyDepth": "0",
             "input": "tests/happy.ged",
         }
-        importer = core.GedcomImport()
+        importer = ged2dot.GedcomImport()
         graph = importer.load(config)
         for node in graph:
             node.resolve(graph)
-        root_family = core.graph_find(graph, "F1")
+        root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
-        subgraph = core.bfs(root_family, config)
+        subgraph = ged2dot.bfs(root_family, config)
         # Just 3 nodes: wife, husband and the family node.
         self.assertEqual(len(subgraph), 3)
 
@@ -153,11 +153,11 @@ class TestMain(unittest.TestCase):
             "input": "tests/no_wife.ged",
             "output": "tests/no_wife.dot",
         }
-        importer = core.GedcomImport()
+        importer = ged2dot.GedcomImport()
         graph = importer.load(config)
         for node in graph:
             node.resolve(graph)
-        root_family = core.graph_find(graph, "F1")
+        root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
         neighbours = root_family.get_neighbours()
         # Just 1 node: husband.
@@ -165,8 +165,8 @@ class TestMain(unittest.TestCase):
         self.assertEqual(neighbours[0].get_identifier(), "P2")
 
         # Test export of a no-wife model.
-        subgraph = core.bfs(root_family, config)
-        exporter = core.DotExport()
+        subgraph = ged2dot.bfs(root_family, config)
+        exporter = ged2dot.DotExport()
         exporter.store(subgraph, config)
 
     def test_no_husband(self) -> None:
@@ -176,11 +176,11 @@ class TestMain(unittest.TestCase):
             "input": "tests/no_husband.ged",
             "output": "tests/no_husband.dot",
         }
-        importer = core.GedcomImport()
+        importer = ged2dot.GedcomImport()
         graph = importer.load(config)
         for node in graph:
             node.resolve(graph)
-        root_family = core.graph_find(graph, "F1")
+        root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
         neighbours = root_family.get_neighbours()
         # Just 1 node: wife.
@@ -188,8 +188,8 @@ class TestMain(unittest.TestCase):
         self.assertEqual(neighbours[0].get_identifier(), "P1")
 
         # Test export of a no-husband model.
-        subgraph = core.bfs(root_family, config)
-        exporter = core.DotExport()
+        subgraph = ged2dot.bfs(root_family, config)
+        exporter = ged2dot.DotExport()
         exporter.store(subgraph, config)
 
     def test_default_options(self) -> None:
@@ -200,8 +200,8 @@ class TestMain(unittest.TestCase):
             self.assertIn("output", config)
             self.assertIn("rootFamily", config)
             self.assertIn("imageDir", config)
-        with unittest.mock.patch('core.convert', mock_convert):
-            core.main()
+        with unittest.mock.patch('ged2dot.convert', mock_convert):
+            ged2dot.main()
 
 
 if __name__ == '__main__':

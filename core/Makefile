@@ -1,8 +1,8 @@
 PYTHON_SAFE_OBJECTS = \
-	core.py \
+	ged2dot.py \
 
 PYTHON_TEST_OBJECTS = \
-	tests/test_core.py \
+	tests/test_ged2dot.py \
 
 PYTHON_OBJECTS = \
 	$(PYTHON_SAFE_OBJECTS) \
@@ -11,8 +11,8 @@ PYTHON_OBJECTS = \
 test.svg: test.dot
 	dot -Tsvg -o test.svg test.dot
 
-test.dot: core.py test.ged
-	./core.py
+test.dot: ged2dot.py test.ged
+	./ged2dot.py
 
 check: check-mypy check-flake8 check-pylint check-unit
 
