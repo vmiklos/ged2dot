@@ -2,7 +2,7 @@ ged2dot tries to produce good layout by not trusting graphviz to do all the posi
 lot of work to provide good hints for positioning. This is nice, but it does not scale: as the
 family tree grows, you keep running into edge cases which break these positioning hints.
 
-"ged2dot core" tries hard to not provide any positioning hints, but just keep it simple: both
+"ged2dot new" tries hard to not provide any positioning hints, but just keep it simple: both
 individuals and families are graph nodes and we just do a depth-limited BFS and throw the result on
 graphviz.
 

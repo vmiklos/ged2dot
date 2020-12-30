@@ -1,0 +1,21 @@
+VERSION         DESCRIPTION
+-----------------------------------------------------------------------------
+7.1 (master)  - rewritten the layout to use BFS for graph traversal
+7.0           - tested with LibreOffice 7.0
+              - pylint fixes
+              - Use sys.stderr.write instead of print to print errors (Colin Chargy)
+              - add better error handling and error out on lack of rc file (Doug Hughes)
+6.0           - fixed to work with 64-bit LibreOffice
+0.8           - fixed to work with LibreOffice 6.1
+0.7           - minor fixes, tested with LibreOffice 5.4
+0.6           - two layout fixes, tested with LibreOffice 5.1
+0.5           - pylint fixes, tested with LibreOffice 4.4
+0.4           - New 'layout = Descendants' configuration key to show
+                descendants, not ancestors of the root family.
+              - Next to "M" and "F", "U" is now accepted as a sex.
+	      - Ancestors layout now handles if the root family has children.
+              - Mac instructions.
+0.3           - Handle UTF-8 BOM at the beginning of .ged files
+              - Fixed layout crash on missing previous parent
+0.2           - Initial LibreOffice extension
+0.1           - Initial release

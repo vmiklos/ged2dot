@@ -5,13 +5,13 @@
 Create it:
 
 ----
-python3 -m venv ged2dot-core-env
+python3 -m venv ged2dot-env
 ----
 
 Activate it:
 
 ----
-. ged2dot-core-env/bin/activate
+. ged2dot-env/bin/activate
 ----
 
 Install requirements:
