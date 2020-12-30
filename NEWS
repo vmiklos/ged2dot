@@ -1,5 +1,6 @@
 VERSION         DESCRIPTION
 -----------------------------------------------------------------------------
+7.1 (master)  - rewritten the layout to use BFS for graph traversal
 7.0           - tested with LibreOffice 7.0
               - pylint fixes
               - Use sys.stderr.write instead of print to print errors (Colin Chargy)

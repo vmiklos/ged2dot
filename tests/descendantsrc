@@ -1,6 +1,0 @@
-[ged2dot]
-# Input GEDCOM file.
-input = screenshot.ged
-# Root family.
-rootFamily = F9
-layout = Descendants

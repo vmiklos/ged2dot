@@ -1,5 +1,0 @@
-- don't hardcode parameters
-- user doc
-- tests for inlineize.py
-- handle placeholders correctly when the script is not running in the current dir
-- restore the libreoffice extension

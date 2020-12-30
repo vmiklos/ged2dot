@@ -1,3 +1,5 @@
-- P165 in tests/husb-cousin.ged could be included, ATM it's ignored
-
-- --help should be able to be run without a config file, but currently there's a catch-22
+- don't hardcode parameters
+- update user doc for the bfs rewrite
+- tests for inlineize.py
+- handle placeholders correctly when the script is not running in the current dir
+- restore the libreoffice extension
