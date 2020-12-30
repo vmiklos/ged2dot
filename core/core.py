@@ -146,9 +146,9 @@ class Individual(Node):
         """Gets the death date."""
         return self.__dict["death"]
 
-    def get_label(self) -> str:
+    def get_label(self, image_dir: str) -> str:
         """Gets the graphviz label."""
-        image_path = "images/" + self.get_forename() + " " + self.get_surname()
+        image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname())
         image_path += " " + self.get_birth() + ".jpg"
         if not os.path.exists(image_path):
             if self.get_sex():
@@ -352,6 +352,7 @@ class DotExport:
     """Serializes the graph to Graphviz / dot."""
     def __init__(self) -> None:
         self.subgraph: List[Node] = []
+        self.config: Dict[str, str] = {}
 
     def __store_individual_nodes(self, stream: TextIO) -> None:
         for node in self.subgraph:
@@ -359,7 +360,7 @@ class DotExport:
                 continue
             individual = cast(Individual, node)
             stream.write(node.get_identifier() + " [shape=box, ")
-            stream.write("label = <" + individual.get_label() + ">\n")
+            stream.write("label = <" + individual.get_label(self.config.get("imageDir", "")) + ">\n")
             stream.write("color = " + individual.get_color() + "];\n")
 
     def __store_family_nodes(self, stream: TextIO) -> None:
@@ -392,6 +393,7 @@ class DotExport:
             stream.write("\n")
 
             self.subgraph = subgraph
+            self.config = config
             self.__store_individual_nodes(stream)
             self.__store_family_nodes(stream)
             self.__store_edges(stream)
@@ -419,6 +421,7 @@ def main() -> None:
         "input": "test.ged",
         "output": "test.dot",
         "rootFamily": "F24",
+        "imageDir": "images",
     }
     convert(config)
 
