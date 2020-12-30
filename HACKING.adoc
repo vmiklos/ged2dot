@@ -19,3 +19,20 @@ Install requirements:
 ----
 pip install -r requirements.txt
 ----
+
+== Development cycle
+
+A typical flow is:
+
+----
+... hack hack hack ...
+make check-mypy
+ged2dot && dot -Tsvg -o test.svg test.dot # test the changes
+----
+
+Once you're happy with your change:
+
+-----
+make check # run all tests
+... write new tests if coverage regressed ...
+-----
