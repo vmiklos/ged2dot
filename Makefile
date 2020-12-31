@@ -12,11 +12,7 @@ PYTHON_OBJECTS = \
 	$(PYTHON_SAFE_OBJECTS) \
 	$(PYTHON_TEST_OBJECTS) \
 
-test.svg: test.dot
-	dot -Tsvg -o test.svg test.dot
-
-test.dot: ged2dot.py test.ged
-	./ged2dot.py
+all:
 
 check: check-mypy check-flake8 check-pylint check-unit
 
