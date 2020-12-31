@@ -1,4 +1,3 @@
-- don't assume P/F prefix for individuals/families
 - don't assume that the preferred name order is big endian
 - tests for inlineize.py
 - restore the libreoffice extension
