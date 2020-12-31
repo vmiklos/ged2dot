@@ -155,7 +155,7 @@ class Individual(Node):
         """Gets the death date."""
         return self.__dict["death"]
 
-    def get_label(self, image_dir: str) -> str:
+    def get_label(self, image_dir: str, name_order: str) -> str:
         """Gets the graphviz label."""
         image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname())
         image_path += " " + self.get_birth() + ".jpg"
@@ -168,8 +168,14 @@ class Individual(Node):
         label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
         label += "<img src=\"" + image_path + "\"/>"
         label += "</td></tr><tr><td>"
-        label += self.get_surname() + "<br/>"
-        label += self.get_forename() + "<br/>"
+        if name_order == "big":
+            # Big endian: family name first.
+            label += self.get_surname() + "<br/>"
+            label += self.get_forename() + "<br/>"
+        else:
+            # Little endian: given name first.
+            label += self.get_forename() + "<br/>"
+            label += self.get_surname() + "<br/>"
         label += self.get_birth() + "-" + self.get_death()
         label += "</td></tr></table>"
         return label
@@ -369,7 +375,9 @@ class DotExport:
                 continue
             individual = node
             stream.write(node.get_identifier() + " [shape=box, ")
-            stream.write("label = <" + individual.get_label(self.config.get("imagedir", "")) + ">\n")
+            image_dir = self.config.get("imagedir", "")
+            name_order = self.config.get("nameorder", "little")
+            stream.write("label = <" + individual.get_label(image_dir, name_order) + ">\n")
             stream.write("color = " + individual.get_color() + "];\n")
 
     def __store_family_nodes(self, stream: TextIO) -> None:
