@@ -5,6 +5,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+"""Turns linked graphics into inline graphics in an SVG file."""
+
 import base64
 import sys
 import xml.etree.ElementTree as ElementTree
@@ -18,6 +20,7 @@ NAMESPACES = {
 
 
 def inlineize(from_path: Union[str, IO[bytes]], to_path: Union[str, IO[bytes]]) -> None:
+    """API interface to this module."""
     ElementTree.register_namespace('', NAMESPACES['svg'])
     ElementTree.register_namespace('xlink', NAMESPACES['xlink'])
     tree = ElementTree.ElementTree()
@@ -32,6 +35,7 @@ def inlineize(from_path: Union[str, IO[bytes]], to_path: Union[str, IO[bytes]]) 
 
 
 def main() -> None:
+    """Commandline interface to this module."""
     inlineize(sys.argv[1], sys.argv[2])
 
 

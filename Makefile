@@ -1,3 +1,6 @@
+PYTHON_UNSAFE_OBJECTS = \
+	inlineize.py \
+
 PYTHON_SAFE_OBJECTS = \
 	ged2dot.py \
 
@@ -5,6 +8,7 @@ PYTHON_TEST_OBJECTS = \
 	tests/test_ged2dot.py \
 
 PYTHON_OBJECTS = \
+	$(PYTHON_UNSAFE_OBJECTS) \
 	$(PYTHON_SAFE_OBJECTS) \
 	$(PYTHON_TEST_OBJECTS) \
 
