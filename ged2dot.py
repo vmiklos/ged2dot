@@ -365,9 +365,9 @@ class DotExport:
 
     def __store_individual_nodes(self, stream: TextIO) -> None:
         for node in self.subgraph:
-            if not node.get_identifier().startswith("P"):
+            if not isinstance(node, Individual):
                 continue
-            individual = cast(Individual, node)
+            individual = node
             stream.write(node.get_identifier() + " [shape=box, ")
             stream.write("label = <" + individual.get_label(self.config.get("imagedir", "")) + ">\n")
             stream.write("color = " + individual.get_color() + "];\n")
@@ -375,16 +375,16 @@ class DotExport:
     def __store_family_nodes(self, stream: TextIO) -> None:
         stream.write("\n")
         for node in self.subgraph:
-            if not node.get_identifier().startswith("F"):
+            if not isinstance(node, Family):
                 continue
             stream.write(node.get_identifier() + " [shape=point, width=0.1];\n")
         stream.write("\n")
 
     def __store_edges(self, stream: TextIO) -> None:
         for node in self.subgraph:
-            if not node.get_identifier().startswith("F"):
+            if not isinstance(node, Family):
                 continue
-            family = cast(Family, node)
+            family = node
             if family.wife:
                 stream.write(family.wife.get_identifier() + " -> " + family.get_identifier() + " [dir=none];\n")
             if family.husb:
