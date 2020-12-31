@@ -27,8 +27,20 @@ class TestIndividual(unittest.TestCase):
         individual = ged2dot.graph_find(graph, "P3")
         assert individual
         assert isinstance(individual, ged2dot.Individual)
-        self.assertIn("placeholder-u", individual.get_label("tests/images"))
+        self.assertIn("placeholder-u", individual.get_label("tests/images", "little"))
         self.assertEqual(individual.get_color(), "black")
+
+    def test_big_endian_name(self) -> None:
+        """Tests the case when the name starts with the family name."""
+        config = {
+            "input": "tests/hello.ged",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        individual = ged2dot.graph_find(graph, "P1")
+        assert individual
+        assert isinstance(individual, ged2dot.Individual)
+        self.assertIn("A<br/>Alice", individual.get_label(image_dir="", name_order="big"))
 
 
 class TestGedcomImport(unittest.TestCase):

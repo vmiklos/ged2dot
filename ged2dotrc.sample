@@ -10,3 +10,5 @@ rootfamily = F1
 familydepth = 4
 # Directory containing 100x100px "First Last YYYY.jpg" images.
 imagedir = images
+# 'little' is First first, 'big' is Last first.
+nameorder = little
