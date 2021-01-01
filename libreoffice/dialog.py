@@ -5,26 +5,29 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+"""The dialog module provides the GedcomDialog class."""
+
 from typing import Any
 from typing import Dict
 from typing import Iterable
 from typing import Optional
 from typing import Tuple
 
-import unohelper  # type: ignore
-from com.sun.star.beans import XPropertyAccess  # type: ignore
-from com.sun.star.ui.dialogs import XExecutableDialog  # type: ignore
-from com.sun.star.document import XImporter  # type: ignore
-from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as ExecutableDialogResults_CANCEL  # type: ignore
-from com.sun.star.ui.dialogs.ExecutableDialogResults import OK as ExecutableDialogResults_OK
-from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK  # type: ignore
-from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL
+import unohelper  # type: ignore  # pylint: disable=import-error
+from com.sun.star.beans import XPropertyAccess  # type: ignore  # pylint: disable=import-error
+from com.sun.star.ui.dialogs import XExecutableDialog  # type: ignore  # pylint: disable=import-error
+from com.sun.star.document import XImporter  # type: ignore  # pylint: disable=import-error
+from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as ExecutableDialogResults_CANCEL  # type: ignore  # noqa: E501  # pylint: disable=import-error,line-too-long
+from com.sun.star.ui.dialogs.ExecutableDialogResults import OK as ExecutableDialogResults_OK  # noqa: E501  # pylint: disable=import-error
+from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK  # type: ignore  # pylint: disable=import-error
+from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL  # pylint: disable=import-error
 
-import ged2dot
 import base
+import ged2dot
 
 
 class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):  # type: ignore
+    """Provides an options dialog during import."""
     def __init__(self, context: Any, _dialogArgs: Any) -> None:
         unohelper.Base.__init__(self)
         base.GedcomBase.__init__(self, context)
@@ -33,7 +36,6 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         self.layout_max = "4"
         self.name_order = "little"
         self.props = {}  # type: Dict[str, Any]
-        self.dst_doc = None
 
     def __extract_families(self) -> None:
         ged = unohelper.fileUrlToSystemPath(self.props['URL'])
@@ -57,43 +59,40 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             key = "%s (%s)" % (node.get_identifier(), help_string)
             self.family_dict[key] = node
 
-    def __create_control(self, parent: Any,
-                         type_string: str,
-                         id_string: str,
-                         tab_index: int,
-                         left: int,
-                         top: int,
-                         width: int,
-                         height: int,
-                         value: Optional[str] = None,
-                         button_type: Optional[int] = None) -> Any:
-        control = parent.createInstance("com.sun.star.awt.UnoControl%sModel" % type_string)
-        control.PositionX = left
-        control.PositionY = top
-        control.Width = width
-        control.Height = height
-        control.Name = id_string
-        control.TabIndex = tab_index
-        if type_string == "FixedText":
-            control.Label = value
-        elif type_string == "Button":
-            control.PushButtonType = button_type
-            control.DefaultButton = button_type == PushButtonType_OK
-        elif type_string == "ListBox":
+    def __create_control(self, options: Dict[str, Any]) -> Any:
+        if "value" not in options:
+            options["value"] = None
+        if "button_type" not in options:
+            options["button_type"] = None
+        parent = options["parent"]
+        control = parent.createInstance("com.sun.star.awt.UnoControl%sModel" % options["type_string"])
+        control.PositionX = options["left"]
+        control.PositionY = options["top"]
+        control.Width = options["width"]
+        control.Height = options["height"]
+        control.Name = options["id_string"]
+        control.TabIndex = options["tab_index"]
+        if options["type_string"] == "FixedText":
+            control.Label = options["value"]
+        elif options["type_string"] == "Button":
+            control.PushButtonType = options["button_type"]
+            control.DefaultButton = options["button_type"] == PushButtonType_OK
+        elif options["type_string"] == "ListBox":
             control.Dropdown = True
-            # TODO check if we could make item text and data independent
+            # Need to check if we could make the item text and data independent to avoid parsing
+            # here.
             control.StringItemList = tuple(sorted(self.family_dict.keys(), key=lambda i: int(i.split(' (')[0][1:])))
             # Select the first item.
             control.SelectedItems = tuple([0])
-        elif type_string == "NumericField":
+        elif options["type_string"] == "NumericField":
             control.Spin = True
             control.Value = 4
             control.DecimalAccuracy = 0
             control.ValueMin = 0
-        elif type_string == "CheckBox":
-            control.Label = value
+        elif options["type_string"] == "CheckBox":
+            control.Label = options["value"]
             control.State = 1
-        parent.insertByName(id_string, control)
+        parent.insertByName(options["id_string"], control)
         return control
 
     def __exec_dialog(self) -> Any:
@@ -111,76 +110,100 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         dialog_model.Title = "GEDCOM Import"
 
         # Then the model of the controls.
-        self.__create_control(dialog_model,
-                              type_string="FixedText",
-                              id_string="ftRootFamily",
-                              tab_index=0,
-                              left=10,
-                              top=10,
-                              width=100,
-                              height=10,
-                              value="Root family")
-        root_family_lb = self.__create_control(dialog_model,
-                                               type_string="ListBox",
-                                               id_string="root_family_lb",
-                                               tab_index=1,
-                                               left=120,
-                                               top=10,
-                                               width=100,
-                                               height=10)
-        self.__create_control(dialog_model,
-                              type_string="FixedText",
-                              id_string="ftLayoutMax",
-                              tab_index=2,
-                              left=10,
-                              top=30,
-                              width=100,
-                              height=10,
-                              value="Number of generations to show")
-        layout_max_nf = self.__create_control(dialog_model,
-                                              type_string="NumericField",
-                                              id_string="layout_max_nf",
-                                              tab_index=3,
-                                              left=120,
-                                              top=30,
-                                              width=100,
-                                              height=10)
-        self.__create_control(dialog_model,
-                              type_string="FixedText",
-                              id_string="ftNameOrder",
-                              tab_index=4,
-                              left=10,
-                              top=50,
-                              width=100,
-                              height=10,
-                              value="Name order")
-        name_order_cb = self.__create_control(dialog_model,
-                                              type_string="CheckBox",
-                                              id_string="name_order_cb",
-                                              tab_index=5,
-                                              left=120,
-                                              top=50,
-                                              width=100,
-                                              height=10,
-                                              value="Forename first")
-        self.__create_control(dialog_model,
-                              type_string="Button",
-                              id_string="btnOk",
-                              tab_index=6,
-                              left=110,
-                              top=70,
-                              width=50,
-                              height=10,
-                              button_type=PushButtonType_OK)
-        self.__create_control(dialog_model,
-                              type_string="Button",
-                              id_string="btnCancel",
-                              tab_index=7,
-                              left=170,
-                              top=70,
-                              width=50,
-                              height=10,
-                              button_type=PushButtonType_CANCEL)
+        options = {
+            "parent": dialog_model,
+            "type_string": "FixedText",
+            "id_string": "ftRootFamily",
+            "tab_index": 0,
+            "left": 10,
+            "top": 10,
+            "width": 100,
+            "height": 10,
+            "value": "Root family",
+        }
+        self.__create_control(options)
+        options = {
+            "parent": dialog_model,
+            "type_string": "ListBox",
+            "id_string": "root_family_lb",
+            "tab_index": 1,
+            "left": 120,
+            "top": 10,
+            "width": 100,
+            "height": 10,
+        }
+        root_family_lb = self.__create_control(options)
+        options = {
+            "parent": dialog_model,
+            "type_string": "FixedText",
+            "id_string": "ftLayoutMax",
+            "tab_index": 2,
+            "left": 10,
+            "top": 30,
+            "width": 100,
+            "height": 10,
+            "value": "Number of generations to show",
+        }
+        self.__create_control(options)
+        options = {
+            "parent": dialog_model,
+            "type_string": "NumericField",
+            "id_string": "layout_max_nf",
+            "tab_index": 3,
+            "left": 120,
+            "top": 30,
+            "width": 100,
+            "height": 10,
+        }
+        layout_max_nf = self.__create_control(options)
+        options = {
+            "parent": dialog_model,
+            "type_string": "FixedText",
+            "id_string": "ftNameOrder",
+            "tab_index": 4,
+            "left": 10,
+            "top": 50,
+            "width": 100,
+            "height": 10,
+            "value": "Name order",
+        }
+        self.__create_control(options)
+        options = {
+            "parent": dialog_model,
+            "type_string": "CheckBox",
+            "id_string": "name_order_cb",
+            "tab_index": 5,
+            "left": 120,
+            "top": 50,
+            "width": 100,
+            "height": 10,
+            "value": "Forename first",
+        }
+        name_order_cb = self.__create_control(options)
+        options = {
+            "parent": dialog_model,
+            "type_string": "Button",
+            "id_string": "btnOk",
+            "tab_index": 6,
+            "left": 110,
+            "top": 70,
+            "width": 50,
+            "height": 10,
+            "button_type": PushButtonType_OK,
+        }
+        self.__create_control(options)
+        options = {
+            "parent": dialog_model,
+            "type_string": "Button",
+            "id_string": "btnCancel",
+            "tab_index": 7,
+            "left": 170,
+            "top": 70,
+            "width": 50,
+            "height": 10,
+            "button_type": PushButtonType_CANCEL,
+        }
+        self.__create_control(options)
 
         # Finally show the dialog.
         dialog = self.create_uno_service("awt.UnoControlDialog")
@@ -198,9 +221,8 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
                 self.name_order = "big"
         return ret
 
-    # XPropertyAccess
-    # pylint: disable=invalid-name
-    def getPropertyValues(self) -> Tuple[Any, ...]:
+    def getPropertyValues(self) -> Tuple[Any, ...]:  # pylint: disable=invalid-name
+        """XPropertyAccess, gets the import options after showing the dialog."""
         try:
             return self.to_tuple(self.props)
         # pylint: disable=broad-except
@@ -209,18 +231,19 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
 
         return ()
 
-    def setPropertyValues(self, props: Iterable[Any]) -> None:
+    def setPropertyValues(self, props: Iterable[Any]) -> None:  # pylint: disable=invalid-name
+        """XPropertyAccess, sets the import options before showing the dialog."""
         try:
             self.props = self.to_dict(props)
         # pylint: disable=broad-except
         except Exception:
             self.print_traceback()
 
-    # XExecutableDialog
-    def setTitle(self, title: str) -> None:
-        pass
+    def setTitle(self, title: str) -> None:  # pylint: disable=invalid-name
+        """XExecutableDialog, Sets the title of the dialog."""
 
     def execute(self) -> Any:
+        """Shows the dialog that allows customizing the import options."""
         try:
             self.__extract_families()
             ret = self.__exec_dialog()
@@ -236,8 +259,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             self.print_traceback()
             return ExecutableDialogResults_CANCEL
 
-    # XImporter
-    def setTargetDocument(self, dst_doc: Any) -> None:
-        self.dst_doc = dst_doc
+    def setTargetDocument(self, dst_doc: Any) -> None:  # pylint: disable=invalid-name
+        """XImporter, sets the destination doc model."""
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab:

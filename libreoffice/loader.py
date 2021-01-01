@@ -5,13 +5,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
+"""Registers the dialog and importer modules as an extension."""
+
 import traceback
 try:
     import sys
 
-    import uno  # type: ignore  # Cannot find module named 'uno'
-    import unohelper  # type: ignore  # Cannot find module named 'unohelper'
-    from com.sun.star.beans import PropertyValue  # type: ignore  # Cannot find module named 'com.sun.star.beans'
+    import uno  # type: ignore  # pylint: disable=import-error
+    import unohelper  # type: ignore  # pylint: disable=import-error
+    from com.sun.star.beans import PropertyValue  # type: ignore  # pylint: disable=import-error
 
     # Insert our own directory into sys.path. Normally that's already done, and
     # even if it's not, __file__ is defined, so it's trivial to do so. But
@@ -23,8 +25,8 @@ try:
     VALUE = PropertyValue()
     VALUE.Name = 'nodepath'
     VALUE.Value = 'hu.vmiklos.libreoffice.Draw.GedcomImportFilter.Settings/Tokens'
-    service_name = "com.sun.star.configuration.ConfigurationAccess"
-    CONFIGURATION_ACCESS = CONFIGURATION_PROVIDER.createInstanceWithArguments(service_name, (VALUE,))
+    SERVICE_NAME = "com.sun.star.configuration.ConfigurationAccess"
+    CONFIGURATION_ACCESS = CONFIGURATION_PROVIDER.createInstanceWithArguments(SERVICE_NAME, (VALUE,))
     ORIGIN = CONFIGURATION_ACCESS.Origin
     # Actually the returned value still contains 'vnd.sun.star.expand:$UNO_USER_PACKAGES_CACHE', let's expand that.
     EXPANDER = CTX.getValueByName('/singletons/com.sun.star.util.theMacroExpander')
