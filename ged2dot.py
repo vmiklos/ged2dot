@@ -88,6 +88,14 @@ class Individual(Node):
         self.__dict["birth"] = ""
         self.__dict["death"] = ""
 
+    def __str__(self) -> str:
+        # Intentionally only print the famc/fams IDs, not the whole object to avoid not wanted
+        # recursion.
+        ret = "Individual(__dict=" + str(self.__dict)
+        ret += ", fams_ids: " + str(self.fams_ids)
+        ret += ", depth: " + str(self.depth) + ")"
+        return ret
+
     def resolve(self, graph: List[Node]) -> None:
         self.famc = cast(Optional["Family"], graph_find(graph, self.get_famc_id()))
         for fams_id in self.fams_ids:
@@ -210,6 +218,14 @@ class Family(Node):
         self.child_ids: List[str] = []
         self.child_list: List["Individual"] = []
         self.depth = 0
+
+    def __str__(self) -> str:
+        # Intentionally only print the wife/husband/child IDs, not the whole object to avoid not
+        # wanted recursion.
+        ret = "Family(__dict=" + str(self.__dict)
+        ret += ", child_ids: " + str(self.child_ids)
+        ret += ", depth: " + str(self.depth) + ")"
+        return ret
 
     def resolve(self, graph: List[Node]) -> None:
         self.wife = cast(Optional["Individual"], graph_find(graph, self.get_wife_id()))

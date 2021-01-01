@@ -42,6 +42,31 @@ class TestIndividual(unittest.TestCase):
         assert isinstance(individual, ged2dot.Individual)
         self.assertIn("A<br/>Alice", individual.get_label(image_dir="", name_order="big"))
 
+    def test_str(self) -> None:
+        """Tests __str()__."""
+        config = {
+            "input": "tests/hello.ged",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        individual = ged2dot.graph_find(graph, "P1")
+        # Make sure that this doesn't loop.
+        self.assertNotEqual(str(individual), "")
+
+
+class TestFamily(unittest.TestCase):
+    """Tests Family."""
+    def test_str(self) -> None:
+        """Tests __str()__."""
+        config = {
+            "input": "tests/hello.ged",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        family = ged2dot.graph_find(graph, "F1")
+        # Make sure that this doesn't loop.
+        self.assertNotEqual(str(family), "")
+
 
 class TestGedcomImport(unittest.TestCase):
     """Tests GedcomImport."""
