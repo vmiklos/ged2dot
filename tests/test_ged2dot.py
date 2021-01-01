@@ -99,7 +99,7 @@ class TestMain(unittest.TestCase):
             "input": "tests/happy.ged",
             "output": "tests/happy.dot",
             "rootfamily": "F1",
-            "imagedir": "tests/images",
+            "imagedir": "images",
         }
         if os.path.exists(config["output"]):
             os.unlink(config["output"])
@@ -108,6 +108,23 @@ class TestMain(unittest.TestCase):
         self.assertTrue(os.path.exists(config["output"]))
         with open(config["output"], "r") as stream:
             self.assertIn("images/", stream.read())
+
+    def test_image_abspath(self) -> None:
+        """Tests the case when imagedir is an abs path already."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/happy.ged",
+            "output": "tests/image-abspath.dot",
+            "rootfamily": "F1",
+            "imagedir": os.path.join(os.getcwd(), "tests/images"),
+        }
+        if os.path.exists(config["output"]):
+            os.unlink(config["output"])
+        self.assertFalse(os.path.exists(config["output"]))
+        ged2dot.convert(config)
+        self.assertTrue(os.path.exists(config["output"]))
+        with open(config["output"], "r") as stream:
+            self.assertIn(config["imagedir"], stream.read())
 
     def test_config(self) -> None:
         """Tests the case when there is a ged2dotrc in the current dir."""
