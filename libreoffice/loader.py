@@ -23,7 +23,8 @@ try:
     VALUE = PropertyValue()
     VALUE.Name = 'nodepath'
     VALUE.Value = 'hu.vmiklos.libreoffice.Draw.GedcomImportFilter.Settings/Tokens'
-    CONFIGURATION_ACCESS = CONFIGURATION_PROVIDER.createInstanceWithArguments('com.sun.star.configuration.ConfigurationAccess', (VALUE,))
+    service_name = "com.sun.star.configuration.ConfigurationAccess"
+    CONFIGURATION_ACCESS = CONFIGURATION_PROVIDER.createInstanceWithArguments(service_name, (VALUE,))
     ORIGIN = CONFIGURATION_ACCESS.Origin
     # Actually the returned value still contains 'vnd.sun.star.expand:$UNO_USER_PACKAGES_CACHE', let's expand that.
     EXPANDER = CTX.getValueByName('/singletons/com.sun.star.util.theMacroExpander')
@@ -37,8 +38,12 @@ try:
     # pythonloader.py has this name hardcoded
     # pylint: disable=invalid-name
     g_ImplementationHelper = unohelper.ImplementationHelper()
-    g_ImplementationHelper.addImplementation(dialog.GedcomDialog, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog", ("com.sun.star.ui.dialogs.FilterOptionsDialog",))
-    g_ImplementationHelper.addImplementation(importer.GedcomImport, "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter", ("com.sun.star.document.ImportFilter",))
+    g_ImplementationHelper.addImplementation(dialog.GedcomDialog,
+                                             "hu.vmiklos.libreoffice.comp.Draw.GedcomImportDialog",
+                                             ("com.sun.star.ui.dialogs.FilterOptionsDialog",))
+    g_ImplementationHelper.addImplementation(importer.GedcomImport,
+                                             "hu.vmiklos.libreoffice.comp.Draw.GedcomImportFilter",
+                                             ("com.sun.star.document.ImportFilter",))
 # pylint: disable=broad-except
 except Exception:
     traceback.print_exc(file=sys.stderr)

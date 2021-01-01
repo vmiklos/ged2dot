@@ -11,20 +11,20 @@ from typing import Iterable
 from typing import Optional
 from typing import Tuple
 
-import unohelper  # type: ignore  # Cannot find module named 'unohelper'
-from com.sun.star.beans import XPropertyAccess  # type: ignore  # Cannot find module named 'com.sun.star.beans'
-from com.sun.star.ui.dialogs import XExecutableDialog  # type: ignore  # Cannot find module named 'com.sun.star.ui.dialogs'
-from com.sun.star.document import XImporter  # type: ignore  # Cannot find module named 'com.sun.star.document'
-from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as ExecutableDialogResults_CANCEL  # type: ignore  # Cannot find module named 'com.sun.star.ui.dialogs.ExecutableDialogResults'
+import unohelper  # type: ignore
+from com.sun.star.beans import XPropertyAccess  # type: ignore
+from com.sun.star.ui.dialogs import XExecutableDialog  # type: ignore
+from com.sun.star.document import XImporter  # type: ignore
+from com.sun.star.ui.dialogs.ExecutableDialogResults import CANCEL as ExecutableDialogResults_CANCEL  # type: ignore
 from com.sun.star.ui.dialogs.ExecutableDialogResults import OK as ExecutableDialogResults_OK
-from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK  # type: ignore  # Cannot find module named 'com.sun.star.awt.PushButtonType'
+from com.sun.star.awt.PushButtonType import OK as PushButtonType_OK  # type: ignore
 from com.sun.star.awt.PushButtonType import CANCEL as PushButtonType_CANCEL
 
 import ged2dot
 import base
 
 
-class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):  # type: ignore  # Class cannot subclass
+class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter, base.GedcomBase):  # type: ignore
     def __init__(self, context: Any, _dialogArgs: Any) -> None:
         unohelper.Base.__init__(self)
         base.GedcomBase.__init__(self, context)
@@ -57,8 +57,16 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             key = "%s (%s)" % (node.get_identifier(), help_string)
             self.family_dict[key] = node
 
-    def __create_control(self, parent: Any, type_string: str, id_string: str, tab_index: int, left: int, top: int, width: int, height: int,
-                         value: Optional[str] = None, button_type: Optional[int] = None) -> Any:
+    def __create_control(self, parent: Any,
+                         type_string: str,
+                         id_string: str,
+                         tab_index: int,
+                         left: int,
+                         top: int,
+                         width: int,
+                         height: int,
+                         value: Optional[str] = None,
+                         button_type: Optional[int] = None) -> Any:
         control = parent.createInstance("com.sun.star.awt.UnoControl%sModel" % type_string)
         control.PositionX = left
         control.PositionY = top
@@ -103,14 +111,76 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         dialog_model.Title = "GEDCOM Import"
 
         # Then the model of the controls.
-        self.__create_control(dialog_model, type_string="FixedText", id_string="ftRootFamily", tab_index=0, left=10, top=10, width=100, height=10, value="Root family")
-        root_family_lb = self.__create_control(dialog_model, type_string="ListBox", id_string="root_family_lb", tab_index=1, left=120, top=10, width=100, height=10)
-        self.__create_control(dialog_model, type_string="FixedText", id_string="ftLayoutMax", tab_index=2, left=10, top=30, width=100, height=10, value="Number of generations to show")
-        layout_max_nf = self.__create_control(dialog_model, type_string="NumericField", id_string="layout_max_nf", tab_index=3, left=120, top=30, width=100, height=10)
-        self.__create_control(dialog_model, type_string="FixedText", id_string="ftNameOrder", tab_index=4, left=10, top=50, width=100, height=10, value="Name order")
-        name_order_cb = self.__create_control(dialog_model, type_string="CheckBox", id_string="name_order_cb", tab_index=5, left=120, top=50, width=100, height=10, value="Forename first")
-        self.__create_control(dialog_model, type_string="Button", id_string="btnOk", tab_index=6, left=110, top=70, width=50, height=10, button_type=PushButtonType_OK)
-        self.__create_control(dialog_model, type_string="Button", id_string="btnCancel", tab_index=7, left=170, top=70, width=50, height=10, button_type=PushButtonType_CANCEL)
+        self.__create_control(dialog_model,
+                              type_string="FixedText",
+                              id_string="ftRootFamily",
+                              tab_index=0,
+                              left=10,
+                              top=10,
+                              width=100,
+                              height=10,
+                              value="Root family")
+        root_family_lb = self.__create_control(dialog_model,
+                                               type_string="ListBox",
+                                               id_string="root_family_lb",
+                                               tab_index=1,
+                                               left=120,
+                                               top=10,
+                                               width=100,
+                                               height=10)
+        self.__create_control(dialog_model,
+                              type_string="FixedText",
+                              id_string="ftLayoutMax",
+                              tab_index=2,
+                              left=10,
+                              top=30,
+                              width=100,
+                              height=10,
+                              value="Number of generations to show")
+        layout_max_nf = self.__create_control(dialog_model,
+                                              type_string="NumericField",
+                                              id_string="layout_max_nf",
+                                              tab_index=3,
+                                              left=120,
+                                              top=30,
+                                              width=100,
+                                              height=10)
+        self.__create_control(dialog_model,
+                              type_string="FixedText",
+                              id_string="ftNameOrder",
+                              tab_index=4,
+                              left=10,
+                              top=50,
+                              width=100,
+                              height=10,
+                              value="Name order")
+        name_order_cb = self.__create_control(dialog_model,
+                                              type_string="CheckBox",
+                                              id_string="name_order_cb",
+                                              tab_index=5,
+                                              left=120,
+                                              top=50,
+                                              width=100,
+                                              height=10,
+                                              value="Forename first")
+        self.__create_control(dialog_model,
+                              type_string="Button",
+                              id_string="btnOk",
+                              tab_index=6,
+                              left=110,
+                              top=70,
+                              width=50,
+                              height=10,
+                              button_type=PushButtonType_OK)
+        self.__create_control(dialog_model,
+                              type_string="Button",
+                              id_string="btnCancel",
+                              tab_index=7,
+                              left=170,
+                              top=70,
+                              width=50,
+                              height=10,
+                              button_type=PushButtonType_CANCEL)
 
         # Finally show the dialog.
         dialog = self.create_uno_service("awt.UnoControlDialog")

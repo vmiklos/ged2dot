@@ -1,1 +1,1 @@
-- libreoffice extension: flake8/pylint fixes
+- add cmdline switches, so a config is not a hard requirement
