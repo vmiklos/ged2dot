@@ -8,7 +8,8 @@ rootfamily = F1
 # Number of cycles to show neighbour families: you can start with 0 and then increase it as you
 # like.
 familydepth = 4
-# Directory containing 100x100px "First Last YYYY.jpg" images.
+# Directory containing 100x100px "First Last YYYY.jpg" images. If the path is not absolute, it'll be
+# relative to the input file.
 imagedir = images
 # 'little' is First first, 'big' is Last first.
 nameorder = little

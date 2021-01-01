@@ -15,19 +15,19 @@ from typing import Dict
 from typing import Iterable
 from typing import Tuple
 
-import uno  # type: ignore  # Cannot find module named 'uno'
-import unohelper  # type: ignore  # Cannot find module named 'unohelper'
-from com.sun.star.document import XFilter  # type: ignore  # Cannot find module named 'com.sun.star.document'
+import uno  # type: ignore
+import unohelper  # type: ignore
+from com.sun.star.document import XFilter  # type: ignore
 from com.sun.star.document import XImporter
 from com.sun.star.document import XExtendedFilterDetection
-from com.sun.star.beans import PropertyValue  # type: ignore  # Cannot find module named 'com.sun.star.beans'
+from com.sun.star.beans import PropertyValue  # type: ignore
 
 import ged2dot
 import inlineize
 import base
 
 
-class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection, base.GedcomBase):  # type: ignore  # Class cannot subclass
+class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection, base.GedcomBase):  # type: ignore
     type = "draw_GEDCOM"
 
     def __init__(self, context: Any) -> None:
@@ -75,7 +75,8 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
                 pattern = os.environ['PROGRAMFILES(x86)'] + '\\Graphviz*\\bin\\dot.exe'
                 dot_paths = glob.glob(pattern)
             if not dot_paths:
-                raise Exception("No dot.exe found at '%s', please download it from <https://graphviz.gitlab.io/_pages/Download/Download_windows.html>." % pattern)
+                url = "<https://graphviz.gitlab.io/_pages/Download/Download_windows.html>"
+                raise Exception("No dot.exe found at '%s', please download it from %s." % (pattern, url))
             dot_path = dot_paths[-1]
         else:
             dot_path = "dot"
