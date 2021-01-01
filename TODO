@@ -1,1 +1,2 @@
-- restore the libreoffice extension
+- fix images when $CWD is not the dir of the .ged file
+- libreoffice extension: flake8/pylint fixes

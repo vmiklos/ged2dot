@@ -30,31 +30,32 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         base.GedcomBase.__init__(self, context)
         self.family_dict = {}  # type: Dict[str, ged2dot.Family]
         self.root_family = None  # type: Optional[str]
-        self.layout_max = 0
-        self.node_label_image = ""
+        self.layout_max = "4"
+        self.name_order = "little"
         self.props = {}  # type: Dict[str, Any]
         self.dst_doc = None
 
     def __extract_families(self) -> None:
         ged = unohelper.fileUrlToSystemPath(self.props['URL'])
-        config_dict = {
-            'ged2dot': {
-                'input': ged,
-            }
+        config = {
+            'input': ged,
         }
-        config = ged2dot.Config(config_dict)
-        model = ged2dot.Model(config)
-        model.load(config.input)
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        for node in graph:
+            node.resolve(graph)
         self.family_dict = {}
-        for i in model.families:
+        for node in graph:
+            if not isinstance(node, ged2dot.Family):
+                continue
             help_string = ""
-            if i.husb and i.husb.surname:
-                help_string += i.husb.surname
+            if node.husb and node.husb.get_surname():
+                help_string += node.husb.get_surname()
             help_string += "-"
-            if i.wife and i.wife.surname:
-                help_string += i.wife.surname
-            key = "%s (%s)" % (i.fid, help_string)
-            self.family_dict[key] = i
+            if node.wife and node.wife.get_surname():
+                help_string += node.wife.get_surname()
+            key = "%s (%s)" % (node.get_identifier(), help_string)
+            self.family_dict[key] = node
 
     def __create_control(self, parent: Any, type_string: str, id_string: str, tab_index: int, left: int, top: int, width: int, height: int,
                          value: Optional[str] = None, button_type: Optional[int] = None) -> Any:
@@ -78,7 +79,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             control.SelectedItems = tuple([0])
         elif type_string == "NumericField":
             control.Spin = True
-            control.Value = ged2dot.Config.layoutMaxDepthDefault
+            control.Value = 4
             control.DecimalAccuracy = 0
             control.ValueMin = 0
         elif type_string == "CheckBox":
@@ -119,12 +120,12 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         ret = dialog.execute()
         if ret == ExecutableDialogResults_OK:
             key = root_family_lb.StringItemList[root_family_lb.SelectedItems[0]]
-            self.root_family = self.family_dict[key].fid
-            self.layout_max = int(layout_max_nf.Value)
+            self.root_family = self.family_dict[key].get_identifier()
+            self.layout_max = layout_max_nf.Value
             if name_order_cb.State:
-                self.node_label_image = ged2dot.Config.nodeLabelImageDefault
+                self.name_order = "little"
             else:
-                self.node_label_image = ged2dot.Config.nodeLabelImageSwappedDefault
+                self.name_order = "big"
         return ret
 
     # XPropertyAccess
@@ -155,9 +156,9 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             ret = self.__exec_dialog()
             if ret == ExecutableDialogResults_OK:
                 self.props['FilterData'] = self.to_tuple({
-                    'rootFamily': self.root_family,
-                    'layoutMaxDepth': self.layout_max,
-                    'nodeLabelImage': self.node_label_image
+                    'rootfamily': self.root_family,
+                    'familydepth': self.layout_max,
+                    'nameorder': self.name_order,
                 })
             return ret
         # pylint: disable=broad-except

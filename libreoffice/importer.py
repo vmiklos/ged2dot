@@ -37,30 +37,36 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         self.dst_doc = None
 
     def __to_svg(self, ged: str) -> bytes:
-        root_family = ged2dot.Config.rootFamilyDefault
-        layout_max_depth = ged2dot.Config.layoutMaxDepthDefault
-        node_label_image = ged2dot.Config.nodeLabelImageDefault
+        root_family = "F1"
+        layout_max_depth = "4"
+        name_order = "little"
         if "FilterData" in self.props.keys():
             filter_data = self.to_dict(self.props["FilterData"])
-            if "rootFamily" in filter_data.keys():
-                root_family = filter_data["rootFamily"]
-            if "layoutMaxDepth" in filter_data.keys():
-                layout_max_depth = filter_data["layoutMaxDepth"]
-            if "nodeLabelImage" in filter_data.keys():
-                node_label_image = filter_data["nodeLabelImage"]
-        config_dict = {
-            'ged2dot': {
-                'input': ged,
-                'rootFamily': root_family,
-                'layoutMaxDepth': layout_max_depth,
-                'nodeLabelImage': node_label_image
-            }
-        }
-        config = ged2dot.Config(config_dict)
-        model = ged2dot.Model(config)
-        model.load(config.input)
+            if "rootfamily" in filter_data.keys():
+                root_family = filter_data["rootfamily"]
+            if "familydepth" in filter_data.keys():
+                layout_max_depth = filter_data["familydepth"]
+            if "nameorder" in filter_data.keys():
+                name_order = filter_data["nameorder"]
         dot = io.StringIO()
-        model.save(dot)
+        config = {
+            'input': ged,
+            'rootfamily': root_family,
+            'familydepth': layout_max_depth,
+            'nameorder': name_order,
+            "imagedir": "images",
+        }
+
+        # Now do the actual ged2dot conversion.
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        for node in graph:
+            node.resolve(graph)
+        root_node = ged2dot.graph_find(graph, config["rootfamily"])
+        assert root_node
+        subgraph = ged2dot.bfs(root_node, config)
+        exporter = ged2dot.DotExport()
+        exporter.store_to_stream(subgraph, dot, config)
 
         if sys.platform.startswith("win"):
             pattern = os.environ['PROGRAMFILES'] + '\\Graphviz*\\bin\\dot.exe'
@@ -75,9 +81,11 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
             dot_path = "dot"
         graphviz = subprocess.Popen([dot_path, '-Tsvg'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         dot.seek(0)
+        assert graphviz.stdin
         graphviz.stdin.write(dot.read().encode('utf-8'))
         graphviz.stdin.close()
         noinline = io.BytesIO()
+        assert graphviz.stdout
         noinline.write(graphviz.stdout.read())
         graphviz.stdout.close()
         graphviz.wait()
