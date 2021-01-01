@@ -64,6 +64,14 @@ def get_abspath(path: str) -> str:
     return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
 
 
+def get_data_abspath(gedcom: str, path: str) -> str:
+    """Make a path absolute, taking the gedcom file's dir as a base dir."""
+    if os.path.isabs(path):
+        return path
+
+    return os.path.join(os.path.dirname(os.path.realpath(gedcom)), path)
+
+
 class Individual(Node):
     """An individual is always a child in a family, and is an adult in 0..* families."""
     def __init__(self) -> None:
@@ -376,8 +384,9 @@ class DotExport:
             individual = node
             stream.write(node.get_identifier() + " [shape=box, ")
             image_dir = self.config.get("imagedir", "")
+            image_dir_abs = get_data_abspath(self.config.get("input", ""), image_dir)
             name_order = self.config.get("nameorder", "little")
-            stream.write("label = <" + individual.get_label(image_dir, name_order) + ">\n")
+            stream.write("label = <" + individual.get_label(image_dir_abs, name_order) + ">\n")
             stream.write("color = " + individual.get_color() + "];\n")
 
     def __store_family_nodes(self, stream: TextIO) -> None:
