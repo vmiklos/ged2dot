@@ -159,7 +159,9 @@ class TestMain(unittest.TestCase):
             if os.path.exists("hello.dot"):
                 os.unlink("hello.dot")
             self.assertFalse(os.path.exists("hello.dot"))
-            ged2dot.main()
+            argv = ["", "--config", "ged2dotrc"]
+            with unittest.mock.patch('sys.argv', argv):
+                ged2dot.main()
             self.assertTrue(os.path.exists("hello.dot"))
         finally:
             os.chdir(pwd)
@@ -259,16 +261,113 @@ class TestMain(unittest.TestCase):
         exporter = ged2dot.DotExport()
         exporter.store(subgraph, config)
 
-    def test_default_options(self) -> None:
-        """Tests which config options are set by default."""
+    def test_config_input_default(self) -> None:
+        """Tests config: input: default."""
         def mock_convert(config: Dict[str, str]) -> None:
-            self.assertIn("familydepth", config)
-            self.assertIn("input", config)
-            self.assertIn("output", config)
-            self.assertIn("rootfamily", config)
-            self.assertIn("imagedir", config)
-        with unittest.mock.patch('ged2dot.convert', mock_convert):
-            ged2dot.main()
+            self.assertEqual(config["input"], "-")
+        argv = [""]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_input_custom(self) -> None:
+        """Tests config: input: custom."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["input"], "test.ged")
+        argv = ["", "--input", "test.ged"]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_output_default(self) -> None:
+        """Tests config: output: default."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["output"], "-")
+        argv = [""]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_output_custom(self) -> None:
+        """Tests config: output: custom."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["output"], "test.ged")
+        argv = ["", "--output", "test.ged"]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_rootfamily_default(self) -> None:
+        """Tests config: rootfamily: default."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["rootfamily"], "F1")
+        argv = [""]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_rootfamily_custom(self) -> None:
+        """Tests config: rootfamily: custom."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["rootfamily"], "F42")
+        argv = ["", "--rootfamily", "F42"]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_familydepth_default(self) -> None:
+        """Tests config: familydepth: default."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["familydepth"], "4")
+        argv = [""]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_familydepth_custom(self) -> None:
+        """Tests config: familydepth: custom."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["familydepth"], "0")
+        argv = ["", "--familydepth", "0"]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_imagedir_default(self) -> None:
+        """Tests config: imagedir: default."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["imagedir"], "images")
+        argv = [""]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_imagedir_custom(self) -> None:
+        """Tests config: imagedir: custom."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["imagedir"], "myimagedir")
+        argv = ["", "--imagedir", "myimagedir"]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_nameorder_default(self) -> None:
+        """Tests config: nameorder: default."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["nameorder"], "little")
+        argv = [""]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_config_nameorder_custom(self) -> None:
+        """Tests config: nameorder: custom."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["nameorder"], "big")
+        argv = ["", "--nameorder", "big"]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
 
 
 class TestGetAbspath(unittest.TestCase):

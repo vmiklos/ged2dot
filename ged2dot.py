@@ -12,8 +12,61 @@ from typing import List
 from typing import Optional
 from typing import TextIO
 from typing import cast
+import argparse
 import configparser
 import os
+
+
+class Config:
+    """Stores options from a config file or from cmdline args."""
+    def __init__(self) -> None:
+        self.input = "-"
+        self.output = "-"
+        self.rootfamily = "F1"
+        # Could be 0, but defaulting to something that can easily explode on large input is not
+        # helpful.
+        self.familydepth = "4"
+        self.imagedir = "images"
+        self.nameorder = "little"
+
+    def read_config(self, config_file: str) -> None:
+        """Reads config from a provided file."""
+        if not config_file:
+            return
+        config_parser = configparser.ConfigParser()
+        config_parser.read(config_file)
+        for section in config_parser.sections():
+            if section != "ged2dot":
+                continue
+            for option in config_parser.options(section):
+                self.__setattr__(option, config_parser.get(section, option))
+
+    def read_args(self, args: argparse.Namespace) -> None:
+        """Reads config from cmdline args."""
+        if args.input:
+            self.input = args.input
+        if args.output:
+            self.output = args.output
+        if args.rootfamily:
+            self.rootfamily = args.rootfamily
+        if args.familydepth:
+            self.familydepth = args.familydepth
+        if args.imagedir:
+            self.imagedir = args.imagedir
+        if args.nameorder:
+            self.nameorder = args.nameorder
+
+    def get_dict(self) -> Dict[str, str]:
+        """Gets the config as a dict."""
+        config = {
+            "input": self.input,
+            "output": self.output,
+            "rootfamily": self.rootfamily,
+            "familydepth": self.familydepth,
+            "imagedir": self.imagedir,
+            "nameorder": self.nameorder,
+        }
+        return config
 
 
 class Node:
@@ -462,23 +515,28 @@ def convert(config: Dict[str, str]) -> None:
 
 def main() -> None:
     """Commandline interface."""
-    # No fooBar, ConfigParser would noramlize it to foobar anyway.
-    config = {
-        "familydepth": "0",
-        "input": "test.ged",
-        "output": "test.dot",
-        "rootfamily": "F1",
-        "imagedir": "images",
-    }
-    if os.path.exists("ged2dotrc"):
-        config_parser = configparser.ConfigParser()
-        config_parser.read("ged2dotrc")
-        for section in config_parser.sections():
-            if section != "ged2dot":
-                continue
-            for option in config_parser.options(section):
-                config[option] = config_parser.get(section, option)
-    convert(config)
+
+    # Parse config from file and cmdline args.
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", type=str,
+                        help="configuration file")
+    parser.add_argument("--input", type=str,
+                        help="input GEDCOM file")
+    parser.add_argument("--output", type=str,
+                        help="output DOT file")
+    parser.add_argument("--rootfamily", type=str,
+                        help="root family")
+    parser.add_argument("--familydepth", type=str,
+                        help="family depth")
+    parser.add_argument("--imagedir", type=str,
+                        help="image directory")
+    parser.add_argument("--nameorder", choices=["little", "big"],
+                        help="name order")
+    args = parser.parse_args()
+    config = Config()
+    config.read_config(args.config)
+    config.read_args(args)
+    convert(config.get_dict())
 
 
 if __name__ == '__main__':
