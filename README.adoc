@@ -14,9 +14,10 @@ map individuals and families to graph nodes and connections between them to grap
 takes care of the rest. What's unique about `ged2dot` is that it allows more than showing ancestors
 and descendants of a single individual (what you can easily do with random family editor software).
 
-You need to have a working ged2dotrc for the tool to process your .ged file.  See the example in
-`ged2dotrc.sample` for the complete list of recognized options. You typically want to customize the
-starting family (who will be at the center of the output) and the graph traversal depth.
+You usually want to customize your input filename, output filenames, the root family and the depth
+of the graph visitor. You can provide these either by using command-line arguments (see `ged2dot.py
+--help`) or by using a configuration file (see `ged2dotrc.sample`). When using both, the
+command-line arguments overwrite configuration values.
 
 == Layout
 
