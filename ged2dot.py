@@ -487,6 +487,9 @@ class DotExport:
 
     def store(self, subgraph: List[Node], config: Dict[str, str]) -> None:
         """Exports subgraph to a graphviz path."""
+        if config["output"] == "-":
+            self.store_to_stream(subgraph, sys.stdout, config)
+            return
         with open(config["output"], "w") as stream:
             self.store_to_stream(subgraph, stream, config)
 
