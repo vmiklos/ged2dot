@@ -15,6 +15,7 @@ from typing import cast
 import argparse
 import configparser
 import os
+import sys
 
 
 class Config:
@@ -390,29 +391,35 @@ class GedcomImport:
 
     def load(self, config: Dict[str, str]) -> List[Node]:
         """Loads a gedcom file into a graph."""
-        with open(config["input"], "rb") as stream:
-            for line_bytes in stream.readlines():
-                line = line_bytes.strip().decode("UTF-8")
-                tokens = line.split(" ")
+        if config["input"] == "-":
+            return self.load_from_stream(sys.stdin)
+        with open(config["input"], "r") as stream:
+            return self.load_from_stream(stream)
 
-                first_token = tokens[0]
-                # Ignore UTF-8 BOM, if there is one at the begining of the line.
-                if first_token.startswith("\ufeff"):
-                    first_token = first_token[1:]
+    def load_from_stream(self, stream: TextIO) -> List[Node]:
+        """Loads a gedcom steam into a graph."""
+        for line_bytes in stream.readlines():
+            line = line_bytes.strip()
+            tokens = line.split(" ")
 
-                level = int(first_token)
-                rest = " ".join(tokens[1:])
-                if level == 0:
-                    self.__handle_level0(rest)
-                elif level == 1:
-                    self.__handle_level1(rest)
-                elif level == 2:
-                    if rest.startswith("DATE") and self.individual:
-                        year = rest.split(' ')[-1]
-                        if self.in_birt:
-                            self.individual.set_birth(year)
-                        elif self.in_deat:
-                            self.individual.set_death(year)
+            first_token = tokens[0]
+            # Ignore UTF-8 BOM, if there is one at the begining of the line.
+            if first_token.startswith("\ufeff"):
+                first_token = first_token[1:]
+
+            level = int(first_token)
+            rest = " ".join(tokens[1:])
+            if level == 0:
+                self.__handle_level0(rest)
+            elif level == 1:
+                self.__handle_level1(rest)
+            elif level == 2:
+                if rest.startswith("DATE") and self.individual:
+                    year = rest.split(' ')[-1]
+                    if self.in_birt:
+                        self.individual.set_birth(year)
+                    elif self.in_deat:
+                        self.individual.set_death(year)
         return self.graph
 
 

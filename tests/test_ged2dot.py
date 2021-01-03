@@ -7,6 +7,7 @@
 """The test_ged2dot module covers the ged2dot module."""
 
 from typing import Dict
+import io
 import os
 import unittest
 import unittest.mock
@@ -268,6 +269,16 @@ class TestMain(unittest.TestCase):
         argv = [""]
         with unittest.mock.patch('sys.argv', argv):
             with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+        # Now test reading from stdin.
+        argv = ["", "--output", "tests/output.dot"]
+        buf = io.StringIO()
+        with open("tests/happy.ged") as stream:
+            buf.write(stream.read())
+            buf.seek(0)
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('sys.stdin', buf):
                 ged2dot.main()
 
     def test_config_input_custom(self) -> None:
