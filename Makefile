@@ -3,6 +3,7 @@ PYTHON_UNSAFE_OBJECTS = \
 	libreoffice/dialog.py \
 	libreoffice/importer.py \
 	libreoffice/loader.py \
+	qt.py \
 
 PYTHON_SAFE_OBJECTS = \
 	ged2dot.py \
