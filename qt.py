@@ -33,6 +33,7 @@ class Widgets:
         self.input_button = QPushButton(self.window)
         self.output_value = QLineEdit(self.window)
         self.output_button = QPushButton(self.window)
+        self.rootfamily_value = QComboBox(self.window)
 
     def set_input(self, rootfamily: QComboBox) -> None:
         """Handler for the input button."""
@@ -111,6 +112,13 @@ class Application:
         self.widgets.output_button.setText("Browse...")
         self.grid_layout.addWidget(self.widgets.output_button, 1, 2)
 
+    def setup_rootfamily(self) -> None:
+        """Sets up the root family row."""
+        rootfamily_key = QLabel(self.window)
+        rootfamily_key.setText("Root family:")
+        self.grid_layout.addWidget(rootfamily_key, 2, 0)
+        self.grid_layout.addWidget(self.widgets.rootfamily_value, 2, 1)
+
     def exec(self) -> None:
         """Starts the main loop."""
         self.window.setWindowTitle("ged2dot")
@@ -136,13 +144,7 @@ def main() -> None:
     app = Application()
     app.setup_input()
     app.setup_output()
-
-    # Root family
-    rootfamily_key = QLabel(app.window)
-    rootfamily_key.setText("Root family:")
-    app.grid_layout.addWidget(rootfamily_key, 2, 0)
-    rootfamily_value = QComboBox(app.window)
-    app.grid_layout.addWidget(rootfamily_value, 2, 1)
+    app.setup_rootfamily()
 
     # Family depth
     rootfamily_key = QLabel(app.window)
@@ -171,7 +173,7 @@ def main() -> None:
     nameorder_value.setChecked(True)
     app.grid_layout.addWidget(nameorder_value, 5, 1)
 
-    app.widgets.input_button.clicked.connect(lambda: app.widgets.set_input(rootfamily_value))
+    app.widgets.input_button.clicked.connect(lambda: app.widgets.set_input(app.widgets.rootfamily_value))
     app.widgets.output_button.clicked.connect(app.widgets.set_output)
     imagedir_button.clicked.connect(lambda: set_imagedir(imagedir_value))
     app.layout.addLayout(app.grid_layout)
