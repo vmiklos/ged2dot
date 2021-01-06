@@ -54,7 +54,7 @@ class Widgets:
         graph = ged_import.load(import_config)
         for node in graph:
             node.resolve(graph)
-        family_list = []
+        rootfamily.clear()
         for node in graph:
             if not isinstance(node, ged2dot.Family):
                 continue
@@ -64,9 +64,8 @@ class Widgets:
             help_string += "-"
             if node.wife and node.wife.get_surname():
                 help_string += node.wife.get_surname()
-            family_list.append("%s (%s)" % (node.get_identifier(), help_string))
-        rootfamily.clear()
-        rootfamily.insertItems(0, family_list)
+            key = "%s (%s)" % (node.get_identifier(), help_string)
+            rootfamily.addItem(key, node.get_identifier())
 
     def set_output(self) -> None:
         """Handler for the output button."""
