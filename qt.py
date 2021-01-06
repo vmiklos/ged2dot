@@ -28,14 +28,12 @@ import ged2dot
 class Widgets:
     """Contains widgets which store shared state."""
     def __init__(self, window: QWidget) -> None:
-        self.window = window
-        self.input_value = QLineEdit(self.window)
-        self.input_button = QPushButton(self.window)
-        self.output_value = QLineEdit(self.window)
-        self.output_button = QPushButton(self.window)
-        self.rootfamily_value = QComboBox(self.window)
+        self.input_value = QLineEdit(window)
+        self.output_value = QLineEdit(window)
+        self.rootfamily_value = QComboBox(window)
+        self.familydepth_value = QSpinBox(window)
 
-    def set_input(self, rootfamily: QComboBox) -> None:
+    def set_input(self) -> None:
         """Handler for the input button."""
         dialog = QFileDialog()
         dialog.setFileMode(QFileDialog.ExistingFile)
@@ -55,7 +53,7 @@ class Widgets:
         graph = ged_import.load(import_config)
         for node in graph:
             node.resolve(graph)
-        rootfamily.clear()
+        self.rootfamily_value.clear()
         for node in graph:
             if not isinstance(node, ged2dot.Family):
                 continue
@@ -66,7 +64,7 @@ class Widgets:
             if node.wife and node.wife.get_surname():
                 help_string += node.wife.get_surname()
             key = "%s (%s)" % (node.get_identifier(), help_string)
-            rootfamily.addItem(key, node.get_identifier())
+            self.rootfamily_value.addItem(key, node.get_identifier())
 
     def set_output(self) -> None:
         """Handler for the output button."""
@@ -100,8 +98,10 @@ class Application:
         input_key.setText("Input:")
         self.grid_layout.addWidget(input_key, 0, 0)
         self.grid_layout.addWidget(self.widgets.input_value, 0, 1)
-        self.widgets.input_button.setText("Browse...")
-        self.grid_layout.addWidget(self.widgets.input_button, 0, 2)
+        input_button = QPushButton(self.window)
+        input_button.setText("Browse...")
+        input_button.clicked.connect(self.widgets.set_input)
+        self.grid_layout.addWidget(input_button, 0, 2)
 
     def setup_output(self) -> None:
         """Sets up in the output row."""
@@ -109,8 +109,10 @@ class Application:
         output_key.setText("Output:")
         self.grid_layout.addWidget(output_key, 1, 0)
         self.grid_layout.addWidget(self.widgets.output_value, 1, 1)
-        self.widgets.output_button.setText("Browse...")
-        self.grid_layout.addWidget(self.widgets.output_button, 1, 2)
+        output_button = QPushButton(self.window)
+        output_button.setText("Browse...")
+        output_button.clicked.connect(self.widgets.set_output)
+        self.grid_layout.addWidget(output_button, 1, 2)
 
     def setup_rootfamily(self) -> None:
         """Sets up the root family row."""
@@ -118,6 +120,14 @@ class Application:
         rootfamily_key.setText("Root family:")
         self.grid_layout.addWidget(rootfamily_key, 2, 0)
         self.grid_layout.addWidget(self.widgets.rootfamily_value, 2, 1)
+
+    def setup_familydepth(self) -> None:
+        """Sets up the familydepth row."""
+        rootfamily_key = QLabel(self.window)
+        rootfamily_key.setText("Family depth:")
+        self.grid_layout.addWidget(rootfamily_key, 3, 0)
+        self.widgets.familydepth_value.setValue(4)
+        self.grid_layout.addWidget(self.widgets.familydepth_value, 3, 1)
 
     def exec(self) -> None:
         """Starts the main loop."""
@@ -145,14 +155,7 @@ def main() -> None:
     app.setup_input()
     app.setup_output()
     app.setup_rootfamily()
-
-    # Family depth
-    rootfamily_key = QLabel(app.window)
-    rootfamily_key.setText("Family depth:")
-    app.grid_layout.addWidget(rootfamily_key, 3, 0)
-    familydepth_value = QSpinBox(app.window)
-    familydepth_value.setValue(4)
-    app.grid_layout.addWidget(familydepth_value, 3, 1)
+    app.setup_familydepth()
 
     # Image directory
     imagedir_key = QLabel(app.window)
@@ -173,8 +176,6 @@ def main() -> None:
     nameorder_value.setChecked(True)
     app.grid_layout.addWidget(nameorder_value, 5, 1)
 
-    app.widgets.input_button.clicked.connect(lambda: app.widgets.set_input(app.widgets.rootfamily_value))
-    app.widgets.output_button.clicked.connect(app.widgets.set_output)
     imagedir_button.clicked.connect(lambda: set_imagedir(imagedir_value))
     app.layout.addLayout(app.grid_layout)
 
