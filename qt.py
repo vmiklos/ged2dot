@@ -10,82 +10,179 @@
 import sys
 
 from PyQt5.QtWidgets import QApplication  # type: ignore
+from PyQt5.QtWidgets import QCheckBox
+from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QDialogButtonBox
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QSpinBox
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 
+import ged2dot
 
-def set_input(input_value: QLineEdit) -> None:
-    """Handler for the input button."""
+
+class Widgets:
+    """Contains widgets which store shared state."""
+    def __init__(self, window: QWidget) -> None:
+        self.window = window
+        self.input_value = QLineEdit(self.window)
+        self.input_button = QPushButton(self.window)
+        self.output_value = QLineEdit(self.window)
+        self.output_button = QPushButton(self.window)
+
+    def set_input(self, rootfamily: QComboBox) -> None:
+        """Handler for the input button."""
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.ExistingFile)
+        dialog.setNameFilters(["GEDCOM files (*.ged)"])
+        if not dialog.exec():
+            return
+
+        files = dialog.selectedFiles()
+        assert len(files) == 1
+        ged_path = files[0]
+        self.input_value.setText(ged_path)
+
+        import_config = {
+            'input': ged_path,
+        }
+        ged_import = ged2dot.GedcomImport()
+        graph = ged_import.load(import_config)
+        for node in graph:
+            node.resolve(graph)
+        family_list = []
+        for node in graph:
+            if not isinstance(node, ged2dot.Family):
+                continue
+            help_string = ""
+            if node.husb and node.husb.get_surname():
+                help_string += node.husb.get_surname()
+            help_string += "-"
+            if node.wife and node.wife.get_surname():
+                help_string += node.wife.get_surname()
+            family_list.append("%s (%s)" % (node.get_identifier(), help_string))
+        rootfamily.clear()
+        rootfamily.insertItems(0, family_list)
+
+    def set_output(self) -> None:
+        """Handler for the output button."""
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.AnyFile)
+        name_filters = [
+            "PNG files (*.png)",
+            "Graphviz files (*.dot)",
+        ]
+        dialog.setNameFilters(name_filters)
+        if not dialog.exec():
+            return
+
+        files = dialog.selectedFiles()
+        assert len(files) == 1
+        self.output_value.setText(files[0])
+
+
+class Application:
+    """Manages shared state of the app."""
+    def __init__(self) -> None:
+        self.qt_app = QApplication(sys.argv)
+        self.window = QWidget()
+        self.layout = QVBoxLayout()
+        self.grid_layout = QGridLayout()
+        self.widgets = Widgets(self.window)
+
+    def setup_input(self) -> None:
+        """Sets up in the input row."""
+        input_key = QLabel(self.window)
+        input_key.setText("Input:")
+        self.grid_layout.addWidget(input_key, 0, 0)
+        self.grid_layout.addWidget(self.widgets.input_value, 0, 1)
+        self.widgets.input_button.setText("Browse...")
+        self.grid_layout.addWidget(self.widgets.input_button, 0, 2)
+
+    def setup_output(self) -> None:
+        """Sets up in the output row."""
+        output_key = QLabel(self.window)
+        output_key.setText("Output:")
+        self.grid_layout.addWidget(output_key, 1, 0)
+        self.grid_layout.addWidget(self.widgets.output_value, 1, 1)
+        self.widgets.output_button.setText("Browse...")
+        self.grid_layout.addWidget(self.widgets.output_button, 1, 2)
+
+    def exec(self) -> None:
+        """Starts the main loop."""
+        self.window.setWindowTitle("ged2dot")
+        self.window.setLayout(self.layout)
+        self.window.show()
+        sys.exit(self.qt_app.exec())
+
+
+def set_imagedir(imagedir_value: QLineEdit) -> None:
+    """Handler for the imagedir button."""
     dialog = QFileDialog()
-    dialog.setFileMode(QFileDialog.ExistingFile)
-    dialog.setNameFilters(["GEDCOM files (*.ged)"])
+    dialog.setFileMode(QFileDialog.Directory)
     if not dialog.exec():
         return
 
     files = dialog.selectedFiles()
     assert len(files) == 1
-    input_value.setText(files[0])
-
-
-def set_output(output_value: QLineEdit) -> None:
-    """Handler for the output button."""
-    dialog = QFileDialog()
-    dialog.setFileMode(QFileDialog.AnyFile)
-    dialog.setNameFilters(["Graphviz files (*.dot)"])
-    if not dialog.exec():
-        return
-
-    files = dialog.selectedFiles()
-    assert len(files) == 1
-    output_value.setText(files[0])
+    imagedir_value.setText(files[0])
 
 
 def main() -> None:
     """Commandline interface to this module."""
-    app = QApplication(sys.argv)
-    window = QWidget()
-    layout = QVBoxLayout()
-    grid_layout = QGridLayout()
+    app = Application()
+    app.setup_input()
+    app.setup_output()
 
-    # Input
-    input_key = QLabel(window)
-    input_key.setText("Input:")
-    grid_layout.addWidget(input_key, 0, 0)
-    input_value = QLineEdit(window)
-    grid_layout.addWidget(input_value, 0, 1)
-    input_button = QPushButton(window)
-    input_button.setText("Browse...")
-    input_button.clicked.connect(lambda: set_input(input_value))
-    grid_layout.addWidget(input_button, 0, 2)
+    # Root family
+    rootfamily_key = QLabel(app.window)
+    rootfamily_key.setText("Root family:")
+    app.grid_layout.addWidget(rootfamily_key, 2, 0)
+    rootfamily_value = QComboBox(app.window)
+    app.grid_layout.addWidget(rootfamily_value, 2, 1)
 
-    # Output
-    output_key = QLabel(window)
-    output_key.setText("Output:")
-    grid_layout.addWidget(output_key, 1, 0)
-    output_value = QLineEdit(window)
-    grid_layout.addWidget(output_value, 1, 1)
-    output_button = QPushButton(window)
-    output_button.setText("Browse...")
-    output_button.clicked.connect(lambda: set_output(output_value))
-    grid_layout.addWidget(output_button, 1, 2)
+    # Family depth
+    rootfamily_key = QLabel(app.window)
+    rootfamily_key.setText("Family depth:")
+    app.grid_layout.addWidget(rootfamily_key, 3, 0)
+    familydepth_value = QSpinBox(app.window)
+    familydepth_value.setValue(4)
+    app.grid_layout.addWidget(familydepth_value, 3, 1)
 
-    layout.addLayout(grid_layout)
+    # Image directory
+    imagedir_key = QLabel(app.window)
+    imagedir_key.setText("Image directory:")
+    app.grid_layout.addWidget(imagedir_key, 4, 0)
+    imagedir_value = QLineEdit(app.window)
+    app.grid_layout.addWidget(imagedir_value, 4, 1)
+    imagedir_button = QPushButton(app.window)
+    imagedir_button.setText("Browse...")
+    app.grid_layout.addWidget(imagedir_button, 4, 2)
+
+    # Name order
+    nameorder_key = QLabel(app.window)
+    nameorder_key.setText("Name order:")
+    app.grid_layout.addWidget(nameorder_key, 5, 0)
+    nameorder_value = QCheckBox(app.window)
+    nameorder_value.setText("Given name first")
+    nameorder_value.setChecked(True)
+    app.grid_layout.addWidget(nameorder_value, 5, 1)
+
+    app.widgets.input_button.clicked.connect(lambda: app.widgets.set_input(rootfamily_value))
+    app.widgets.output_button.clicked.connect(app.widgets.set_output)
+    imagedir_button.clicked.connect(lambda: set_imagedir(imagedir_value))
+    app.layout.addLayout(app.grid_layout)
 
     button_box = QDialogButtonBox()
     button_box.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-    layout.addWidget(button_box)
+    app.layout.addWidget(button_box)
     button_box.button(QDialogButtonBox.Cancel).clicked.connect(sys.exit)
 
-    window.setWindowTitle("ged2dot")
-    window.setLayout(layout)
-    window.show()
-    sys.exit(app.exec())
+    app.exec()
 
 
 if __name__ == "__main__":
