@@ -32,6 +32,8 @@ class Widgets:
         self.output_value = QLineEdit(window)
         self.rootfamily_value = QComboBox(window)
         self.familydepth_value = QSpinBox(window)
+        self.imagedir_value = QLineEdit(window)
+        self.nameorder_value = QCheckBox(window)
 
     def set_input(self) -> None:
         """Handler for the input button."""
@@ -82,6 +84,17 @@ class Widgets:
         assert len(files) == 1
         self.output_value.setText(files[0])
 
+    def set_imagedir(self) -> None:
+        """Handler for the imagedir button."""
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.Directory)
+        if not dialog.exec():
+            return
+
+        files = dialog.selectedFiles()
+        assert len(files) == 1
+        self.imagedir_value.setText(files[0])
+
 
 class Application:
     """Manages shared state of the app."""
@@ -129,24 +142,32 @@ class Application:
         self.widgets.familydepth_value.setValue(4)
         self.grid_layout.addWidget(self.widgets.familydepth_value, 3, 1)
 
+    def setup_imagedir(self) -> None:
+        """Sets up the imagedir row."""
+        imagedir_key = QLabel(self.window)
+        imagedir_key.setText("Image directory:")
+        self.grid_layout.addWidget(imagedir_key, 4, 0)
+        self.grid_layout.addWidget(self.widgets.imagedir_value, 4, 1)
+        imagedir_button = QPushButton(self.window)
+        imagedir_button.setText("Browse...")
+        imagedir_button.clicked.connect(self.widgets.set_imagedir)
+        self.grid_layout.addWidget(imagedir_button, 4, 2)
+
+    def setup_nameorder(self) -> None:
+        """Sets up the nameorder row."""
+        nameorder_key = QLabel(self.window)
+        nameorder_key.setText("Name order:")
+        self.grid_layout.addWidget(nameorder_key, 5, 0)
+        self.widgets.nameorder_value.setText("Given name first")
+        self.widgets.nameorder_value.setChecked(True)
+        self.grid_layout.addWidget(self.widgets.nameorder_value, 5, 1)
+
     def exec(self) -> None:
         """Starts the main loop."""
         self.window.setWindowTitle("ged2dot")
         self.window.setLayout(self.layout)
         self.window.show()
         sys.exit(self.qt_app.exec())
-
-
-def set_imagedir(imagedir_value: QLineEdit) -> None:
-    """Handler for the imagedir button."""
-    dialog = QFileDialog()
-    dialog.setFileMode(QFileDialog.Directory)
-    if not dialog.exec():
-        return
-
-    files = dialog.selectedFiles()
-    assert len(files) == 1
-    imagedir_value.setText(files[0])
 
 
 def main() -> None:
@@ -156,27 +177,9 @@ def main() -> None:
     app.setup_output()
     app.setup_rootfamily()
     app.setup_familydepth()
+    app.setup_imagedir()
+    app.setup_nameorder()
 
-    # Image directory
-    imagedir_key = QLabel(app.window)
-    imagedir_key.setText("Image directory:")
-    app.grid_layout.addWidget(imagedir_key, 4, 0)
-    imagedir_value = QLineEdit(app.window)
-    app.grid_layout.addWidget(imagedir_value, 4, 1)
-    imagedir_button = QPushButton(app.window)
-    imagedir_button.setText("Browse...")
-    app.grid_layout.addWidget(imagedir_button, 4, 2)
-
-    # Name order
-    nameorder_key = QLabel(app.window)
-    nameorder_key.setText("Name order:")
-    app.grid_layout.addWidget(nameorder_key, 5, 0)
-    nameorder_value = QCheckBox(app.window)
-    nameorder_value.setText("Given name first")
-    nameorder_value.setChecked(True)
-    app.grid_layout.addWidget(nameorder_value, 5, 1)
-
-    imagedir_button.clicked.connect(lambda: set_imagedir(imagedir_value))
     app.layout.addLayout(app.grid_layout)
 
     button_box = QDialogButtonBox()
