@@ -7,8 +7,10 @@
 
 """Qt-based GUI for ged2dot."""
 
+import io
 import subprocess
 import sys
+import traceback
 
 from PyQt5.QtWidgets import QApplication  # type: ignore
 from PyQt5.QtWidgets import QCheckBox
@@ -124,6 +126,10 @@ class Widgets:
         except Exception:  # pylint: disable=broad-except
             msg.setIcon(QMessageBox.Warning)
             msg.setText("Conversion failed.")
+            with io.StringIO() as stream:
+                traceback.print_exc(file=stream)
+                stream.seek(0)
+                msg.setDetailedText(stream.read())
         msg.exec()
 
     @staticmethod
