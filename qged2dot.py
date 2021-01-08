@@ -11,6 +11,7 @@ import io
 import subprocess
 import sys
 import traceback
+import webbrowser
 
 from PyQt5.QtWidgets import QApplication  # type: ignore
 from PyQt5.QtWidgets import QCheckBox
@@ -115,22 +116,20 @@ class Widgets:
         if self.output_value.text().endswith(".png"):
             invoke_dot = True
             config["output"] = self.output_value.text() + ".dot"
-        msg = QMessageBox()
         try:
             ged2dot.convert(config)
-            msg.setText("Conversion to dot succeeded.")
             if invoke_dot:
                 self.to_png(config["output"], self.output_value.text())
-                msg.setText("Conversion to png succeeded.")
-            msg.setIcon(QMessageBox.Information)
+            webbrowser.open(self.output_value.text())
         except Exception:  # pylint: disable=broad-except
+            msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
             msg.setText("Conversion failed.")
             with io.StringIO() as stream:
                 traceback.print_exc(file=stream)
                 stream.seek(0)
                 msg.setDetailedText(stream.read())
-        msg.exec()
+            msg.exec()
 
     @staticmethod
     def to_png(dot_path: str, png_path: str) -> None:
