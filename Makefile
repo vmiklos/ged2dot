@@ -3,7 +3,7 @@ PYTHON_UNSAFE_OBJECTS = \
 	libreoffice/dialog.py \
 	libreoffice/importer.py \
 	libreoffice/loader.py \
-	qt.py \
+	qged2dot.py \
 
 PYTHON_SAFE_OBJECTS = \
 	ged2dot.py \
@@ -40,3 +40,10 @@ check-unit:
 
 %.pylint : %.py Makefile .pylintrc
 	env PYTHONPATH=. pylint $< && touch $@
+
+pyinstaller:
+	pyinstaller \
+		--add-data="placeholder-f.png:." \
+		--add-data="placeholder-m.png:." \
+		--add-data="placeholder-u.png:." \
+		qged2dot.py
