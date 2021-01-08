@@ -7,6 +7,7 @@
 
 """Qt-based GUI for ged2dot."""
 
+import subprocess
 import sys
 
 from PyQt5.QtWidgets import QApplication  # type: ignore
@@ -108,15 +109,36 @@ class Widgets:
         }
         if not self.nameorder_value.isChecked():
             config["nameorder"] = "big"
+        invoke_dot = False
+        if self.output_value.text().endswith(".png"):
+            invoke_dot = True
+            config["output"] = self.output_value.text() + ".dot"
         msg = QMessageBox()
         try:
             ged2dot.convert(config)
+            msg.setText("Conversion to dot succeeded.")
+            if invoke_dot:
+                self.to_png(config["output"], self.output_value.text())
+                msg.setText("Conversion to png succeeded.")
             msg.setIcon(QMessageBox.Information)
-            msg.setText("Conversion succeeded.")
         except Exception:  # pylint: disable=broad-except
             msg.setIcon(QMessageBox.Warning)
             msg.setText("Conversion failed.")
         msg.exec()
+
+    @staticmethod
+    def to_png(dot_path: str, png_path: str) -> None:
+        """Convert the generated .dot further to .png, using dot."""
+        graphviz = subprocess.Popen(["dot", "-Tpng"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        assert graphviz.stdin
+        with open(dot_path, "r") as text_stream:
+            graphviz.stdin.write(text_stream.read().encode("utf-8"))
+        graphviz.stdin.close()
+        assert graphviz.stdout
+        with open(png_path, "wb") as bin_stream:
+            bin_stream.write(graphviz.stdout.read())
+        graphviz.stdout.close()
+        graphviz.wait()
 
 
 class Application:
