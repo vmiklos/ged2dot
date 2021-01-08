@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QSpinBox
 from PyQt5.QtWidgets import QVBoxLayout
@@ -94,6 +95,28 @@ class Widgets:
         files = dialog.selectedFiles()
         assert len(files) == 1
         self.imagedir_value.setText(files[0])
+
+    def convert(self) -> None:
+        """Does the actual conversion."""
+        config = {
+            "input": self.input_value.text(),
+            "output": self.output_value.text(),
+            "rootfamily": self.rootfamily_value.currentData(),
+            "familydepth": str(self.familydepth_value.value()),
+            "imagedir": self.imagedir_value.text(),
+            "nameorder": "little",
+        }
+        if not self.nameorder_value.isChecked():
+            config["nameorder"] = "big"
+        msg = QMessageBox()
+        try:
+            ged2dot.convert(config)
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("Conversion succeeded.")
+        except Exception:  # pylint: disable=broad-except
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("Conversion failed.")
+        msg.exec()
 
 
 class Application:
@@ -186,6 +209,7 @@ def main() -> None:
     button_box.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
     app.layout.addWidget(button_box)
     button_box.button(QDialogButtonBox.Cancel).clicked.connect(sys.exit)
+    button_box.button(QDialogButtonBox.Ok).clicked.connect(app.widgets.convert)
 
     app.exec()
 
