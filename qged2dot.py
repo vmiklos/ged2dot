@@ -42,36 +42,39 @@ class Widgets:
 
     def set_input(self) -> None:
         """Handler for the input button."""
-        dialog = QFileDialog()
-        dialog.setFileMode(QFileDialog.ExistingFile)
-        dialog.setNameFilters(["GEDCOM files (*.ged)"])
-        if not dialog.exec():
-            return
+        try:
+            dialog = QFileDialog()
+            dialog.setFileMode(QFileDialog.ExistingFile)
+            dialog.setNameFilters(["GEDCOM files (*.ged)"])
+            if not dialog.exec():
+                return
 
-        files = dialog.selectedFiles()
-        assert len(files) == 1
-        ged_path = files[0]
-        self.input_value.setText(ged_path)
+            files = dialog.selectedFiles()
+            assert len(files) == 1
+            ged_path = files[0]
+            self.input_value.setText(ged_path)
 
-        import_config = {
-            'input': ged_path,
-        }
-        ged_import = ged2dot.GedcomImport()
-        graph = ged_import.load(import_config)
-        for node in graph:
-            node.resolve(graph)
-        self.rootfamily_value.clear()
-        for node in graph:
-            if not isinstance(node, ged2dot.Family):
-                continue
-            help_string = ""
-            if node.husb and node.husb.get_surname():
-                help_string += node.husb.get_surname()
-            help_string += "-"
-            if node.wife and node.wife.get_surname():
-                help_string += node.wife.get_surname()
-            key = "%s (%s)" % (node.get_identifier(), help_string)
-            self.rootfamily_value.addItem(key, node.get_identifier())
+            import_config = {
+                'input': ged_path,
+            }
+            ged_import = ged2dot.GedcomImport()
+            graph = ged_import.load(import_config)
+            for node in graph:
+                node.resolve(graph)
+            self.rootfamily_value.clear()
+            for node in graph:
+                if not isinstance(node, ged2dot.Family):
+                    continue
+                help_string = ""
+                if node.husb and node.husb.get_surname():
+                    help_string += node.husb.get_surname()
+                help_string += "-"
+                if node.wife and node.wife.get_surname():
+                    help_string += node.wife.get_surname()
+                key = "%s (%s)" % (node.get_identifier(), help_string)
+                self.rootfamily_value.addItem(key, node.get_identifier())
+        except Exception:  # pylint: disable=broad-except
+            self.print_traceback()
 
     def set_output(self) -> None:
         """Handler for the output button."""
@@ -102,34 +105,27 @@ class Widgets:
 
     def convert(self) -> None:
         """Does the actual conversion."""
-        config = {
-            "input": self.input_value.text(),
-            "output": self.output_value.text(),
-            "rootfamily": self.rootfamily_value.currentData(),
-            "familydepth": str(self.familydepth_value.value()),
-            "imagedir": self.imagedir_value.text(),
-            "nameorder": "little",
-        }
-        if not self.nameorder_value.isChecked():
-            config["nameorder"] = "big"
-        invoke_dot = False
-        if self.output_value.text().endswith(".png"):
-            invoke_dot = True
-            config["output"] = self.output_value.text() + ".dot"
         try:
+            config = {
+                "input": self.input_value.text(),
+                "output": self.output_value.text(),
+                "rootfamily": self.rootfamily_value.currentData(),
+                "familydepth": str(self.familydepth_value.value()),
+                "imagedir": self.imagedir_value.text(),
+                "nameorder": "little",
+            }
+            if not self.nameorder_value.isChecked():
+                config["nameorder"] = "big"
+            invoke_dot = False
+            if self.output_value.text().endswith(".png"):
+                invoke_dot = True
+                config["output"] = self.output_value.text() + ".dot"
             ged2dot.convert(config)
             if invoke_dot:
                 self.to_png(config["output"], self.output_value.text())
-            webbrowser.open(self.output_value.text())
+            webbrowser.open("file://" + self.output_value.text())
         except Exception:  # pylint: disable=broad-except
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setText("Conversion failed.")
-            with io.StringIO() as stream:
-                traceback.print_exc(file=stream)
-                stream.seek(0)
-                msg.setDetailedText(stream.read())
-            msg.exec()
+            self.print_traceback()
 
     @staticmethod
     def to_png(dot_path: str, png_path: str) -> None:
@@ -144,6 +140,18 @@ class Widgets:
             bin_stream.write(graphviz.stdout.read())
         graphviz.stdout.close()
         graphviz.wait()
+
+    @staticmethod
+    def print_traceback() -> None:
+        """Shows the exception to the user when it would not be caught."""
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText("Conversion failed.")
+        with io.StringIO() as stream:
+            traceback.print_exc(file=stream)
+            stream.seek(0)
+            msg.setDetailedText(stream.read())
+        msg.exec()
 
 
 class Application:
