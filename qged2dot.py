@@ -76,7 +76,7 @@ class Widgets:
     def set_output(self) -> None:
         """Handler for the output button."""
         dialog = QFileDialog()
-        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
         name_filters = [
             "PNG files (*.png)",
             "Graphviz files (*.dot)",
