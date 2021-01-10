@@ -18,6 +18,7 @@ PYTHON_OBJECTS = \
 	$(PYTHON_SAFE_OBJECTS) \
 	$(PYTHON_TEST_OBJECTS) \
 
+DOT = $(shell which dot)
 all:
 
 check: check-mypy check-flake8 check-pylint check-unit
@@ -43,7 +44,11 @@ check-unit:
 
 pyinstaller:
 	pyinstaller \
+		-y \
+		--clean \
+		--windowed \
 		--add-data="placeholder-f.png:." \
 		--add-data="placeholder-m.png:." \
 		--add-data="placeholder-u.png:." \
+		--add-binary="$(DOT):." \
 		qged2dot.py
