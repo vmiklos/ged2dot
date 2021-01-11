@@ -53,7 +53,7 @@ Its dependencies:
 
   * For Linux, use your package manager to install the `graphviz` package (2.28 is tested).
 
-  * For macOS, http://www.graphviz.org/Download_macos.php[get it here] (2.36 is tested).
+  * For macOS, install it from https://brew.sh/[brew] (2.36 is tested).
 
 - LibreOffice >= 6.1
 
