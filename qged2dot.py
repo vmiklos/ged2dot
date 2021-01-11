@@ -24,6 +24,7 @@ from PyQt5.QtWidgets import QLineEdit
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QSpinBox
+from PyQt5.QtWidgets import QStatusBar
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 
@@ -39,6 +40,7 @@ class Widgets:
         self.familydepth_value = QSpinBox(window)
         self.imagedir_value = QLineEdit(window)
         self.nameorder_value = QCheckBox(window)
+        self.statusbar = QStatusBar()
 
     def set_input(self) -> None:
         """Handler for the input button."""
@@ -73,6 +75,7 @@ class Widgets:
                     help_string += node.wife.get_surname()
                 key = "%s (%s)" % (node.get_identifier(), help_string)
                 self.rootfamily_value.addItem(key, node.get_identifier())
+            self.update_status()
         except Exception:  # pylint: disable=broad-except
             self.print_traceback()
 
@@ -91,6 +94,7 @@ class Widgets:
         files = dialog.selectedFiles()
         assert len(files) == 1
         self.output_value.setText(files[0])
+        self.update_status()
 
     def set_imagedir(self) -> None:
         """Handler for the imagedir button."""
@@ -120,10 +124,13 @@ class Widgets:
             if self.output_value.text().endswith(".png"):
                 invoke_dot = True
                 config["output"] = self.output_value.text() + ".dot"
+            self.statusbar.showMessage("Converting to " + config["output"] + "...")
             ged2dot.convert(config)
             if invoke_dot:
+                self.statusbar.showMessage("Converting to " + self.output_value.text() + "...")
                 self.to_png(config["output"], self.output_value.text())
             webbrowser.open("file://" + self.output_value.text())
+            self.statusbar.showMessage("Conversion finished successfully.")
         except Exception:  # pylint: disable=broad-except
             self.print_traceback()
 
@@ -152,6 +159,16 @@ class Widgets:
             stream.seek(0)
             msg.setDetailedText(stream.read())
         msg.exec()
+
+    def update_status(self) -> None:
+        """Updates the statusbar depending on what should be the next action."""
+        if not self.input_value.text():
+            message = "Select an input."
+        elif not self.output_value.text():
+            message = "Select an output."
+        else:
+            message = "Press OK to start the conversion."
+        self.statusbar.showMessage(message)
 
 
 class Application:
@@ -245,6 +262,8 @@ def main() -> None:
     app.layout.addWidget(button_box)
     button_box.button(QDialogButtonBox.Cancel).clicked.connect(sys.exit)
     button_box.button(QDialogButtonBox.Ok).clicked.connect(app.widgets.convert)
+    app.layout.addWidget(app.widgets.statusbar)
+    app.widgets.update_status()
 
     app.exec()
 
