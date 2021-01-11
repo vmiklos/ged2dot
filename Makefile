@@ -42,7 +42,8 @@ check-unit:
 %.pylint : %.py Makefile .pylintrc
 	env PYTHONPATH=. pylint $< && touch $@
 
-pyinstaller:
+pack:
+	rm -rf dist
 	pyinstaller \
 		-y \
 		--clean \
@@ -52,3 +53,6 @@ pyinstaller:
 		--add-data="placeholder-u.png:." \
 		--add-binary="$(DOT):." \
 		qged2dot.py
+ifeq ($(shell uname),Darwin)
+	hdiutil create dist/qged2dot.dmg -srcfolder dist/qged2dot.app -ov
+endif
