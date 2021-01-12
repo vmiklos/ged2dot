@@ -17,4 +17,8 @@ fi
 
 make -j$(getconf _NPROCESSORS_ONLN) check
 
+if [ "$GITHUB_JOB" == "macos" ]; then
+    make pack
+fi
+
 # vim:set shiftwidth=4 softtabstop=4 expandtab:
