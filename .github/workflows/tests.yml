@@ -17,3 +17,13 @@ jobs:
     - name: Run make check
       run: |
         tools/ci-build.sh
+  macos:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Run make check
+        run: |
+          tools/ci-build.sh
