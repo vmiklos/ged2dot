@@ -1,3 +1,5 @@
+OS = $(shell uname)
+
 PYTHON_UNSAFE_OBJECTS = \
 	libreoffice/base.py \
 	libreoffice/dialog.py \
@@ -48,11 +50,13 @@ pack:
 		-y \
 		--clean \
 		--windowed \
+		$(if $(filter Darwin,$(OS)),--icon icon.icns,) \
+		$(if $(filter Darwin,$(OS)),--osx-bundle-identifier hu.vmiklos.ged2dot,) \
 		--add-data="placeholder-f.png:." \
 		--add-data="placeholder-m.png:." \
 		--add-data="placeholder-u.png:." \
 		--add-binary="$(DOT):." \
 		qged2dot.py
-ifeq ($(shell uname),Darwin)
+ifeq ($(OS),Darwin)
 	hdiutil create dist/qged2dot.dmg -srcfolder dist/qged2dot.app -ov
 endif
