@@ -8,11 +8,13 @@
 """Qt-based GUI for ged2dot."""
 
 import io
+import os
 import subprocess
 import sys
 import traceback
 import webbrowser
 
+from PyQt5 import QtGui  # type: ignore
 from PyQt5.QtWidgets import QApplication  # type: ignore
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QComboBox
@@ -240,6 +242,8 @@ class Application:
     def exec(self) -> None:
         """Starts the main loop."""
         self.window.setWindowTitle("ged2dot")
+        icon_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "icon.svg")
+        self.window.setWindowIcon(QtGui.QIcon(icon_path))
         self.window.setLayout(self.layout)
         self.window.show()
         sys.exit(self.qt_app.exec())
