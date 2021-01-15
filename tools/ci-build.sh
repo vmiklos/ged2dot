@@ -6,7 +6,7 @@
 #
 
 #
-# Baseline: Ubuntu latest and macOS 10.15.
+# Baseline: Ubuntu 20.04 and macOS 10.15.
 #
 
 pip install -r requirements.txt
