@@ -1,4 +1,5 @@
 OS = $(shell uname)
+VERSION = $(shell git describe)
 
 PYTHON_UNSAFE_OBJECTS = \
 	libreoffice/base.py \
@@ -58,5 +59,5 @@ pack:
 		--add-binary="$(DOT):." \
 		qged2dot.py
 ifeq ($(OS),Darwin)
-	hdiutil create dist/qged2dot.dmg -srcfolder dist/qged2dot.app -ov
+	hdiutil create dist/qged2dot-$(VERSION).dmg -srcfolder dist/qged2dot.app -ov
 endif
