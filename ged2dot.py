@@ -390,14 +390,21 @@ class GedcomImport:
             self.family.child_ids.append(line[6:-1])
 
     def load(self, config: Dict[str, str]) -> List[Node]:
-        """Loads a gedcom file into a graph."""
-        if config["input"] == "-":
-            return self.load_from_stream(sys.stdin)
-        with open(config["input"], "r") as stream:
-            return self.load_from_stream(stream)
+        """Tokenizes and resolves a gedcom file into a graph."""
+        graph = self.tokenize(config)
+        for node in graph:
+            node.resolve(graph)
+        return graph
 
-    def load_from_stream(self, stream: TextIO) -> List[Node]:
-        """Loads a gedcom steam into a graph."""
+    def tokenize(self, config: Dict[str, str]) -> List[Node]:
+        """Tokenizes a gedcom file into a graph."""
+        if config["input"] == "-":
+            return self.tokenize_from_stream(sys.stdin)
+        with open(config["input"], "r") as stream:
+            return self.tokenize_from_stream(stream)
+
+    def tokenize_from_stream(self, stream: TextIO) -> List[Node]:
+        """Tokenizes a gedcom steam into a graph."""
         for line_bytes in stream.readlines():
             line = line_bytes.strip()
             tokens = line.split(" ")
@@ -514,8 +521,6 @@ def convert(config: Dict[str, str]) -> None:
     """API interface."""
     importer = GedcomImport()
     graph = importer.load(config)
-    for node in graph:
-        node.resolve(graph)
     root_family = graph_find(graph, config["rootfamily"])
     assert root_family
     subgraph = bfs(root_family, config)

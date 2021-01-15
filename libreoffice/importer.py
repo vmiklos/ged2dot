@@ -60,8 +60,6 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         dot = io.StringIO()
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        for node in graph:
-            node.resolve(graph)
         root_node = ged2dot.graph_find(graph, config["rootfamily"])
         assert root_node
         subgraph = ged2dot.bfs(root_node, config)

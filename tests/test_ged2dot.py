@@ -24,7 +24,7 @@ class TestIndividual(unittest.TestCase):
             "input": "tests/nosex.ged",
         }
         importer = ged2dot.GedcomImport()
-        graph = importer.load(config)
+        graph = importer.tokenize(config)
         individual = ged2dot.graph_find(graph, "P3")
         assert individual
         assert isinstance(individual, ged2dot.Individual)
@@ -37,7 +37,7 @@ class TestIndividual(unittest.TestCase):
             "input": "tests/hello.ged",
         }
         importer = ged2dot.GedcomImport()
-        graph = importer.load(config)
+        graph = importer.tokenize(config)
         individual = ged2dot.graph_find(graph, "P1")
         assert individual
         assert isinstance(individual, ged2dot.Individual)
@@ -49,7 +49,7 @@ class TestIndividual(unittest.TestCase):
             "input": "tests/hello.ged",
         }
         importer = ged2dot.GedcomImport()
-        graph = importer.load(config)
+        graph = importer.tokenize(config)
         individual = ged2dot.graph_find(graph, "P1")
         # Make sure that this doesn't loop.
         self.assertNotEqual(str(individual), "")
@@ -63,7 +63,7 @@ class TestFamily(unittest.TestCase):
             "input": "tests/hello.ged",
         }
         importer = ged2dot.GedcomImport()
-        graph = importer.load(config)
+        graph = importer.tokenize(config)
         family = ged2dot.graph_find(graph, "F1")
         # Make sure that this doesn't loop.
         self.assertNotEqual(str(family), "")
@@ -78,7 +78,7 @@ class TestGedcomImport(unittest.TestCase):
             "input": "tests/no_surname.ged",
         }
         importer = ged2dot.GedcomImport()
-        graph = importer.load(config)
+        graph = importer.tokenize(config)
         individual = ged2dot.graph_find(graph, "P1")
         assert individual
         assert isinstance(individual, ged2dot.Individual)
@@ -93,8 +93,6 @@ class TestGedcomImport(unittest.TestCase):
         }
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        for node in graph:
-            node.resolve(graph)
         root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
         subgraph = ged2dot.bfs(root_family, config)
@@ -108,8 +106,6 @@ class TestGedcomImport(unittest.TestCase):
         }
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        for node in graph:
-            node.resolve(graph)
         root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
         subgraph = ged2dot.bfs(root_family, config)
@@ -208,8 +204,6 @@ class TestMain(unittest.TestCase):
         }
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        for node in graph:
-            node.resolve(graph)
         root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
         subgraph = ged2dot.bfs(root_family, config)
@@ -225,8 +219,6 @@ class TestMain(unittest.TestCase):
         }
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        for node in graph:
-            node.resolve(graph)
         root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
         neighbours = root_family.get_neighbours()
@@ -248,8 +240,6 @@ class TestMain(unittest.TestCase):
         }
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        for node in graph:
-            node.resolve(graph)
         root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
         neighbours = root_family.get_neighbours()
@@ -401,8 +391,6 @@ class TestMain2(unittest.TestCase):
         }
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        for node in graph:
-            node.resolve(graph)
         root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
         subgraph = ged2dot.bfs(root_family, config)
