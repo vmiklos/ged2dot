@@ -117,7 +117,7 @@ class TestGedcomImport(unittest.TestCase):
 
 
 class TestMain(unittest.TestCase):
-    """Tests main()."""
+    """Tests main(), first test set."""
     def test_happy(self) -> None:
         """Tests the happy path."""
         config = {
@@ -389,6 +389,33 @@ class TestMain(unittest.TestCase):
         with unittest.mock.patch('sys.argv', argv):
             with unittest.mock.patch('ged2dot.convert', mock_convert):
                 ged2dot.main()
+
+
+class TestMain2(unittest.TestCase):
+    """Tests main(), second test set."""
+    def test_cousins_marrying(self) -> None:
+        """Tests cousins marrying."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/cousins-marrying.ged",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        for node in graph:
+            node.resolve(graph)
+        root_family = ged2dot.graph_find(graph, "F1")
+        assert root_family
+        subgraph = ged2dot.bfs(root_family, config)
+        # 8 nodes:
+        # 1) A
+        # 2) B
+        # 3) family in which A and B are kids
+        # 4) A's family
+        # 5) B's family
+        # 6) A's kid: C
+        # 7) B's kid: D
+        # 8) C and D's family
+        self.assertEqual(len(subgraph), 8)
 
 
 class TestGetAbspath(unittest.TestCase):
