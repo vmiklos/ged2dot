@@ -44,8 +44,6 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         }
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
-        for node in graph:
-            node.resolve(graph)
         self.family_dict = {}
         for node in graph:
             if not isinstance(node, ged2dot.Family):

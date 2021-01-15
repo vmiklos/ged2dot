@@ -63,8 +63,6 @@ class Widgets:
             }
             ged_import = ged2dot.GedcomImport()
             graph = ged_import.load(import_config)
-            for node in graph:
-                node.resolve(graph)
             self.rootfamily_value.clear()
             for node in graph:
                 if not isinstance(node, ged2dot.Family):
