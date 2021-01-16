@@ -27,7 +27,7 @@ A typical flow is:
 ----
 ... hack hack hack ...
 make check-mypy
-ged2dot && dot -Tsvg -o test.svg test.dot # test the changes
+ged2dot --input test.ged --output test.dot && dot -Tsvg -o test.svg test.dot # test the changes
 ----
 
 Once you're happy with your change:
