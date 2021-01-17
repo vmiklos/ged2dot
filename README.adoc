@@ -34,6 +34,8 @@ Some example more tricky cases, which are handled by `ged2dot`:
 
 - root family -> husband -> grand father -> showing both wives with the matching kids
 
+- marrying cousins
+
 (ged2dot <= 7.0 allowed multiple layouts, none of them supported the above more tricky cases.)
 
 == Qt-based GUI
