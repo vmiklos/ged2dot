@@ -1,5 +1,5 @@
 OS = $(shell uname)
-VERSION = $(shell git describe)
+VERSION = 7.1-rc1
 
 PYTHON_UNSAFE_OBJECTS = \
 	libreoffice/base.py \
@@ -45,19 +45,24 @@ check-unit:
 %.pylint : %.py Makefile .pylintrc
 	env PYTHONPATH=. pylint $< && touch $@
 
+# If not macOS, assume Linux.
 pack:
 	rm -rf dist
+ifeq ($(OS),Darwin)
 	pyinstaller \
 		-y \
 		--clean \
 		--windowed \
-		$(if $(filter Darwin,$(OS)),--icon icon.icns,) \
-		$(if $(filter Darwin,$(OS)),--osx-bundle-identifier hu.vmiklos.ged2dot,) \
+		--icon icon.icns \
+		--osx-bundle-identifier hu.vmiklos.ged2dot \
 		--add-data="placeholder-f.png:." \
 		--add-data="placeholder-m.png:." \
 		--add-data="placeholder-u.png:." \
 		--add-binary="$(DOT):." \
 		qged2dot.py
-ifeq ($(OS),Darwin)
 	hdiutil create dist/qged2dot-$(VERSION).dmg -srcfolder dist/qged2dot.app -ov
+else
+	make -C libreoffice VERSION=$(VERSION)
+	mkdir -p dist
+	cp libreoffice/*.oxt dist/
 endif

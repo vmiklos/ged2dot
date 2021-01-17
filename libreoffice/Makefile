@@ -3,7 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 NAME = gedcom
+ifeq ($(VERSION),)
 VERSION = $(shell git describe)
+endif
 OXT = $(NAME)-$(VERSION).oxt
 PACKAGE = hu.vmiklos.libreoffice.Draw.GedcomImportFilter
 
@@ -18,7 +20,7 @@ $(OXT): $(PARENTFILES_SRC) $(MYFILES) Makefile
 	zip -q $(OXT) $(PARENTFILES) $(MYFILES)
 	rm -f $(PARENTFILES)
 
-description.xml: description.in.xml ../.git/refs/heads/master
+description.xml: description.in.xml
 	echo '[build XML] description'
 	sed 's/@VERSION@/$(VERSION)/' description.in.xml > description.xml
 
