@@ -21,7 +21,6 @@ PYTHON_OBJECTS = \
 	$(PYTHON_SAFE_OBJECTS) \
 	$(PYTHON_TEST_OBJECTS) \
 
-DOT = $(shell which dot)
 all:
 
 check: check-mypy check-flake8 check-pylint check-unit
@@ -58,7 +57,6 @@ ifeq ($(OS),Darwin)
 		--add-data="placeholder-f.png:." \
 		--add-data="placeholder-m.png:." \
 		--add-data="placeholder-u.png:." \
-		--add-binary="$(DOT):." \
 		qged2dot.py
 	hdiutil create dist/qged2dot-$(VERSION).dmg -srcfolder dist/qged2dot.app -ov
 else

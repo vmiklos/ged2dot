@@ -11,10 +11,6 @@
 
 pip install -r requirements.txt
 
-if [ -n "${GITHUB_JOB}" -a "$(uname -s)" == "Darwin" ]; then
-    brew install graphviz
-fi
-
 make -j$(getconf _NPROCESSORS_ONLN) check
 
 make pack

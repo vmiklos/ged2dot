@@ -137,7 +137,11 @@ class Widgets:
     @staticmethod
     def to_png(dot_path: str, png_path: str) -> None:
         """Convert the generated .dot further to .png, using dot."""
-        graphviz = subprocess.Popen(["dot", "-Tpng"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        dot_path = "dot"
+        if os.path.exists("/usr/local/bin/dot"):
+            # Help the macOS + brew case.
+            dot_path = "/usr/local/bin/dot"
+        graphviz = subprocess.Popen([dot_path, "-Tpng"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         assert graphviz.stdin
         with open(dot_path, "r") as text_stream:
             graphviz.stdin.write(text_stream.read().encode("utf-8"))
