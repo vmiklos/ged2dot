@@ -410,6 +410,19 @@ class TestMain2(unittest.TestCase):
         # 8) C and D's family
         self.assertEqual(len(subgraph), 8)
 
+    def test_multiline_note(self) -> None:
+        """Tests multiline notes."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/multiline-note.ged",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        person = ged2dot.graph_find(graph, "P2")
+        assert person
+        assert isinstance(person, ged2dot.Individual)
+        self.assertEqual(person.get_config().get_note(), "This is a note with\n3\nlines")
+
 
 class TestGetAbspath(unittest.TestCase):
     """Tests get_abspath()."""
