@@ -254,6 +254,11 @@ class TestMain(unittest.TestCase):
 
     def test_config_input_default(self) -> None:
         """Tests config: input: default."""
+        class BufferHolder:
+            """Mock for sys.stdin."""
+            def __init__(self) -> None:
+                self.buffer = io.BytesIO()
+
         def mock_convert(config: Dict[str, str]) -> None:
             self.assertEqual(config["input"], "-")
         argv = [""]
@@ -263,12 +268,12 @@ class TestMain(unittest.TestCase):
 
         # Now test reading from stdin.
         argv = ["", "--output", "tests/output.dot"]
-        buf = io.StringIO()
-        with open("tests/happy.ged") as stream:
-            buf.write(stream.read())
-            buf.seek(0)
+        stdin = BufferHolder()
+        with open("tests/happy.ged", "rb") as stream:
+            stdin.buffer.write(stream.read())
+            stdin.buffer.seek(0)
         with unittest.mock.patch('sys.argv', argv):
-            with unittest.mock.patch('sys.stdin', buf):
+            with unittest.mock.patch('sys.stdin', stdin):
                 ged2dot.main()
 
     def test_config_input_custom(self) -> None:

@@ -7,6 +7,7 @@
 
 """A version of ged2dot that uses breadth-first search to traverse the gedcom graph."""
 
+from typing import BinaryIO
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -399,14 +400,16 @@ class GedcomImport:
     def tokenize(self, config: Dict[str, str]) -> List[Node]:
         """Tokenizes a gedcom file into a graph."""
         if config["input"] == "-":
-            return self.tokenize_from_stream(sys.stdin)
-        with open(config["input"], "r") as stream:
+            return self.tokenize_from_stream(sys.stdin.buffer)
+        with open(config["input"], "rb") as stream:
             return self.tokenize_from_stream(stream)
 
-    def tokenize_from_stream(self, stream: TextIO) -> List[Node]:
+    def tokenize_from_stream(self, stream: BinaryIO) -> List[Node]:
         """Tokenizes a gedcom steam into a graph."""
-        for line_bytes in stream.readlines():
-            line = line_bytes.strip()
+        for line_bytes in stream.read().split(b"\r\n"):
+            line = line_bytes.strip().decode("utf-8")
+            if not line:
+                continue
             tokens = line.split(" ")
 
             first_token = tokens[0]
