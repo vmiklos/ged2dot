@@ -127,6 +127,38 @@ def get_data_abspath(gedcom: str, path: str) -> str:
     return os.path.join(os.path.dirname(os.path.realpath(gedcom)), path)
 
 
+class IndividualConfig:
+    """Key-value pairs on an individual."""
+    def __init__(self) -> None:
+        self.__note = ""
+        self.__birth = ""
+        self.__death = ""
+
+    def set_note(self, note: str) -> None:
+        """Sets a note."""
+        self.__note = note
+
+    def get_note(self) -> str:
+        """Gets a note."""
+        return self.__note
+
+    def set_birth(self, birth: str) -> None:
+        """Sets the birth date."""
+        self.__birth = birth
+
+    def get_birth(self) -> str:
+        """Gets the birth date."""
+        return self.__birth
+
+    def set_death(self, death: str) -> None:
+        """Sets the death date."""
+        self.__death = death
+
+    def get_death(self) -> str:
+        """Gets the death date."""
+        return self.__death
+
+
 class Individual(Node):
     """An individual is always a child in a family, and is an adult in 0..* families."""
     def __init__(self) -> None:
@@ -140,8 +172,7 @@ class Individual(Node):
         self.__dict["forename"] = ""
         self.__dict["surname"] = ""
         self.__dict["sex"] = ""
-        self.__dict["birth"] = ""
-        self.__dict["death"] = ""
+        self.__config = IndividualConfig()
 
     def __str__(self) -> str:
         # Intentionally only print the famc/fams IDs, not the whole object to avoid not wanted
@@ -164,6 +195,10 @@ class Individual(Node):
             ret.append(self.famc)
         ret += self.fams_list
         return ret
+
+    def get_config(self) -> IndividualConfig:
+        """Returns key-value pairs of individual."""
+        return self.__config
 
     def set_identifier(self, identifier: str) -> None:
         """Sets the ID of this individual."""
@@ -210,26 +245,10 @@ class Individual(Node):
         """Gets the child family ID."""
         return self.__dict["famc_id"]
 
-    def set_birth(self, birth: str) -> None:
-        """Sets the birth date."""
-        self.__dict["birth"] = birth
-
-    def get_birth(self) -> str:
-        """Gets the birth date."""
-        return self.__dict["birth"]
-
-    def set_death(self, death: str) -> None:
-        """Sets the death date."""
-        self.__dict["death"] = death
-
-    def get_death(self) -> str:
-        """Gets the death date."""
-        return self.__dict["death"]
-
     def get_label(self, image_dir: str, name_order: str) -> str:
         """Gets the graphviz label."""
         image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname())
-        image_path += " " + self.get_birth() + ".jpg"
+        image_path += " " + self.get_config().get_birth() + ".jpg"
         if not os.path.exists(image_path):
             if self.get_sex():
                 sex = self.get_sex().lower()
@@ -247,7 +266,7 @@ class Individual(Node):
             # Little endian: given name first.
             label += self.get_forename() + "<br/>"
             label += self.get_surname() + "<br/>"
-        label += self.get_birth() + "-" + self.get_death()
+        label += self.get_config().get_birth() + "-" + self.get_config().get_death()
         label += "</td></tr></table>"
         return label
 
@@ -379,16 +398,23 @@ class GedcomImport:
                 self.individual.set_famc_id(line[6:-1])
         elif line.startswith("FAMS") and self.individual:
             self.individual.fams_ids.append(line[6:-1])
-        elif line.startswith("BIRT"):
-            self.in_birt = True
-        elif line.startswith("DEAT"):
-            self.in_deat = True
         elif line.startswith("HUSB") and self.family:
             self.family.set_husb_id(line[6:-1])
         elif line.startswith("WIFE") and self.family:
             self.family.set_wife_id(line[6:-1])
         elif line.startswith("CHIL") and self.family:
             self.family.child_ids.append(line[6:-1])
+        else:
+            self.__handle_individual_config(line)
+
+    def __handle_individual_config(self, line: str) -> None:
+        """Handles fields stored in individual.get_config()."""
+        if line.startswith("BIRT"):
+            self.in_birt = True
+        elif line.startswith("DEAT"):
+            self.in_deat = True
+        elif line.startswith("NOTE") and self.individual:
+            self.individual.get_config().set_note(line[5:])
 
     def load(self, config: Dict[str, str]) -> List[Node]:
         """Tokenizes and resolves a gedcom file into a graph."""
@@ -427,9 +453,9 @@ class GedcomImport:
                 if rest.startswith("DATE") and self.individual:
                     year = rest.split(' ')[-1]
                     if self.in_birt:
-                        self.individual.set_birth(year)
+                        self.individual.get_config().set_birth(year)
                     elif self.in_deat:
-                        self.individual.set_death(year)
+                        self.individual.get_config().set_death(year)
         return self.graph
 
 
