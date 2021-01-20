@@ -43,8 +43,12 @@ Some example more tricky cases, which are handled by `ged2dot`:
 The `qged2dot.py` script is a Qt-based GUI for `ged2dot`. Releases also include a DMG for macOS,
 which bundles Graphviz, so you don't have to install it manually.
 
-The DMG is not signed digitally, so you need to allow its usage
-https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac[explicitly].
+For macOS:
+
+- The DMG is not signed digitally, so you need to allow its usage
+  https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac[explicitly].
+
+- You need to install `graphviz` from https://brew.sh/[brew].
 
 The app icon is by https://icon-icons.com/icon/family-tree/120659[Appzgear].
 
