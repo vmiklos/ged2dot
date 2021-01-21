@@ -56,8 +56,8 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         return dot_path
 
     @staticmethod
-    def __to_dot(config: Dict[str, str]) -> io.StringIO:
-        dot = io.StringIO()
+    def __to_dot(config: Dict[str, str]) -> io.BytesIO:
+        dot = io.BytesIO()
         importer = ged2dot.GedcomImport()
         graph = importer.load(config)
         root_node = ged2dot.graph_find(graph, config["rootfamily"])
@@ -93,7 +93,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         graphviz = subprocess.Popen([dot_path, '-Tsvg'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         dot.seek(0)
         assert graphviz.stdin
-        graphviz.stdin.write(dot.read().encode('utf-8'))
+        graphviz.stdin.write(dot.read())
         graphviz.stdin.close()
         noinline = io.BytesIO()
         assert graphviz.stdout
