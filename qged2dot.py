@@ -143,8 +143,8 @@ class Widgets:
             dot_binary_path = "/usr/local/bin/dot"
         graphviz = subprocess.Popen([dot_binary_path, "-Tpng"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         assert graphviz.stdin
-        with open(dot_path, "r") as text_stream:
-            graphviz.stdin.write(text_stream.read().encode("utf-8"))
+        with open(dot_path, "rb") as text_stream:
+            graphviz.stdin.write(text_stream.read())
         graphviz.stdin.close()
         assert graphviz.stdout
         with open(png_path, "wb") as bin_stream:
