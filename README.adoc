@@ -126,6 +126,10 @@ Icons are from
 http://www.wpzoom.com/wpzoom/new-freebie-wpzoom-developer-icon-set-154-free-icons/[WPZOOM],
 in case placeholders have to be used for missing images.
 
+== Resources
+
+- https://www.familysearch.org/developers/docs/guides/gedcom[GEDCOM specification]
+
 == Download
 
 From https://github.com/vmiklos/ged2dot[GitHub].
