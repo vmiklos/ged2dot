@@ -7,6 +7,7 @@ PYTHON_UNSAFE_OBJECTS = \
 	libreoffice/importer.py \
 	libreoffice/loader.py \
 	qged2dot.py \
+	tools/pack.py \
 
 PYTHON_SAFE_OBJECTS = \
 	ged2dot.py \
@@ -48,16 +49,7 @@ check-unit:
 pack:
 	rm -rf dist
 ifeq ($(OS),Darwin)
-	pyinstaller \
-		-y \
-		--clean \
-		--windowed \
-		--icon icon.icns \
-		--osx-bundle-identifier hu.vmiklos.ged2dot \
-		--add-data="placeholder-f.png:." \
-		--add-data="placeholder-m.png:." \
-		--add-data="placeholder-u.png:." \
-		qged2dot.py
+	tools/pack.py
 	hdiutil create dist/qged2dot-$(VERSION).dmg -srcfolder dist/qged2dot.app -ov
 else
 	make -C libreoffice VERSION=$(VERSION)
