@@ -40,13 +40,15 @@ def get_version() -> str:
 def main() -> None:
     """Commandline interface to this module."""
     run_pyinstaller()
-    if sys.platform == "darwin":
-        # Using hdiutil instead.
-        return
-
     version = get_version()
     version += "-" + platform.system().lower()
     version += "-" + platform.machine().lower()
+    if sys.platform == "darwin":
+        args = ["hdiutil", "create", "dist/qged2dot-" + version + ".dmg", "-srcfolder", "dist/qged2dot.app", "-ov"]
+        print("Running '" + " ".join(args) + "'...")
+        subprocess.run(args, check=True)
+        return
+
     os.chdir("dist")
     with zipfile.ZipFile("qged2dot-" + version + ".zip", "w", zipfile.ZIP_DEFLATED) as stream:
         root_path = "qged2dot"
