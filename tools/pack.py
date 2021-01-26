@@ -9,10 +9,13 @@
 
 import subprocess
 import sys
+import os
+import zipfile
+import platform
 
 
-def main() -> None:
-    """Commandline interface to this module."""
+def run_pyinstaller() -> None:
+    """Invokes pyinstaller with the platform-specific flags."""
     args = ["pyinstaller", "-y", "--clean", "--windowed"]
 
     if sys.platform == "darwin":
@@ -20,9 +23,37 @@ def main() -> None:
         args.extend(["--osx-bundle-identifier", "hu.vmiklos.ged2dot"])
 
     for sex in ["f", "m", "u"]:
-        args.append("--add-data=placeholder-" + sex + ".png:.")
+        args.append("--add-data=placeholder-" + sex + ".png" + os.pathsep + ".")
     args.append("qged2dot.py")
     subprocess.run(args, check=True)
+
+
+def get_version() -> str:
+    """Extracts the version number from the Makefile."""
+    with open("Makefile") as stream:
+        for line in stream.readlines():
+            if line.startswith("VERSION = "):
+                return line.split(" = ")[1].strip()
+    return ""
+
+
+def main() -> None:
+    """Commandline interface to this module."""
+    run_pyinstaller()
+    if sys.platform == "darwin":
+        # Using hdiutil instead.
+        return
+
+    version = get_version()
+    version += "-" + platform.system().lower()
+    version += "-" + platform.machine().lower()
+    os.chdir("dist")
+    with zipfile.ZipFile("qged2dot-" + version + ".zip", "w", zipfile.ZIP_DEFLATED) as stream:
+        root_path = "qged2dot"
+        for root, _dirs, files in os.walk(root_path):
+            for file in files:
+                stream.write(os.path.join(root, file),
+                             os.path.relpath(os.path.join(root, file), os.path.join(root_path, '..')))
 
 
 if __name__ == "__main__":

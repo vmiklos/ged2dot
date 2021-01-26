@@ -53,7 +53,7 @@ For macOS:
 For Windows:
 
 - You need to install https://chocolatey.org/[choco], then `dot` itself with `choco install
-  graphviz`.
+  graphviz`, finally run `dot -c` to register the PNG output plugin.
 
 The app icon is by https://icon-icons.com/icon/family-tree/120659[Appzgear].
 
