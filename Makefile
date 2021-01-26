@@ -50,7 +50,6 @@ pack:
 	rm -rf dist
 ifeq ($(OS),Darwin)
 	tools/pack.py
-	hdiutil create dist/qged2dot-$(VERSION).dmg -srcfolder dist/qged2dot.app -ov
 else
 	make -C libreoffice VERSION=$(VERSION)
 	mkdir -p dist
