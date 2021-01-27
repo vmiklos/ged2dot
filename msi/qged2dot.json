@@ -1,0 +1,22 @@
+{
+    "upgrade_guid": "062a50ee-5d26-4cad-b92d-a06fc395c972",
+    "version": "1.0.0",
+    "product_name": "qged2dot",
+    "manufacturer": "vmiklos",
+    "name": "qged2dot",
+    "name_base": "qged2dot",
+    "comments": "ged to dot converter",
+    "installdir": "qged2dot",
+    "license_file": "license.rtf",
+    "startmenu_shortcut": "qged2dot.exe",
+     "desktop_shortcut": "qged2dot.exe",
+    "parts": [
+        {
+         "id": "MainProgram",
+         "title": "qged2dot",
+         "description": "ged to dot converter",
+         "absent": "disallow",
+         "staged_dir": "qged2dot"
+        }
+    ]
+}
