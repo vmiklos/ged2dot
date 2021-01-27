@@ -21,10 +21,14 @@ def run_pyinstaller() -> None:
     if sys.platform == "darwin":
         args.extend(["--icon", "icon.icns"])
         args.extend(["--osx-bundle-identifier", "hu.vmiklos.ged2dot"])
+    elif sys.platform.startswith("win"):
+        args.extend(["--icon", "icon.ico"])
 
     for sex in ["f", "m", "u"]:
         args.append("--add-data=placeholder-" + sex + ".png" + os.pathsep + ".")
+    args.append("--add-data=icon.svg" + os.pathsep + ".")
     args.append("qged2dot.py")
+    print("Running '" + " ".join(args) + "'...")
     subprocess.run(args, check=True)
 
 
