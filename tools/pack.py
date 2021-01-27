@@ -41,8 +41,14 @@ def main() -> None:
     """Commandline interface to this module."""
     run_pyinstaller()
     version = get_version()
-    version += "-" + platform.system().lower()
-    version += "-" + platform.machine().lower()
+    system = platform.system().lower()
+    if sys.platform == "darwin":
+        system = "macos"
+    version += "-" + system
+    machine = platform.machine().lower()
+    if system == "windows" and machine == "amd64":
+        machine = "x64"
+    version += "-" + machine
     if sys.platform == "darwin":
         args = ["hdiutil", "create", "dist/qged2dot-" + version + ".dmg", "-srcfolder", "dist/qged2dot.app", "-ov"]
         print("Running '" + " ".join(args) + "'...")
@@ -50,7 +56,9 @@ def main() -> None:
         return
 
     os.chdir("dist")
-    with zipfile.ZipFile("qged2dot-" + version + ".zip", "w", zipfile.ZIP_DEFLATED) as stream:
+    zip_path = "qged2dot-" + version + ".zip"
+    print("Creating '" + zip_path + "'...")
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as stream:
         root_path = "qged2dot"
         for root, _dirs, files in os.walk(root_path):
             for file in files:
