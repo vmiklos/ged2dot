@@ -77,6 +77,7 @@ def main() -> None:
         old_path = glob.glob("*.msi")[0]
         new_path = "qged2dot-" + version + ".msi"
         os.rename(old_path, new_path)
+        print("Created '" + new_path + "'.")
         return
 
     os.chdir("dist")
