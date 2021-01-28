@@ -7,11 +7,15 @@
 
 """Wrapper around pyinstaller."""
 
+import os
+import platform
+import shutil
 import subprocess
 import sys
-import os
 import zipfile
-import platform
+import glob
+
+from msicreator import createmsi  # type: ignore
 
 
 def run_pyinstaller() -> None:
@@ -34,29 +38,45 @@ def run_pyinstaller() -> None:
 
 def get_version() -> str:
     """Extracts the version number from the Makefile."""
+    version = ""
     with open("Makefile") as stream:
         for line in stream.readlines():
             if line.startswith("VERSION = "):
-                return line.split(" = ")[1].strip()
-    return ""
+                version = line.split(" = ")[1].strip()
+                break
+
+    system = platform.system().lower()
+    if sys.platform == "darwin":
+        system = "macos"
+    version += "-" + system
+    machine = platform.machine().lower()
+    if sys.platform.startswith("win") and machine == "amd64":
+        machine = "x64"
+    version += "-" + machine
+    return version
 
 
 def main() -> None:
     """Commandline interface to this module."""
     run_pyinstaller()
     version = get_version()
-    system = platform.system().lower()
-    if sys.platform == "darwin":
-        system = "macos"
-    version += "-" + system
-    machine = platform.machine().lower()
-    if system == "windows" and machine == "amd64":
-        machine = "x64"
-    version += "-" + machine
     if sys.platform == "darwin":
         args = ["hdiutil", "create", "dist/qged2dot-" + version + ".dmg", "-srcfolder", "dist/qged2dot.app", "-ov"]
         print("Running '" + " ".join(args) + "'...")
         subprocess.run(args, check=True)
+        return
+    if sys.platform.startswith("win"):
+        os.chdir("dist")
+        shutil.copyfile("../msi/LICENSE.rtf", "LICENSE.rtf")
+        with open("../msi/qged2dot.json", "r") as stream:
+            buf = stream.read()
+        with open("qged2dot.json", "w") as stream:
+            stream.write(buf.replace("1.0.0", version.split("-")[0]))
+        print("Running createmsi...")
+        createmsi.run(["qged2dot.json"])
+        old_path = glob.glob("*.msi")[0]
+        new_path = "qged2dot-" + version + ".msi"
+        os.rename(old_path, new_path)
         return
 
     os.chdir("dist")
