@@ -8,6 +8,9 @@
 # Baseline: Windows 2019
 #
 
+choco install graphviz
+# Register plugins.
+dot -c
 choco install wixtools
 
 cd tools

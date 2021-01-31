@@ -27,6 +27,14 @@ def run_pyinstaller() -> None:
         args.extend(["--osx-bundle-identifier", "hu.vmiklos.ged2dot"])
     elif sys.platform.startswith("win"):
         args.extend(["--icon", "icon.ico"])
+        # Bundle graphviz.
+        binaries = glob.glob("c:/Program Files/Graphviz*/bin/dot.exe")
+        binaries.extend(glob.glob("c:/Program Files/Graphviz*/bin/*.dll"))
+        for binary in binaries:
+            args.append("--add-binary=" + binary + os.pathsep + ".")
+        configs = glob.glob("c:/Program Files/Graphviz*/bin/config*")
+        for config in configs:
+            args.append("--add-data=" + config + os.pathsep + ".")
 
     for sex in ["f", "m", "u"]:
         args.append("--add-data=placeholder-" + sex + ".png" + os.pathsep + ".")

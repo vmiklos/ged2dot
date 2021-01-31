@@ -33,6 +33,14 @@ from PyQt5.QtWidgets import QWidget
 import ged2dot
 
 
+def get_abspath(path: str) -> str:
+    """Make a path absolute, taking the script dir as a base dir."""
+    if os.path.isabs(path):
+        return path
+
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
+
+
 class Widgets:
     """Contains widgets which store shared state."""
     def __init__(self, window: QWidget) -> None:
@@ -141,6 +149,9 @@ class Widgets:
         if os.path.exists("/usr/local/bin/dot"):
             # Help the macOS + brew case.
             dot_binary_path = "/usr/local/bin/dot"
+        elif os.path.exists(get_abspath("dot.exe")):
+            # Help the Windows + bundled graphviz case.
+            dot_binary_path = get_abspath("dot.exe")
         graphviz = subprocess.Popen([dot_binary_path, "-Tpng"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         assert graphviz.stdin
         with open(dot_path, "rb") as text_stream:
