@@ -50,10 +50,7 @@ For macOS:
 
 - You need to install https://brew.sh/[brew], then `dot` itself with `brew install graphviz`.
 
-For Windows:
-
-- You need to install https://chocolatey.org/[choco], then `dot` itself with `choco install
-  graphviz`, finally run `dot -c` to register the PNG output plugin.
+The installer bundles Graphviz for Windows.
 
 The app icon is by https://icon-icons.com/icon/family-tree/120659[Appzgear].
 
