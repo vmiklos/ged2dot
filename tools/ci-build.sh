@@ -9,6 +9,10 @@
 # Baseline: Ubuntu 20.04 and macOS 10.15.
 #
 
+if [ "$GITHUB_JOB" == "macos" ]; then
+    brew install graphviz
+fi
+
 cd tools
 git clone https://github.com/jpakkane/msicreator
 cd msicreator

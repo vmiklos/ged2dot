@@ -146,9 +146,9 @@ class Widgets:
     def to_png(dot_path: str, png_path: str) -> None:
         """Convert the generated .dot further to .png, using dot."""
         dot_binary_path = "dot"
-        if os.path.exists("/usr/local/bin/dot"):
-            # Help the macOS + brew case.
-            dot_binary_path = "/usr/local/bin/dot"
+        if os.path.exists(get_abspath("dot")):
+            # Help the macOS + bundled graphviz case.
+            dot_binary_path = get_abspath("dot")
         elif os.path.exists(get_abspath("dot.exe")):
             # Help the Windows + bundled graphviz case.
             dot_binary_path = get_abspath("dot.exe")

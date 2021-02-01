@@ -25,6 +25,48 @@ def run_pyinstaller() -> None:
     if sys.platform == "darwin":
         args.extend(["--icon", "icon.icns"])
         args.extend(["--osx-bundle-identifier", "hu.vmiklos.ged2dot"])
+        # Bundle graphviz.
+        for binary in glob.glob("/usr/local/Cellar/graphviz/*/bin/dot"):
+            args.append("--add-binary=" + binary + os.pathsep + ".")
+        libraries = [
+            "graphviz",
+            "cairo",
+            "fontconfig",
+            "freetype",
+            "fribidi",
+            "gd",
+            "gdbm",
+            "gettext",
+            "glib",
+            "graphite2",
+            "gts",
+            "harfbuzz",
+            "icu4c",
+            "jasper",
+            "jpeg",
+            "libffi",
+            "libpng",
+            "libtiff",
+            "libtool",
+            "lzo",
+            "netpbm",
+            "openssl@1.1",
+            "pango",
+            "pcre",
+            "pixman",
+            "python",
+            "readline",
+            "sqlite",
+            "webp",
+            "xz",
+        ]
+        for library in libraries:
+            for binary in glob.glob("/usr/local/Cellar/" + library + "/*/lib/*.dylib"):
+                args.append("--add-binary=" + binary + os.pathsep + ".")
+        for binary in glob.glob("/usr/local/Cellar/graphviz/*/lib/graphviz/*.dylib"):
+            args.append("--add-binary=" + binary + os.pathsep + "graphviz")
+        for config in glob.glob("/usr/local/Cellar/graphviz/*/lib/graphviz/config*"):
+            args.append("--add-data=" + config + os.pathsep + "graphviz")
     elif sys.platform.startswith("win"):
         args.extend(["--icon", "icon.ico"])
         # Bundle graphviz.
