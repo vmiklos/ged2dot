@@ -9,7 +9,6 @@
 
 import io
 import os
-import subprocess
 import sys
 import traceback
 import webbrowser
@@ -29,16 +28,9 @@ from PyQt5.QtWidgets import QSpinBox
 from PyQt5.QtWidgets import QStatusBar
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
+import pygraphviz  # type: ignore
 
 import ged2dot
-
-
-def get_abspath(path: str) -> str:
-    """Make a path absolute, taking the script dir as a base dir."""
-    if os.path.isabs(path):
-        return path
-
-    return os.path.join(os.path.dirname(os.path.realpath(__file__)), path)
 
 
 class Widgets:
@@ -145,23 +137,8 @@ class Widgets:
     @staticmethod
     def to_png(dot_path: str, png_path: str) -> None:
         """Convert the generated .dot further to .png, using dot."""
-        dot_binary_path = "dot"
-        if os.path.exists(get_abspath("dot")):
-            # Help the macOS + bundled graphviz case.
-            dot_binary_path = get_abspath("dot")
-        elif os.path.exists(get_abspath("dot.exe")):
-            # Help the Windows + bundled graphviz case.
-            dot_binary_path = get_abspath("dot.exe")
-        graphviz = subprocess.Popen([dot_binary_path, "-Tpng"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        assert graphviz.stdin
-        with open(dot_path, "rb") as text_stream:
-            graphviz.stdin.write(text_stream.read())
-        graphviz.stdin.close()
-        assert graphviz.stdout
-        with open(png_path, "wb") as bin_stream:
-            bin_stream.write(graphviz.stdout.read())
-        graphviz.stdout.close()
-        graphviz.wait()
+        graph = pygraphviz.AGraph(dot_path)
+        graph.draw(png_path, format="png", prog="dot")
 
     @staticmethod
     def print_traceback() -> None:
