@@ -43,14 +43,10 @@ Some example more tricky cases, which are handled by `ged2dot`:
 The `qged2dot.py` script is a Qt-based GUI for `ged2dot`, which can turn the `dot` output into PNG
 files.
 
-For macOS:
+For macOS, the DMG is not signed digitally, so you need to allow its usage
+https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac[explicitly].
 
-- The DMG is not signed digitally, so you need to allow its usage
-  https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac[explicitly].
-
-- You need to install https://brew.sh/[brew], then `dot` itself with `brew install graphviz`.
-
-The installer bundles Graphviz for Windows.
+The installer bundles Graphviz for macOS and Windows.
 
 The app icon is by https://icon-icons.com/icon/family-tree/120659[Appzgear].
 
