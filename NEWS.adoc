@@ -1,12 +1,12 @@
 = Version descriptions
 
-== master
+== 7.1
 
 - Rewritten ged2dot to use BFS for graph traversal (much more robust, though some incompatible old
   options are now ignored)
 - Resolves: gh#19 fix infinite recursive stack in Individual.__str__ and Family.__str__
 - Resolves: gh#13 marrying cousins is now handled
-- Comes with a qged2dot GUI (packaged as DMG for macOS)
+- Comes with a qged2dot GUI (packaged as DMG for macOS, MSI for Windows)
 
 == 7.0
 
