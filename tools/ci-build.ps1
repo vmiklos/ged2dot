@@ -21,6 +21,8 @@ git checkout 57c0d083ee8ce6d5c9b417d88aa80a1c8d3d6419
 cd ..
 cd ..
 
+$GVPATH = Resolve-Path "C:/Program Files/Graphviz *" | Select -ExpandProperty Path
+pip install --global-option=build_ext --global-option="-I${GVPATH}/include" --global-option="-L${GVPATH}/lib/" pygraphviz==1.6
 python -m pip install -r requirements.txt
 
 python tools\pack.py

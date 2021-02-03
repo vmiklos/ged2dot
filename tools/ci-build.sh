@@ -11,6 +11,8 @@
 
 if [ "$GITHUB_JOB" == "macos" ]; then
     brew install graphviz
+elif [ -n "$GITHUB_JOB" ]; then
+    sudo apt-get install graphviz graphviz-dev
 fi
 
 cd tools
