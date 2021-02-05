@@ -3,6 +3,8 @@
 """Pygraphviz hook for pyinstaller."""
 
 import glob
+import os
+import shutil
 
 from PyInstaller.compat import is_win, is_darwin
 
@@ -10,15 +12,20 @@ binaries = []
 datas = []
 
 if is_darwin:
-    for binary in glob.glob("/usr/local/Cellar/graphviz/*/bin/dot"):
+    # The dot binary in PATH is typically a symlink, handle that.
+    # graphviz_bindir is e.g. /usr/local/Cellar/graphviz/2.46.0/bin
+    graphviz_bindir = os.path.dirname(os.path.realpath(shutil.which("dot")))
+    for binary in glob.glob(graphviz_bindir + "/*"):
         binaries.append((binary, "."))
-    for binary in glob.glob("/usr/local/Cellar/graphviz/*/lib/graphviz/*.dylib"):
+    # graphviz_bindir is e.g. /usr/local/Cellar/graphviz/2.46.0/lib/graphviz
+    graphviz_libdir = os.path.realpath(graphviz_bindir + "/../lib/graphviz")
+    for binary in glob.glob(graphviz_libdir + "/*.dylib"):
         binaries.append((binary, "graphviz"))
-    for data in glob.glob("/usr/local/Cellar/graphviz/*/lib/graphviz/config*"):
+    for data in glob.glob(graphviz_libdir + "/config*"):
         datas.append((data, "graphviz"))
 
 if is_win:
-    for binary in glob.glob("c:/Program Files/Graphviz*/bin/dot.exe"):
+    for binary in glob.glob("c:/Program Files/Graphviz*/bin/*.exe"):
         binaries.append((binary, "."))
     for binary in glob.glob("c:/Program Files/Graphviz*/bin/*.dll"):
         binaries.append((binary, "."))
