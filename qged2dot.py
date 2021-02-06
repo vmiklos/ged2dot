@@ -206,7 +206,7 @@ class Application:
         rootfamily_key = QLabel(self.window)
         rootfamily_key.setText("Family depth:")
         self.grid_layout.addWidget(rootfamily_key, 3, 0)
-        self.widgets.familydepth_value.setValue(4)
+        self.widgets.familydepth_value.setValue(3)
         self.grid_layout.addWidget(self.widgets.familydepth_value, 3, 1)
 
     def setup_imagedir(self) -> None:
