@@ -85,6 +85,7 @@ class Widgets:
         dialog.setAcceptMode(QFileDialog.AcceptSave)
         name_filters = [
             "PNG files (*.png)",
+            "SVG files (*.svg)",
             "Graphviz files (*.dot)",
         ]
         dialog.setNameFilters(name_filters)
@@ -121,24 +122,27 @@ class Widgets:
             if not self.nameorder_value.isChecked():
                 config["nameorder"] = "big"
             invoke_dot = False
-            if self.output_value.text().endswith(".png"):
+            if not self.output_value.text().endswith(".dot"):
                 invoke_dot = True
                 config["output"] = self.output_value.text() + ".dot"
             self.statusbar.showMessage("Converting to " + config["output"] + "...")
             ged2dot.convert(config)
             if invoke_dot:
                 self.statusbar.showMessage("Converting to " + self.output_value.text() + "...")
-                self.to_png(config["output"], self.output_value.text())
+                self.to_graphic(config["output"], self.output_value.text())
             webbrowser.open("file://" + self.output_value.text())
             self.statusbar.showMessage("Conversion finished successfully.")
         except Exception:  # pylint: disable=broad-except
             self.print_traceback()
 
     @staticmethod
-    def to_png(dot_path: str, png_path: str) -> None:
-        """Convert the generated .dot further to .png, using dot."""
+    def to_graphic(dot_path: str, graphic_path: str) -> None:
+        """Convert the generated .dot further to .png/.svg, using dot."""
         graph = pygraphviz.AGraph(dot_path)
-        graph.draw(png_path, format="png", prog="dot")
+        if graphic_path.endswith(".png"):
+            graph.draw(graphic_path, format="png", prog="dot")
+        else:
+            graph.draw(graphic_path, format="svg", prog="dot")
 
     @staticmethod
     def print_traceback() -> None:
