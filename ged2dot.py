@@ -384,7 +384,7 @@ class GedcomImport:
 
     def __handle_level1(self, line: str) -> None:
         self.__reset_flags()
-        
+
         line_lead_token = line.split(' ')[0]
 
         if line_lead_token == "SEX" and self.individual:
