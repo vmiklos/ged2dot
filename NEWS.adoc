@@ -1,5 +1,9 @@
 = Version descriptions
 
+== master
+
+- Better support for GenoPro-generated GED files (Andreas Hrubak)
+
 == 7.1
 
 - Rewritten ged2dot to use BFS for graph traversal (much more robust, though some incompatible old
