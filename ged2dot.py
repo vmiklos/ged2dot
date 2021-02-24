@@ -384,40 +384,44 @@ class GedcomImport:
 
     def __handle_level1(self, line: str) -> None:
         self.__reset_flags()
+        
+        line_lead_token = line.split(' ')[0]
 
-        if line.startswith("SEX") and self.individual:
+        if line_lead_token == "SEX" and self.individual:
             tokens = line.split(' ')
             if len(tokens) > 1:
                 self.individual.set_sex(tokens[1])
-        elif line.startswith("NAME") and self.individual:
+        elif line_lead_token == "NAME" and self.individual:
             line = line[5:]
             tokens = line.split('/')
             self.individual.set_forename(tokens[0].strip())
             if len(tokens) > 1:
                 self.individual.set_surname(tokens[1].strip())
-        elif line.startswith("FAMC") and self.individual:
+        elif line_lead_token == "FAMC" and self.individual:
             # At least <https://www.ancestry.com> sometimes writes multiple FAMC, which doesn't
             # make sense. Import only the first one.
             if not self.individual.get_famc_id():
                 self.individual.set_famc_id(line[6:-1])
-        elif line.startswith("FAMS") and self.individual:
+        elif line_lead_token == "FAMS" and self.individual:
             self.individual.fams_ids.append(line[6:-1])
-        elif line.startswith("HUSB") and self.family:
+        elif line_lead_token == "HUSB" and self.family:
             self.family.set_husb_id(line[6:-1])
-        elif line.startswith("WIFE") and self.family:
+        elif line_lead_token == "WIFE" and self.family:
             self.family.set_wife_id(line[6:-1])
-        elif line.startswith("CHIL") and self.family:
+        elif line_lead_token == "CHIL" and self.family:
             self.family.child_ids.append(line[6:-1])
         else:
             self.__handle_individual_config(line)
 
     def __handle_individual_config(self, line: str) -> None:
         """Handles fields stored in individual.get_config()."""
-        if line.startswith("BIRT"):
+        line_lead_token = line.split(' ')[0]
+
+        if line_lead_token == "BIRT":
             self.in_birt = True
-        elif line.startswith("DEAT"):
+        elif line_lead_token == "DEAT":
             self.in_deat = True
-        elif line.startswith("NOTE") and self.individual:
+        elif line_lead_token == "NOTE" and self.individual:
             self.individual.get_config().set_note(line[5:])
 
     def load(self, config: Dict[str, str]) -> List[Node]:
