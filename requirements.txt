@@ -3,5 +3,5 @@ flake8==3.8.4
 mypy==0.812
 pyinstaller==4.2
 pylint==2.6.0
-pyqt5==5.15.2
+pyqt5==5.15.3
 pygraphviz==1.6
