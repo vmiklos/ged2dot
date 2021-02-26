@@ -43,8 +43,9 @@ if is_darwin:
         datas.append((data, "graphviz"))
 
 if is_win:
-    for binary in progs:
-        binaries.append(("c:/Program Files/Graphviz*/bin/" + binary + ".exe", "."))
+    for prog in progs:
+        for binary in glob.glob("c:/Program Files/Graphviz*/bin/" + prog + ".exe"):
+            binaries.append((binary, "."))
     for binary in glob.glob("c:/Program Files/Graphviz*/bin/*.dll"):
         binaries.append((binary, "."))
     for data in glob.glob("c:/Program Files/Graphviz*/bin/config*"):
