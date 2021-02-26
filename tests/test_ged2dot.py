@@ -335,7 +335,7 @@ class TestMain(unittest.TestCase):
     def test_config_familydepth_default(self) -> None:
         """Tests config: familydepth: default."""
         def mock_convert(config: Dict[str, str]) -> None:
-            self.assertEqual(config["familydepth"], "4")
+            self.assertEqual(config["familydepth"], "3")
         argv = [""]
         with unittest.mock.patch('sys.argv', argv):
             with unittest.mock.patch('ged2dot.convert', mock_convert):

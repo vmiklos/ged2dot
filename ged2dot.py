@@ -26,7 +26,7 @@ class Config:
         self.rootfamily = "F1"
         # Could be 0, but defaulting to something that can easily explode on large input is not
         # helpful.
-        self.familydepth = "4"
+        self.familydepth = "3"
         self.imagedir = "images"
         self.nameorder = "little"
 
