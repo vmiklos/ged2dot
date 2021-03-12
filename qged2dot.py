@@ -7,14 +7,16 @@
 
 """Qt-based GUI for ged2dot."""
 
+from typing import cast
 import io
 import os
 import sys
 import traceback
 import webbrowser
 
-from PyQt5 import QtGui  # type: ignore
-from PyQt5.QtWidgets import QApplication  # type: ignore
+from PyQt5 import QtGui
+from PyQt5.QtCore import pyqtBoundSignal
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QDialogButtonBox
@@ -184,7 +186,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.input_value, 0, 1)
         input_button = QPushButton(self.window)
         input_button.setText("Browse...")
-        input_button.clicked.connect(self.widgets.set_input)
+        cast(pyqtBoundSignal, input_button.clicked).connect(self.widgets.set_input)
         self.grid_layout.addWidget(input_button, 0, 2)
 
     def setup_output(self) -> None:
@@ -195,7 +197,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.output_value, 1, 1)
         output_button = QPushButton(self.window)
         output_button.setText("Browse...")
-        output_button.clicked.connect(self.widgets.set_output)
+        cast(pyqtBoundSignal, output_button.clicked).connect(self.widgets.set_output)
         self.grid_layout.addWidget(output_button, 1, 2)
 
     def setup_rootfamily(self) -> None:
@@ -221,7 +223,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.imagedir_value, 4, 1)
         imagedir_button = QPushButton(self.window)
         imagedir_button.setText("Browse...")
-        imagedir_button.clicked.connect(self.widgets.set_imagedir)
+        cast(pyqtBoundSignal, imagedir_button.clicked).connect(self.widgets.set_imagedir)
         self.grid_layout.addWidget(imagedir_button, 4, 2)
 
     def setup_nameorder(self) -> None:
@@ -258,8 +260,8 @@ def main() -> None:
     button_box = QDialogButtonBox()
     button_box.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
     app.layout.addWidget(button_box)
-    button_box.button(QDialogButtonBox.Cancel).clicked.connect(sys.exit)
-    button_box.button(QDialogButtonBox.Ok).clicked.connect(app.widgets.convert)
+    cast(pyqtBoundSignal, button_box.button(QDialogButtonBox.Cancel).clicked).connect(sys.exit)
+    cast(pyqtBoundSignal, button_box.button(QDialogButtonBox.Ok).clicked).connect(app.widgets.convert)
     app.layout.addWidget(app.widgets.statusbar)
     app.widgets.update_status()
 
