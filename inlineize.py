@@ -28,9 +28,8 @@ def inlineize(from_path: Union[str, IO[bytes]], to_path: Union[str, IO[bytes]]) 
     for image in tree.findall('.//{%s}image' % NAMESPACES['svg']):
         xlinkhref = '{%s}href' % NAMESPACES['xlink']
         href = image.attrib[xlinkhref]
-        sock = open(href, 'rb')
-        image.attrib[xlinkhref] = "data:image/png;base64,%s" % base64.b64encode(sock.read()).decode('ascii')
-        sock.close()
+        with open(href, 'rb') as stream:
+            image.attrib[xlinkhref] = "data:image/png;base64,%s" % base64.b64encode(stream.read()).decode('ascii')
     tree.write(to_path)
 
 

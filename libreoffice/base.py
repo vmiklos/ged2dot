@@ -55,9 +55,8 @@ class GedcomBase:
             directory = os.path.dirname(path)
             if not os.path.exists(directory):
                 os.makedirs(directory)
-            sock = open(path, "a")
-            traceback.print_exc(file=sock)
-            sock.close()
+            with open(path, "a") as stream:
+                traceback.print_exc(file=stream)
         else:
             traceback.print_exc(file=sys.stderr)
 
