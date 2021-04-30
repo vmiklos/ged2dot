@@ -90,16 +90,16 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         dot = self.__to_dot(config)
 
         dot_path = self.__find_dot()
-        graphviz = subprocess.Popen([dot_path, '-Tsvg'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        dot.seek(0)
-        assert graphviz.stdin
-        graphviz.stdin.write(dot.read())
-        graphviz.stdin.close()
-        noinline = io.BytesIO()
-        assert graphviz.stdout
-        noinline.write(graphviz.stdout.read())
-        graphviz.stdout.close()
-        graphviz.wait()
+        with subprocess.Popen([dot_path, '-Tsvg'], stdin=subprocess.PIPE, stdout=subprocess.PIPE) as graphviz:
+            dot.seek(0)
+            assert graphviz.stdin
+            graphviz.stdin.write(dot.read())
+            graphviz.stdin.close()
+            noinline = io.BytesIO()
+            assert graphviz.stdout
+            noinline.write(graphviz.stdout.read())
+            graphviz.stdout.close()
+            graphviz.wait()
 
         noinline.seek(0)
         inline = io.BytesIO()
