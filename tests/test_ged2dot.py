@@ -424,6 +424,20 @@ class TestMain2(unittest.TestCase):
         assert isinstance(person, ged2dot.Individual)
         self.assertEqual(person.get_config().get_note(), "This is a note with\n3\nlines")
 
+    def test_no_cr(self) -> None:
+        """Tests the case when the file contains no \r."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/no-cr.ged",
+            "output": "tests/no-cr.dot",
+            "rootfamily": "F1",
+        }
+        if os.path.exists(config["output"]):
+            os.unlink(config["output"])
+        self.assertFalse(os.path.exists(config["output"]))
+        ged2dot.convert(config)
+        self.assertTrue(os.path.exists(config["output"]))
+
 
 class TestGetAbspath(unittest.TestCase):
     """Tests get_abspath()."""
