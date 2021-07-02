@@ -3,6 +3,7 @@
 == master
 
 - Better support for GenoPro-generated GED files (Andreas Hrubak)
+- Keep aspect ratio of images in the PDF output with long names (humaita)
 
 == 7.1
 
