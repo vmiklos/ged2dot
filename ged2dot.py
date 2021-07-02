@@ -260,7 +260,7 @@ class Individual(Node):
                 sex = 'u'
             image_path = get_abspath("placeholder-%s.png" % sex)
         label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
-        label += "<img src=\"" + image_path + "\"/>"
+        label += "<img scale=\"true\" src=\"" + image_path + "\"/>"
         label += "</td></tr><tr><td>"
         if name_order == "big":
             # Big endian: family name first.
