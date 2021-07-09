@@ -4,6 +4,7 @@
 
 - Better support for GenoPro-generated GED files (Andreas Hrubak)
 - Keep aspect ratio of images in the PDF output with long names (humaita)
+- New --relpath option to use relative paths when referring to images
 
 == 7.1
 

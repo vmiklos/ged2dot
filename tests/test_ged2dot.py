@@ -28,7 +28,7 @@ class TestIndividual(unittest.TestCase):
         individual = ged2dot.graph_find(graph, "P3")
         assert individual
         assert isinstance(individual, ged2dot.Individual)
-        self.assertIn("placeholder-u", individual.get_label("tests/images", "little"))
+        self.assertIn("placeholder-u", individual.get_label("tests/images", "little", basepath=""))
         self.assertEqual(individual.get_color(), "black")
 
     def test_big_endian_name(self) -> None:
@@ -41,7 +41,7 @@ class TestIndividual(unittest.TestCase):
         individual = ged2dot.graph_find(graph, "P1")
         assert individual
         assert isinstance(individual, ged2dot.Individual)
-        self.assertIn("A<br/>Alice", individual.get_label(image_dir="", name_order="big"))
+        self.assertIn("A<br/>Alice", individual.get_label(image_dir="", name_order="big", basepath=""))
 
     def test_str(self) -> None:
         """Tests __str()__."""
@@ -437,6 +437,33 @@ class TestMain2(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
+
+    def test_relpath(self) -> None:
+        """Tests the happy path."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/happy.ged",
+            "output": "tests/happy.dot",
+            "rootfamily": "F1",
+            "imagedir": os.path.join(os.getcwd(), "tests/images"),
+            "relpath": "true",
+        }
+        if os.path.exists(config["output"]):
+            os.unlink(config["output"])
+        self.assertFalse(os.path.exists(config["output"]))
+        ged2dot.convert(config)
+        self.assertTrue(os.path.exists(config["output"]))
+        with open(config["output"], "r") as stream:
+            self.assertNotIn('src="/', stream.read())
+
+    def test_config_relpath_custom(self) -> None:
+        """Tests config: relpath: custom."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["relpath"], "true")
+        argv = ["", "--relpath"]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
 
 
 class TestGetAbspath(unittest.TestCase):

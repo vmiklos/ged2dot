@@ -29,6 +29,7 @@ class Config:
         self.familydepth = "3"
         self.imagedir = "images"
         self.nameorder = "little"
+        self.relpath = "false"
 
     def read_config(self, config_file: str) -> None:
         """Reads config from a provided file."""
@@ -56,6 +57,8 @@ class Config:
             self.imagedir = args.imagedir
         if args.nameorder:
             self.nameorder = args.nameorder
+        if args.relpath:
+            self.relpath = "true"
 
     def get_dict(self) -> Dict[str, str]:
         """Gets the config as a dict."""
@@ -66,6 +69,7 @@ class Config:
             "familydepth": self.familydepth,
             "imagedir": self.imagedir,
             "nameorder": self.nameorder,
+            "relpath": self.relpath,
         }
         return config
 
@@ -249,7 +253,7 @@ class Individual(Node):
         """Gets the child family ID."""
         return self.__dict["famc_id"]
 
-    def get_label(self, image_dir: str, name_order: str) -> str:
+    def get_label(self, image_dir: str, name_order: str, basepath: str) -> str:
         """Gets the graphviz label."""
         image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname())
         image_path += " " + self.get_config().get_birth() + ".jpg"
@@ -259,6 +263,8 @@ class Individual(Node):
             else:
                 sex = 'u'
             image_path = get_abspath("placeholder-%s.png" % sex)
+        if basepath:
+            image_path = os.path.relpath(image_path, basepath)
         label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
         label += "<img scale=\"true\" src=\"" + image_path + "\"/>"
         label += "</td></tr><tr><td>"
@@ -510,7 +516,10 @@ class DotExport:
             image_dir = self.config.get("imagedir", "")
             image_dir_abs = get_data_abspath(self.config.get("input", ""), image_dir)
             name_order = self.config.get("nameorder", "little")
-            stream.write(to_bytes("label = <" + individual.get_label(image_dir_abs, name_order) + ">\n"))
+            basepath = ""
+            if self.config.get("relpath", "false") == "true" and self.config["output"] != "-":
+                basepath = os.path.dirname(os.path.abspath(self.config["output"]))
+            stream.write(to_bytes("label = <" + individual.get_label(image_dir_abs, name_order, basepath) + ">\n"))
             stream.write(to_bytes("color = " + individual.get_color() + "];\n"))
 
     def __store_family_nodes(self, stream: BinaryIO) -> None:
@@ -590,6 +599,8 @@ def main() -> None:
                         help="image directory")
     parser.add_argument("--nameorder", choices=["little", "big"],
                         help="name order")
+    parser.add_argument("--relpath", dest="relpath", action="store_true",
+                        help="try to use relative paths (default: false)")
     args = parser.parse_args()
     config = Config()
     config.read_config(args.config)
