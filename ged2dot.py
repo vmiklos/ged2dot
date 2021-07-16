@@ -267,7 +267,8 @@ class Individual(Node):
             image_path = os.path.relpath(image_path, basepath)
         label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
         label += "<img scale=\"true\" src=\"" + image_path + "\"/>"
-        label += "</td></tr><tr><td>"
+        # State the font face explicitly to help correct centering.
+        label += "</td></tr><tr><td><font face=\"Times\">"
         if name_order == "big":
             # Big endian: family name first.
             label += self.get_surname() + "<br/>"
@@ -277,7 +278,7 @@ class Individual(Node):
             label += self.get_forename() + "<br/>"
             label += self.get_surname() + "<br/>"
         label += self.get_config().get_birth() + "-" + self.get_config().get_death()
-        label += "</td></tr></table>"
+        label += "</font></td></tr></table>"
         return label
 
     def get_color(self) -> str:
