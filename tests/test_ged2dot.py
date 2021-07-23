@@ -465,6 +465,22 @@ class TestMain2(unittest.TestCase):
             with unittest.mock.patch('ged2dot.convert', mock_convert):
                 ged2dot.main()
 
+    def test_death_date(self) -> None:
+        """Tests the case when no birth date is provided."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/death_date.ged",
+            "output": "tests/death_date.dot",
+            "rootfamily": "F1",
+        }
+        if os.path.exists(config["output"]):
+            os.unlink(config["output"])
+        self.assertFalse(os.path.exists(config["output"]))
+        ged2dot.convert(config)
+        self.assertTrue(os.path.exists(config["output"]))
+        with open(config["output"], "r") as stream:
+            self.assertIn("† Y", stream.read())
+
 
 class TestGetAbspath(unittest.TestCase):
     """Tests get_abspath()."""

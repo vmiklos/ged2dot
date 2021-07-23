@@ -277,7 +277,10 @@ class Individual(Node):
             # Little endian: given name first.
             label += self.get_forename() + "<br/>"
             label += self.get_surname() + "<br/>"
-        label += self.get_config().get_birth() + "-" + self.get_config().get_death()
+        if not self.get_config().get_birth() and self.get_config().get_death():
+            label += "† " + self.get_config().get_death()
+        else:
+            label += self.get_config().get_birth() + "-" + self.get_config().get_death()
         label += "</font></td></tr></table>"
         return label
 
