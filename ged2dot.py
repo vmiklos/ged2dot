@@ -29,6 +29,7 @@ class Config:
         self.familydepth = "3"
         self.imagedir = "images"
         self.nameorder = "little"
+        self.birthformat = "{}-"
         self.relpath = "false"
 
     def read_config(self, config_file: str) -> None:
@@ -57,6 +58,8 @@ class Config:
             self.imagedir = args.imagedir
         if args.nameorder:
             self.nameorder = args.nameorder
+        if args.birthformat:
+            self.birthformat = args.birthformat
         if args.relpath:
             self.relpath = "true"
 
@@ -69,6 +72,7 @@ class Config:
             "familydepth": self.familydepth,
             "imagedir": self.imagedir,
             "nameorder": self.nameorder,
+            "birthformat": self.birthformat,
             "relpath": self.relpath,
         }
         return config
@@ -253,7 +257,7 @@ class Individual(Node):
         """Gets the child family ID."""
         return self.__dict["famc_id"]
 
-    def get_label(self, image_dir: str, name_order: str, basepath: str) -> str:
+    def get_label(self, image_dir: str, name_order: str, birth_format: str, basepath: str) -> str:
         """Gets the graphviz label."""
         image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname())
         image_path += " " + self.get_config().get_birth() + ".jpg"
@@ -277,7 +281,9 @@ class Individual(Node):
             # Little endian: given name first.
             label += self.get_forename() + "<br/>"
             label += self.get_surname() + "<br/>"
-        if not self.get_config().get_birth() and self.get_config().get_death():
+        if self.get_config().get_birth() and not self.get_config().get_death():
+            label += birth_format.format(self.get_config().get_birth())
+        elif not self.get_config().get_birth() and self.get_config().get_death():
             label += "† " + self.get_config().get_death()
         else:
             label += self.get_config().get_birth() + "-" + self.get_config().get_death()
@@ -520,10 +526,12 @@ class DotExport:
             image_dir = self.config.get("imagedir", "")
             image_dir_abs = get_data_abspath(self.config.get("input", ""), image_dir)
             name_order = self.config.get("nameorder", "little")
+            birth_format = self.config.get("birthformat", "{}-")
             basepath = ""
             if self.config.get("relpath", "false") == "true" and self.config["output"] != "-":
                 basepath = os.path.dirname(os.path.abspath(self.config["output"]))
-            stream.write(to_bytes("label = <" + individual.get_label(image_dir_abs, name_order, basepath) + ">\n"))
+            label = individual.get_label(image_dir_abs, name_order, birth_format, basepath)
+            stream.write(to_bytes("label = <" + label + ">\n"))
             stream.write(to_bytes("color = " + individual.get_color() + "];\n"))
 
     def __store_family_nodes(self, stream: BinaryIO) -> None:
@@ -603,6 +611,8 @@ def main() -> None:
                         help="image directory")
     parser.add_argument("--nameorder", choices=["little", "big"],
                         help="name order")
+    parser.add_argument("--birthformat", type=str,
+                        help="birth format when death is missing (default: '{}-', e.g. '1942-')")
     parser.add_argument("--relpath", dest="relpath", action="store_true",
                         help="try to use relative paths (default: false)")
     args = parser.parse_args()
