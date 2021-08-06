@@ -30,7 +30,7 @@ def run_pyinstaller() -> None:
 
     args.append("--additional-hooks-dir=pyi")
     for sex in ["f", "m", "u"]:
-        args.append("--add-data=placeholder-" + sex + ".png" + os.pathsep + ".")
+        args.append("--add-data=placeholder-" + sex + ".svg" + os.pathsep + ".")
     args.append("--add-data=icon.svg" + os.pathsep + ".")
     args.append("qged2dot.py")
     print("Running '" + " ".join(args) + "'...")
