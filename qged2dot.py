@@ -86,8 +86,8 @@ class Widgets:
         dialog = QFileDialog()
         dialog.setAcceptMode(QFileDialog.AcceptSave)
         name_filters = [
-            "PNG files (*.png)",
             "SVG files (*.svg)",
+            "PNG files (*.png)",
             "Graphviz files (*.dot)",
         ]
         dialog.setNameFilters(name_filters)

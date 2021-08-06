@@ -9,7 +9,7 @@ endif
 OXT = $(NAME)-$(VERSION).oxt
 PACKAGE = hu.vmiklos.libreoffice.Draw.GedcomImportFilter
 
-PARENTFILES = inlineize.py ged2dot.py placeholder-m.png placeholder-f.png placeholder-u.png
+PARENTFILES = inlineize.py ged2dot.py placeholder-m.svg placeholder-f.svg placeholder-u.svg
 MYFILES = loader.py base.py importer.py dialog.py Config.xcs Config.xcu Filter.xcu Type.xcu description.xml META-INF/manifest.xml
 
 PARENTFILES_SRC = $(foreach FILE,$(PARENTFILES),../$(FILE))
