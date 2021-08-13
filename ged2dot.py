@@ -539,7 +539,12 @@ class DotExport:
         for node in self.subgraph:
             if not isinstance(node, Family):
                 continue
-            stream.write(to_bytes(node.get_identifier() + " [shape=point, width=0.1];\n"))
+            image_path = get_abspath("marriage.svg")
+            if self.config.get("relpath", "false") == "true" and self.config["output"] != "-":
+                basepath = os.path.dirname(os.path.abspath(self.config["output"]))
+                image_path = os.path.relpath(image_path, basepath)
+            label = "<table border=\"0\" cellborder=\"0\"><tr><td><img src=\"" + image_path + "\"/></td></tr></table>"
+            stream.write(to_bytes(node.get_identifier() + " [shape=circle, margin=\"0,0\", label=<" + label + ">];\n"))
         stream.write(to_bytes("\n"))
 
     def __store_edges(self, stream: BinaryIO) -> None:
