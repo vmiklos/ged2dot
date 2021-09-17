@@ -266,7 +266,7 @@ class Individual(Node):
                 sex = self.get_sex().lower()
             else:
                 sex = 'u'
-            image_path = get_abspath("placeholder-%s.svg" % sex)
+            image_path = get_abspath(f"placeholder-{sex}.svg")
         if basepath:
             image_path = os.path.relpath(image_path, basepath)
         label = "<table border=\"0\" cellborder=\"0\"><tr><td>"

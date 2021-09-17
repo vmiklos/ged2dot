@@ -25,7 +25,7 @@ class GedcomBase:
 
     def create_uno_service(self, name: str) -> Any:
         """Creates an UNO object instalce with the given name."""
-        return self.context.ServiceManager.createInstanceWithContext("com.sun.star.%s" % name, self.context)
+        return self.context.ServiceManager.createInstanceWithContext(f"com.sun.star.{name}", self.context)
 
     @staticmethod
     def to_dict(args: Iterable[Any]) -> Dict[str, Any]:

@@ -29,7 +29,7 @@ def inlineize(from_path: Union[str, IO[bytes]], to_path: Union[str, IO[bytes]]) 
         xlinkhref = '{%s}href' % NAMESPACES['xlink']
         href = image.attrib[xlinkhref]
         with open(href, 'rb') as stream:
-            image.attrib[xlinkhref] = "data:image/png;base64,%s" % base64.b64encode(stream.read()).decode('ascii')
+            image.attrib[xlinkhref] = f"data:image/png;base64,{base64.b64encode(stream.read()).decode('ascii')}"
     tree.write(to_path)
 
 
