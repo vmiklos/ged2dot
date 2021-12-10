@@ -64,8 +64,15 @@ def main() -> None:
     version = get_version()
     if sys.platform == "darwin":
         args = ["hdiutil", "create", "dist/qged2dot-" + version + ".dmg", "-srcfolder", "dist/qged2dot.app", "-ov"]
-        print("Running '" + " ".join(args) + "'...")
-        subprocess.run(args, check=True)
+        # hdiutil sometimes fails with "create failed - Resource busy"
+        # when that happens, we run it again
+        for _ in range(2):
+            try:
+                print("Running '" + " ".join(args) + "'...")
+                subprocess.run(args, check=True)
+            except subprocess.CalledProcessError:
+                continue
+            break
         return
     if sys.platform.startswith("win"):
         os.chdir("dist")
