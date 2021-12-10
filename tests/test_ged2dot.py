@@ -491,6 +491,27 @@ class TestMain2(unittest.TestCase):
             with unittest.mock.patch('ged2dot.convert', mock_convert):
                 ged2dot.main()
 
+    def test_fam_marr(self) -> None:
+        """Tests handling of marriage date in a family."""
+        config = {
+            "familydepth": "0",
+            "input": "tests/fam_marr.ged",
+            "output": "tests/fam_marr.dot",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        root_family = ged2dot.graph_find(graph, "F1")
+        assert root_family
+        assert isinstance(root_family, ged2dot.Family)
+        # Check the found date, both the husb and the wife has a bogus date, which should be
+        # ignored.
+        self.assertEqual(root_family.get_marr(), "1970")
+
+        # Test export of a fam-marr model.
+        subgraph = ged2dot.bfs(root_family, config)
+        exporter = ged2dot.DotExport()
+        exporter.store(subgraph, config)
+
 
 class TestGetAbspath(unittest.TestCase):
     """Tests get_abspath()."""

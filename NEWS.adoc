@@ -1,5 +1,9 @@
 = Version descriptions
 
+== master
+
+- Resolves: gh#179 show date of marriage for a family
+
 == 7.2
 
 - Better support for GenoPro-generated GED files (Andreas Hrubak)

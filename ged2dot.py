@@ -305,6 +305,7 @@ class Family(Node):
     def __init__(self) -> None:
         self.__dict: Dict[str, str] = {}
         self.__dict["identifier"] = ""
+        self.__dict["marr"] = ""
         self.__dict["wife_id"] = ""
         self.wife: Optional["Individual"] = None
         self.__dict["husb_id"] = ""
@@ -345,6 +346,14 @@ class Family(Node):
     def get_identifier(self) -> str:
         return self.__dict["identifier"]
 
+    def set_marr(self, marr: str) -> None:
+        """Sets the marriage date."""
+        self.__dict["marr"] = marr
+
+    def get_marr(self) -> str:
+        """Gets the marriage date."""
+        return self.__dict["marr"]
+
     def set_depth(self, depth: int) -> None:
         self.depth = depth
 
@@ -376,12 +385,15 @@ class GedcomImport:
         self.graph: List[Node] = []
         self.in_birt = False
         self.in_deat = False
+        self.in_marr = False
 
     def __reset_flags(self) -> None:
         if self.in_birt:
             self.in_birt = False
         elif self.in_deat:
             self.in_deat = False
+        elif self.in_marr:
+            self.in_marr = False
 
     def __handle_level0(self, line: str) -> None:
         if self.individual:
@@ -426,6 +438,8 @@ class GedcomImport:
             self.family.set_wife_id(line[6:-1])
         elif line_lead_token == "CHIL" and self.family:
             self.family.child_ids.append(line[6:-1])
+        elif line_lead_token == "MARR" and self.family:
+            self.in_marr = True
         else:
             self.__handle_individual_config(line)
 
@@ -478,12 +492,15 @@ class GedcomImport:
             elif level == 1:
                 self.__handle_level1(rest)
             elif level == 2:
-                if rest.startswith("DATE") and self.individual:
+                if rest.startswith("DATE"):
                     year = rest.split(' ')[-1]
-                    if self.in_birt:
-                        self.individual.get_config().set_birth(year)
-                    elif self.in_deat:
-                        self.individual.get_config().set_death(year)
+                    if self.individual:
+                        if self.in_birt:
+                            self.individual.get_config().set_birth(year)
+                        elif self.in_deat:
+                            self.individual.get_config().set_death(year)
+                    elif self.family and self.in_marr:
+                        self.family.set_marr(year)
         return self.graph
 
 
@@ -544,6 +561,8 @@ class DotExport:
                 basepath = os.path.dirname(os.path.abspath(self.config["output"]))
                 image_path = os.path.relpath(image_path, basepath)
             label = "<table border=\"0\" cellborder=\"0\"><tr><td><img src=\"" + image_path + "\"/></td></tr></table>"
+            if node.get_marr():
+                label = node.get_marr()
             stream.write(to_bytes(node.get_identifier() + " [shape=circle, margin=\"0,0\", label=<" + label + ">];\n"))
         stream.write(to_bytes("\n"))
 

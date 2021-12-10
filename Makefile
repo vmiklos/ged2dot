@@ -25,6 +25,7 @@ PYTHON_OBJECTS = \
 all:
 
 check: check-mypy check-flake8 check-pylint check-unit
+	@echo "make check: ok"
 
 check-mypy: $(patsubst %.py,%.mypy,$(PYTHON_OBJECTS))
 
