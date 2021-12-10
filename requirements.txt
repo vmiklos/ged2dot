@@ -1,4 +1,4 @@
-coverage==5.5
+coverage==6.2
 flake8==3.9.2
 mypy==0.910
 pyinstaller==4.3
