@@ -8,7 +8,7 @@
 # Baseline: Windows 2019
 #
 
-choco install graphviz
+choco install graphviz --version 2.48.0
 if (-not $?) { throw "error $?" }
 # Register plugins.
 dot -c

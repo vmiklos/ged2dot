@@ -467,7 +467,7 @@ class GedcomImport:
             tokens = line.split(" ")
 
             first_token = tokens[0]
-            # Ignore UTF-8 BOM, if there is one at the begining of the line.
+            # Ignore UTF-8 BOM, if there is one at the beginning of the line.
             if first_token.startswith("\ufeff"):
                 first_token = first_token[1:]
 
