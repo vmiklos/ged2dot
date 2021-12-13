@@ -27,7 +27,8 @@ all:
 check: check-mypy check-flake8 check-pylint check-unit
 	@echo "make check: ok"
 
-check-mypy: $(patsubst %.py,%.mypy,$(PYTHON_OBJECTS))
+check-mypy: $(PYTHON_OBJECTS)
+	env PYTHONPATH=.:tests mypy --python-version 3.6 --strict --no-error-summary $(PYTHON_OBJECTS) && touch $@
 
 check-flake8: $(patsubst %.py,%.flake8,$(PYTHON_OBJECTS))
 
