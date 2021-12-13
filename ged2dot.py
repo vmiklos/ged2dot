@@ -262,6 +262,9 @@ class Individual(Node):
         image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname())
         image_path += " " + self.get_config().get_birth() + ".jpg"
         if not os.path.exists(to_bytes(image_path)):
+            image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname()) \
+                + ".jpg"
+        if not os.path.exists(to_bytes(image_path)):
             if self.get_sex():
                 sex = self.get_sex().lower()
             else:
