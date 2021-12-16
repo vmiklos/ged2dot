@@ -563,7 +563,12 @@ class DotExport:
             if self.config.get("relpath", "false") == "true" and self.config["output"] != "-":
                 basepath = os.path.dirname(os.path.abspath(self.config["output"]))
                 image_path = os.path.relpath(image_path, basepath)
-            label = "<table border=\"0\" cellborder=\"0\"><tr><td><img src=\"" + image_path + "\"/></td></tr></table>"
+
+            # Emit explicit size from marriage.svg, otherwise it won't be centered in the PNG
+            # output.
+            table_start = "<table border=\"0\" cellborder=\"0\" width=\"32px\" height=\"23px\">"
+
+            label = table_start + "<tr><td><img src=\"" + image_path + "\"/></td></tr></table>"
             if node.get_marr():
                 label = node.get_marr()
             stream.write(to_bytes(node.get_identifier() + " [shape=circle, margin=\"0,0\", label=<" + label + ">];\n"))
