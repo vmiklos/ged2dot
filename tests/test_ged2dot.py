@@ -11,6 +11,9 @@ import io
 import os
 import unittest
 import unittest.mock
+import xml.etree.ElementTree as ET
+
+import pygraphviz  # type: ignore
 
 import ged2dot
 
@@ -511,6 +514,32 @@ class TestMain2(unittest.TestCase):
         subgraph = ged2dot.bfs(root_family, config)
         exporter = ged2dot.DotExport()
         exporter.store(subgraph, config)
+
+    def test_fam_no_marr(self) -> None:
+        """Tests handling of marriage node when it has no date."""
+        # Given a family with no marriage date:
+        config = {
+            "familydepth": "4",
+            "input": "tests/happy.ged",
+            "output": "tests/happy.dot",
+            "rootfamily": "F1",
+            "imagedir": os.path.join(os.getcwd(), "tests/images"),
+            "relpath": "true",
+        }
+
+        # When converting from ged to dot:
+        ged2dot.convert(config)
+
+        # Then make sure that explicit width and height is specified for the table around the image,
+        # required by the PNG output:
+        with open(config["output"], "r") as stream:
+            graph = pygraphviz.AGraph(string=stream.read())
+        family = graph.get_node("F1")
+        stream = io.StringIO(family.attr.get("label"))
+        tree = ET.parse(stream)
+        root = tree.getroot()
+        self.assertIn("width", root.attrib)
+        self.assertIn("height", root.attrib)
 
 
 class TestGetAbspath(unittest.TestCase):
