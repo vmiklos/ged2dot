@@ -54,7 +54,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
             help_string += "-"
             if node.wife and node.wife.get_surname():
                 help_string += node.wife.get_surname()
-            key = "%s (%s)" % (node.get_identifier(), help_string)
+            key = f"{node.get_identifier()} ({help_string})"
             self.family_dict[key] = node
 
     def __create_control(self, options: Dict[str, Any]) -> Any:
@@ -63,7 +63,7 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
         if "button_type" not in options:
             options["button_type"] = None
         parent = options["parent"]
-        control = parent.createInstance("com.sun.star.awt.UnoControl%sModel" % options["type_string"])
+        control = parent.createInstance(f"com.sun.star.awt.UnoControl{options['type_string']}Model")
         control.PositionX = options["left"]
         control.PositionY = options["top"]
         control.Width = options["width"]

@@ -41,7 +41,7 @@ def run_pyinstaller() -> None:
 def get_version() -> str:
     """Extracts the version number from the Makefile."""
     version = ""
-    with open("Makefile") as stream:
+    with open("Makefile", encoding="utf-8") as stream:
         for line in stream.readlines():
             if line.startswith("VERSION = "):
                 version = line.split(" = ")[1].strip()
@@ -77,9 +77,9 @@ def main() -> None:
     if sys.platform.startswith("win"):
         os.chdir("dist")
         shutil.copyfile("../msi/LICENSE.rtf", "LICENSE.rtf")
-        with open("../msi/qged2dot.json", "r") as stream:
+        with open("../msi/qged2dot.json", "r", encoding="utf-8") as stream:
             buf = stream.read()
-        with open("qged2dot.json", "w") as stream:
+        with open("qged2dot.json", "w", encoding="utf-8") as stream:
             stream.write(buf.replace("1.0.0", version.split("-")[0]))
         print("Running createmsi...")
         createmsi.run(["qged2dot.json"])

@@ -25,7 +25,7 @@ class GedcomBase:
 
     def create_uno_service(self, name: str) -> Any:
         """Creates an UNO object instalce with the given name."""
-        return self.context.ServiceManager.createInstanceWithContext("com.sun.star.%s" % name, self.context)
+        return self.context.ServiceManager.createInstanceWithContext(f"com.sun.star.{name}", self.context)
 
     @staticmethod
     def to_dict(args: Iterable[Any]) -> Dict[str, Any]:
@@ -55,7 +55,7 @@ class GedcomBase:
             directory = os.path.dirname(path)
             if not os.path.exists(directory):
                 os.makedirs(directory)
-            with open(path, "a") as stream:
+            with open(path, "a", encoding="utf-8") as stream:
                 traceback.print_exc(file=stream)
         else:
             traceback.print_exc(file=sys.stderr)
