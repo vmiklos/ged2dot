@@ -9,27 +9,28 @@
 
 import base64
 import sys
-import xml.etree.ElementTree as ElementTree
+from xml.etree import ElementTree
 from typing import Union
 from typing import IO
 
-NAMESPACES = {
-    'svg': 'http://www.w3.org/2000/svg',
-    'xlink': 'http://www.w3.org/1999/xlink'
-}
+SVG_NS = 'http://www.w3.org/2000/svg'
+XLINK_NS = 'http://www.w3.org/1999/xlink'
 
 
 def inlineize(from_path: Union[str, IO[bytes]], to_path: Union[str, IO[bytes]]) -> None:
     """API interface to this module."""
-    ElementTree.register_namespace('', NAMESPACES['svg'])
-    ElementTree.register_namespace('xlink', NAMESPACES['xlink'])
+    ElementTree.register_namespace('', SVG_NS)
+    ElementTree.register_namespace('xlink', XLINK_NS)
     tree = ElementTree.ElementTree()
     tree.parse(from_path)
-    for image in tree.findall('.//{%s}image' % NAMESPACES['svg']):
-        xlinkhref = '{%s}href' % NAMESPACES['xlink']
+    svg_ns = "{" + SVG_NS + "}"
+    xlink_ns = "{" + XLINK_NS + "}"
+    for image in tree.findall(f".//{svg_ns}image"):
+        xlinkhref = f"{xlink_ns}href"
         href = image.attrib[xlinkhref]
         with open(href, 'rb') as stream:
-            image.attrib[xlinkhref] = "data:image/png;base64,%s" % base64.b64encode(stream.read()).decode('ascii')
+            b64 = base64.b64encode(stream.read()).decode('ascii')
+            image.attrib[xlinkhref] = f"data:image/png;base64,{b64}"
     tree.write(to_path)
 
 

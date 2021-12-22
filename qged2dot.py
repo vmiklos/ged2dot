@@ -75,7 +75,7 @@ class Widgets:
                 help_string += "-"
                 if node.wife and node.wife.get_surname():
                     help_string += node.wife.get_surname()
-                key = "%s (%s)" % (node.get_identifier(), help_string)
+                key = f"%{node.get_identifier()} ({help_string})"
                 self.rootfamily_value.addItem(key, node.get_identifier())
             self.update_status()
         except Exception:  # pylint: disable=broad-except

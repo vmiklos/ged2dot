@@ -138,7 +138,7 @@ class TestMain(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
-        with open(config["output"], "r") as stream:
+        with open(config["output"], "r", encoding="utf-8") as stream:
             self.assertIn("images/", stream.read())
 
     def test_image_abspath(self) -> None:
@@ -155,7 +155,7 @@ class TestMain(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
-        with open(config["output"], "r") as stream:
+        with open(config["output"], "r", encoding="utf-8") as stream:
             self.assertIn(config["imagedir"], stream.read())
 
     def test_config(self) -> None:
@@ -186,7 +186,7 @@ class TestMain(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
-        with open(config["output"], "r") as stream:
+        with open(config["output"], "r", encoding="utf-8") as stream:
             self.assertNotIn("images/", stream.read())
 
     def test_bom(self) -> None:
@@ -457,7 +457,7 @@ class TestMain2(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
-        with open(config["output"], "r") as stream:
+        with open(config["output"], "r", encoding="utf-8") as stream:
             self.assertNotIn('src="/', stream.read())
 
     def test_config_relpath_custom(self) -> None:
@@ -482,7 +482,7 @@ class TestMain2(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
-        with open(config["output"], "r") as stream:
+        with open(config["output"], "r", encoding="utf-8") as stream:
             self.assertIn("† Y", stream.read())
 
     def test_config_nameorder_custom(self) -> None:
@@ -532,7 +532,7 @@ class TestMain2(unittest.TestCase):
 
         # Then make sure that explicit width and height is specified for the table around the image,
         # required by the PNG output:
-        with open(config["output"], "r") as stream:
+        with open(config["output"], "r", encoding="utf-8") as stream:
             graph = pygraphviz.AGraph(string=stream.read())
         family = graph.get_node("F1")
         stream = io.StringIO(family.attr.get("label"))

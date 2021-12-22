@@ -44,12 +44,12 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         if sys.platform.startswith("win"):
             pattern = os.environ['PROGRAMFILES'] + '\\Graphviz*\\bin\\dot.exe'
             dot_paths = glob.glob(pattern)
-            if not dot_paths and 'PROGRAMFILES(x86)' in os.environ.keys():
+            if not dot_paths and 'PROGRAMFILES(x86)' in os.environ:
                 pattern = os.environ['PROGRAMFILES(x86)'] + '\\Graphviz*\\bin\\dot.exe'
                 dot_paths = glob.glob(pattern)
             if not dot_paths:
                 url = "<https://graphviz.gitlab.io/_pages/Download/Download_windows.html>"
-                raise Exception("No dot.exe found at '%s', please download it from %s." % (pattern, url))
+                raise Exception(f"No dot.exe found at '{pattern}', please download it from {url}.")
             dot_path = dot_paths[-1]
         else:
             dot_path = "dot"
@@ -71,14 +71,11 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
         root_family = "F1"
         layout_max_depth = "4"
         name_order = "little"
-        if "FilterData" in self.props.keys():
+        if "FilterData" in self.props:
             filter_data = self.to_dict(self.props["FilterData"])
-            if "rootfamily" in filter_data.keys():
-                root_family = filter_data["rootfamily"]
-            if "familydepth" in filter_data.keys():
-                layout_max_depth = filter_data["familydepth"]
-            if "nameorder" in filter_data.keys():
-                name_order = filter_data["nameorder"]
+            root_family = filter_data.get("rootfamily", root_family)
+            layout_max_depth = filter_data.get("familydepth", layout_max_depth)
+            name_order = filter_data.get("nameorder", name_order)
         config = {
             'input': ged,
             'rootfamily': root_family,
