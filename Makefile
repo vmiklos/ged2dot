@@ -27,7 +27,7 @@ all:
 check: check-mypy check-flake8 check-pylint check-unit
 	@echo "make check: ok"
 
-check-mypy: $(PYTHON_OBJECTS)
+check-mypy: $(PYTHON_OBJECTS) Makefile requirements.txt
 	env PYTHONPATH=.:tests mypy --python-version 3.6 --strict --no-error-summary $(PYTHON_OBJECTS) && touch $@
 
 check-flake8: $(patsubst %.py,%.flake8,$(PYTHON_OBJECTS))
@@ -37,9 +37,6 @@ check-pylint: $(patsubst %.py,%.pylint,$(PYTHON_OBJECTS))
 check-unit:
 	env PYTHONPATH=.:tests coverage run --branch --module unittest $(PYTHON_TEST_OBJECTS)
 	env PYTHONPATH=.:tests coverage report --show-missing --fail-under=100 $(PYTHON_SAFE_OBJECTS)
-
-%.mypy: %.py Makefile
-	mypy --python-version 3.6 --strict --no-error-summary $< && touch $@
 
 %.flake8: %.py Makefile
 	flake8 $< && touch $@
