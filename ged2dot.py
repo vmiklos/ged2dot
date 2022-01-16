@@ -472,7 +472,7 @@ class GedcomImport:
             return self.tokenize_from_stream(stream)
 
     def tokenize_from_stream(self, stream: BinaryIO) -> List[Node]:
-        """Tokenizes a gedcom steam into a graph."""
+        """Tokenizes a gedcom stream into a graph."""
         stream_buf = stream.read()
         lines = stream_buf.split(b"\r\n")
         if b"\r" not in stream_buf:
