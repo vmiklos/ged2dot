@@ -127,6 +127,8 @@ in case placeholders have to be used for missing images.
 == Resources
 
 - https://www.familysearch.org/developers/docs/guides/gedcom[GEDCOM specification]
+- https://gist.github.com/fetsorn/1d5f6cbc47989b32cb461528c1e253b4[Translation of ged2dot to
+  JavaScript]
 
 == Download
 
