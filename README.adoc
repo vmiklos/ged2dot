@@ -82,10 +82,13 @@ Features:
   fine-tuned if necessary.
 - Runs on Windows and Linux and macOS.
 
-You can grap a release binary at the
-http://extensions.libreoffice.org/extension-center/gedcom[LibreOffice
-Extensions] site -- more on how to to install a LibreOffice extension
+You can grap a release binary at https://github.com/vmiklos/ged2dot/releases[the releases page] --
+more on how to to install a LibreOffice extension
 https://wiki.documentfoundation.org/Documentation/HowTo/install_extension[here].
+
+NOTE: Linux distributions install Python support separately, be sure to install the
+`libreoffice-script-provider-python` (deb) or `libreoffice-pyuno` (rpm) packages before the OXT
+file.
 
 Once that's done, you'll see something like this if you open a GEDCOM file:
 
