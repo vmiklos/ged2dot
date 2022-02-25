@@ -28,6 +28,8 @@ class TestIndividual(unittest.TestCase):
         }
         importer = ged2dot.GedcomImport()
         graph = importer.tokenize(config)
+        individual = ged2dot.graph_find(graph, "42")
+        assert individual is None
         individual = ged2dot.graph_find(graph, "P3")
         assert individual
         assert isinstance(individual, ged2dot.Individual)
@@ -540,6 +542,36 @@ class TestMain2(unittest.TestCase):
         root = tree.getroot()
         self.assertIn("width", root.attrib)
         self.assertIn("height", root.attrib)
+
+    def test_bad_rootfamily(self) -> None:
+        """Tests the happy path."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/happy.ged",
+            "output": "tests/happy.dot",
+            "rootfamily": "42",
+            "imagedir": "images",
+        }
+        if os.path.exists(config["output"]):
+            os.unlink(config["output"])
+        self.assertFalse(os.path.exists(config["output"]))
+        with self.assertRaises(Exception):
+            ged2dot.convert(config)
+
+    def test_bad_rootfamily_empty_graph(self) -> None:
+        """Tests the happy path."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/empty.ged",
+            "output": "tests/empty.dot",
+            "rootfamily": "42",
+            "imagedir": "images",
+        }
+        if os.path.exists(config["output"]):
+            os.unlink(config["output"])
+        self.assertFalse(os.path.exists(config["output"]))
+        with self.assertRaises(Exception):
+            ged2dot.convert(config)
 
 
 class TestGetAbspath(unittest.TestCase):
