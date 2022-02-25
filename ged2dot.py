@@ -114,6 +114,9 @@ def graph_find(graph: List[Node], identifier: str) -> Optional[Node]:
         return None
 
     results = [node for node in graph if node.get_identifier() == identifier]
+    if not results:
+        return None
+
     assert len(results) == 1
     return results[0]
 
@@ -618,7 +621,17 @@ def convert(config: Dict[str, str]) -> None:
     importer = GedcomImport()
     graph = importer.load(config)
     root_family = graph_find(graph, config["rootfamily"])
-    assert root_family
+    if not root_family:
+        family_id = ""
+        for node in graph:
+            if not isinstance(node, Family):
+                continue
+            family_id = node.get_identifier()
+            break
+        reason = f"Root family '{config['rootfamily']}' is not found."
+        if family_id:
+            reason += f" First valid family would be '{family_id}'."
+        raise Exception(reason)
     subgraph = bfs(root_family, config)
     exporter = DotExport()
     exporter.store(subgraph, config)
