@@ -19,7 +19,7 @@ http://wiki.documentfoundation.org/Installing_in_parallel#Step_4_-_Optional.2C_b
 Then you can use something like:
 
 ----
-make -s install UNOPKG_PREFIX=$HOME/git/libreoffice/lo71/opt/libreoffice7.1/program/
+make -s install UNOPKG_PREFIX=$HOME/git/libreoffice/lo73/opt/libreoffice7.3/program/
 ----
 
 To package and install your changes in a few seconds, with a single
