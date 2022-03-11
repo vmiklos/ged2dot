@@ -69,7 +69,7 @@ Its dependencies:
 
   * For macOS, install it from https://brew.sh/[brew] (2.36 is tested).
 
-- LibreOffice >= 6.1
+- LibreOffice >= 7.2
 
 Features:
 
