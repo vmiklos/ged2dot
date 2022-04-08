@@ -38,6 +38,12 @@ Some example more tricky cases, which are handled by `ged2dot`:
 
 (ged2dot <= 7.0 allowed multiple layouts, none of them supported the above more tricky cases.)
 
+GEDCOM files don't contain images, but you can put images next to the GEDCOM file, and in that case
+ged2dot will try to pick them up when generating `dot` output. The expected location is
+`images/Given Family 1234.jpg`, relative to the GEDCOM file. For example, there is a person called
+Ray Smith in the above screenshot. The birth year string is `Y`, so the image location has to be
+`images/Ray Smith Y.jpg`.
+
 == Qt-based GUI
 
 The `qged2dot.py` script is a Qt-based GUI for `ged2dot`, which can turn the `dot` output into PNG
