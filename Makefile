@@ -28,7 +28,7 @@ check: check-mypy check-flake8 check-pylint check-unit
 	@echo "make check: ok"
 
 check-mypy: $(PYTHON_OBJECTS) Makefile requirements.txt
-	env PYTHONPATH=.:tests mypy --python-version 3.6 --strict --no-error-summary $(PYTHON_OBJECTS) && touch $@
+	env PYTHONPATH=.:tests mypy --python-version 3.9 --strict --no-error-summary $(PYTHON_OBJECTS) && touch $@
 
 check-flake8: $(patsubst %.py,%.flake8,$(PYTHON_OBJECTS))
 

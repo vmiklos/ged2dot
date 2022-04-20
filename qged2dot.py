@@ -186,6 +186,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.input_value, 0, 1)
         input_button = QPushButton(self.window)
         input_button.setText("Browse...")
+        # pylint: disable=no-value-for-parameter
         cast(pyqtBoundSignal, input_button.clicked).connect(self.widgets.set_input)
         self.grid_layout.addWidget(input_button, 0, 2)
 
@@ -197,6 +198,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.output_value, 1, 1)
         output_button = QPushButton(self.window)
         output_button.setText("Browse...")
+        # pylint: disable=no-value-for-parameter
         cast(pyqtBoundSignal, output_button.clicked).connect(self.widgets.set_output)
         self.grid_layout.addWidget(output_button, 1, 2)
 
@@ -223,6 +225,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.imagedir_value, 4, 1)
         imagedir_button = QPushButton(self.window)
         imagedir_button.setText("Browse...")
+        # pylint: disable=no-value-for-parameter
         cast(pyqtBoundSignal, imagedir_button.clicked).connect(self.widgets.set_imagedir)
         self.grid_layout.addWidget(imagedir_button, 4, 2)
 
