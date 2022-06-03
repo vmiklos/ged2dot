@@ -41,7 +41,7 @@ check-unit:
 %.flake8: %.py Makefile
 	flake8 $< && touch $@
 
-%.pylint : %.py Makefile .pylintrc
+%.pylint : %.py Makefile .pylintrc requirements.txt
 	env PYTHONPATH=. pylint $< && touch $@
 
 # If not macOS, assume Linux.
