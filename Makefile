@@ -38,7 +38,7 @@ check-unit:
 	env PYTHONPATH=.:tests coverage run --branch --module unittest $(PYTHON_TEST_OBJECTS)
 	env PYTHONPATH=.:tests coverage report --show-missing --fail-under=100 $(PYTHON_SAFE_OBJECTS)
 
-%.flake8: %.py Makefile
+%.flake8: %.py Makefile requirements.txt
 	flake8 $< && touch $@
 
 %.pylint : %.py Makefile .pylintrc requirements.txt
