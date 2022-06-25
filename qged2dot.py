@@ -50,7 +50,7 @@ class Widgets:
         """Handler for the input button."""
         try:
             dialog = QFileDialog()
-            dialog.setFileMode(QFileDialog.ExistingFile)
+            dialog.setFileMode(QFileDialog.FileMode.ExistingFile)  # pylint: disable=no-member
             dialog.setNameFilters(["GEDCOM files (*.ged)"])
             if not dialog.exec():
                 return
@@ -84,7 +84,7 @@ class Widgets:
     def set_output(self) -> None:
         """Handler for the output button."""
         dialog = QFileDialog()
-        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)  # pylint: disable=no-member
         name_filters = [
             "SVG files (*.svg)",
             "PNG files (*.png)",
@@ -102,7 +102,7 @@ class Widgets:
     def set_imagedir(self) -> None:
         """Handler for the imagedir button."""
         dialog = QFileDialog()
-        dialog.setFileMode(QFileDialog.Directory)
+        dialog.setFileMode(QFileDialog.FileMode.Directory)  # pylint: disable=no-member
         if not dialog.exec():
             return
 
@@ -150,7 +150,7 @@ class Widgets:
     def print_traceback() -> None:
         """Shows the exception to the user when it would not be caught."""
         msg = QMessageBox()
-        msg.setIcon(QMessageBox.Warning)
+        msg.setIcon(QMessageBox.Icon.Warning)  # pylint: disable=no-member
         msg.setText("Conversion failed.")
         with io.StringIO() as stream:
             traceback.print_exc(file=stream)
@@ -261,10 +261,20 @@ def main() -> None:
     app.layout.addLayout(app.grid_layout)
 
     button_box = QDialogButtonBox()
-    button_box.setStandardButtons(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+    standard_buttons = cast(
+        QDialogButtonBox.StandardButtons,
+        QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel  # pylint: disable=no-member
+    )
+    button_box.setStandardButtons(standard_buttons)
     app.layout.addWidget(button_box)
-    cast(pyqtBoundSignal, button_box.button(QDialogButtonBox.Cancel).clicked).connect(sys.exit)
-    cast(pyqtBoundSignal, button_box.button(QDialogButtonBox.Ok).clicked).connect(app.widgets.convert)
+    cast(
+        pyqtBoundSignal,
+        button_box.button(QDialogButtonBox.StandardButton.Cancel).clicked  # pylint: disable=no-member
+    ).connect(sys.exit)
+    cast(
+        pyqtBoundSignal,
+        button_box.button(QDialogButtonBox.StandardButton.Ok).clicked  # pylint: disable=no-member
+    ).connect(app.widgets.convert)
     app.layout.addWidget(app.widgets.statusbar)
     app.widgets.update_status()
 
