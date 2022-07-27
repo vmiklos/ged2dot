@@ -36,3 +36,10 @@ Once you're happy with your change:
 make check # run all tests
 ... write new tests if coverage regressed ...
 -----
+
+== Maintenance
+
+Ideally CI checks everything before a commit hits master, but here are a few
+things which are not part of CI:
+
+- Run `pip list --outdated` from time to time and make sure Python dependencies are reasonably up to date.
