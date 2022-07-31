@@ -1,5 +1,10 @@
 = Version descriptions
 
+== master
+
+- Fail nicer when the specified root family doesn't exist
+- Document expected image location
+
 == 7.3
 
 - Resolves: gh#179 show date of marriage for a family
