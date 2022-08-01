@@ -3,7 +3,7 @@
 image:https://github.com/vmiklos/ged2dot/workflows/tests/badge.svg["Build Status", link="https://github.com/vmiklos/ged2dot/actions"]
 image:https://tokei.rs/b1/github/vmiklos/ged2dot?category=code["LoC"]
 
-The latest version is v7.3, released on 2022-02-04.  See the
+The latest version is v7.4, released on 2022-08-01.  See the
 https://github.com/vmiklos/ged2dot/blob/master/NEWS.adoc[release notes].
 
 == What's the problem the tool solves?
