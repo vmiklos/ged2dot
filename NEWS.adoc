@@ -1,6 +1,6 @@
 = Version descriptions
 
-== master
+== 7.4
 
 - Fail nicer when the specified root family doesn't exist
 - Document expected image location
