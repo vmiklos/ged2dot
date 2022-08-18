@@ -1,5 +1,5 @@
 coverage==6.4.2
-flake8==4.0.1
+flake8==5.0.4
 mypy==0.961
 pyinstaller==5.1
 pylint==2.14.0
