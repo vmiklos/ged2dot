@@ -2,6 +2,6 @@ coverage==6.4.2
 flake8==5.0.4
 mypy==0.961
 pyinstaller==5.3
-pylint==2.14.0
+pylint==2.15.2
 pyqt5==5.15.7
 pygraphviz==1.6
