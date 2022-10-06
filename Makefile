@@ -8,6 +8,7 @@ PYTHON_UNSAFE_OBJECTS = \
 	libreoffice/loader.py \
 	qged2dot.py \
 	tools/pack.py \
+	tools/requirements.py \
 
 PYTHON_SAFE_OBJECTS = \
 	ged2dot.py \
