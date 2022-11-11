@@ -1,5 +1,9 @@
 = Version descriptions
 
+== master
+
+- new config option: direction (defaults to `both`, can be `child`)
+
 == 7.4
 
 - Fail nicer when the specified root family doesn't exist

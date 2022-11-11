@@ -233,7 +233,7 @@ class TestMain(unittest.TestCase):
         graph = importer.load(config)
         root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
-        neighbours = root_family.get_neighbours()
+        neighbours = root_family.get_neighbours("both")
         # Just 1 node: husband.
         self.assertEqual(len(neighbours), 1)
         self.assertEqual(neighbours[0].get_identifier(), "P2")
@@ -254,7 +254,7 @@ class TestMain(unittest.TestCase):
         graph = importer.load(config)
         root_family = ged2dot.graph_find(graph, "F1")
         assert root_family
-        neighbours = root_family.get_neighbours()
+        neighbours = root_family.get_neighbours("both")
         # Just 1 node: wife.
         self.assertEqual(len(neighbours), 1)
         self.assertEqual(neighbours[0].get_identifier(), "P1")
@@ -572,6 +572,34 @@ class TestMain2(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         with self.assertRaises(Exception):
             ged2dot.convert(config)
+
+    def test_config_direction_custom(self) -> None:
+        """Tests config: direction: custom."""
+        def mock_convert(config: Dict[str, str]) -> None:
+            self.assertEqual(config["direction"], "child")
+        argv = ["", "--direction", "child"]
+        with unittest.mock.patch('sys.argv', argv):
+            with unittest.mock.patch('ged2dot.convert', mock_convert):
+                ged2dot.main()
+
+    def test_direction_child(self) -> None:
+        """Tests the direction=child case."""
+        config = {
+            "familydepth": "4",
+            "input": "tests/happy.ged",
+            "output": "tests/happy.dot",
+            "direction": "child",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.load(config)
+        indi = ged2dot.graph_find(graph, "P157")
+        assert indi
+        neighbours = indi.get_neighbours("both")
+        # parent: F152 + child: F25
+        self.assertEqual(len(neighbours), 2)
+        neighbours = indi.get_neighbours("child")
+        # child: F25
+        self.assertEqual(len(neighbours), 1)
 
 
 class TestGetAbspath(unittest.TestCase):

@@ -29,6 +29,7 @@ class Config:
         self.familydepth = "3"
         self.imagedir = "images"
         self.nameorder = "little"
+        self.direction = "both"
         self.birthformat = "{}-"
         self.relpath = "false"
 
@@ -58,6 +59,8 @@ class Config:
             self.imagedir = args.imagedir
         if args.nameorder:
             self.nameorder = args.nameorder
+        if args.direction:
+            self.direction = args.direction
         if args.birthformat:
             self.birthformat = args.birthformat
         if args.relpath:
@@ -72,6 +75,7 @@ class Config:
             "familydepth": self.familydepth,
             "imagedir": self.imagedir,
             "nameorder": self.nameorder,
+            "direction": self.direction,
             "birthformat": self.birthformat,
             "relpath": self.relpath,
         }
@@ -90,7 +94,7 @@ class Node:
     def get_depth(self) -> int:  # pragma: no cover
         """Get the depth of this node, during one graph traversal."""
 
-    def get_neighbours(self) -> List["Node"]:  # pragma: no cover
+    def get_neighbours(self, direction: str) -> List["Node"]:  # pragma: no cover
         """Get the neighbour nodes of this node."""
 
     def resolve(self, graph: List["Node"]) -> None:  # pragma: no cover
@@ -194,9 +198,9 @@ class Individual(Node):
             assert fams
             self.fams_list.append(cast("Family", fams))
 
-    def get_neighbours(self) -> List[Node]:
+    def get_neighbours(self, direction: str) -> List[Node]:
         ret: List[Node] = []
-        if self.famc:
+        if self.famc and direction != "child":
             ret.append(self.famc)
         ret += self.fams_list
         return ret
@@ -326,7 +330,7 @@ class Family(Node):
             assert child
             self.child_list.append(cast("Individual", child))
 
-    def get_neighbours(self) -> List[Node]:
+    def get_neighbours(self, direction: str) -> List[Node]:
         ret: List[Node] = []
         if self.wife:
             ret.append(self.wife)
@@ -508,6 +512,7 @@ def bfs(root: Node, config: Dict[str, str]) -> List[Node]:
     queue = [root]
     ret: List[Node] = []
 
+    direction = config.get("direction", "both")
     while queue:
         node = queue.pop(0)
         # Every 2nd node is a family + the root is always a family.
@@ -515,7 +520,7 @@ def bfs(root: Node, config: Dict[str, str]) -> List[Node]:
         if node.get_depth() > family_depth * 2 + 1:
             return ret
         ret.append(node)
-        for neighbour in node.get_neighbours():
+        for neighbour in node.get_neighbours(direction):
             if neighbour not in visited:
                 neighbour.set_depth(node.get_depth() + 1)
                 visited.append(neighbour)
@@ -645,6 +650,8 @@ def main() -> None:
     parser.add_argument("--imagedir", type=str,
                         help="image directory")
     parser.add_argument("--nameorder", choices=["little", "big"],
+                        help="name order")
+    parser.add_argument("--direction", choices=["both", "child"],
                         help="name order")
     parser.add_argument("--birthformat", type=str,
                         help="birth format when death is missing (default: '{}-', e.g. '1942-')")

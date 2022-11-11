@@ -13,3 +13,5 @@ familydepth = 4
 imagedir = images
 # 'little' is First first, 'big' is Last first.
 nameorder = little
+# 'both' is the default, also possible: 'child' (to only show children of root)
+direction = both
