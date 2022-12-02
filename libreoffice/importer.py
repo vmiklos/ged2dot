@@ -36,7 +36,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
     def __init__(self, context: Any) -> None:
         unohelper.Base.__init__(self)
         base.GedcomBase.__init__(self, context)
-        self.props = {}  # type: Dict[str, Any]
+        self.props: Dict[str, Any] = {}
         self.dst_doc = None
 
     @staticmethod

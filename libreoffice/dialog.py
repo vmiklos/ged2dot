@@ -31,11 +31,11 @@ class GedcomDialog(unohelper.Base, XPropertyAccess, XExecutableDialog, XImporter
     def __init__(self, context: Any, _dialogArgs: Any) -> None:
         unohelper.Base.__init__(self)
         base.GedcomBase.__init__(self, context)
-        self.family_dict = {}  # type: Dict[str, ged2dot.Family]
-        self.root_family = None  # type: Optional[str]
+        self.family_dict: Dict[str, ged2dot.Family] = {}
+        self.root_family: Optional[str] = None
         self.layout_max = "4"
         self.name_order = "little"
-        self.props = {}  # type: Dict[str, Any]
+        self.props: Dict[str, Any] = {}
 
     def __extract_families(self) -> None:
         ged = unohelper.fileUrlToSystemPath(self.props['URL'])
