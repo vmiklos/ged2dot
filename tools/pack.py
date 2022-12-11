@@ -15,7 +15,7 @@ import sys
 import zipfile
 import glob
 
-from msicreator import createmsi  # type: ignore
+from msicreator import createmsi
 
 
 def run_pyinstaller() -> None:

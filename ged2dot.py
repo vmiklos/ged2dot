@@ -86,6 +86,7 @@ class Node:
     """Base class for an individual or family."""
     def get_identifier(self) -> str:  # pragma: no cover
         """Gets the ID of this node."""
+        return str()
 
     def set_depth(self, depth: int) -> None:  # pragma: no cover
         """Set the depth of this node, during one graph traversal."""
@@ -93,9 +94,11 @@ class Node:
 
     def get_depth(self) -> int:  # pragma: no cover
         """Get the depth of this node, during one graph traversal."""
+        return 0
 
     def get_neighbours(self, direction: str) -> List["Node"]:  # pragma: no cover
         """Get the neighbour nodes of this node."""
+        return []
 
     def resolve(self, graph: List["Node"]) -> None:  # pragma: no cover
         """Resolve string IDs to node objects."""
