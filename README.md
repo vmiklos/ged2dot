@@ -131,11 +131,11 @@ Icons are from
 [WPZOOM](http://www.wpzoom.com/wpzoom/new-freebie-wpzoom-developer-icon-set-154-free-icons/),
 in case placeholders have to be used for missing images.
 
-== Resources
+## Resources
 
 - [GEDCOM specification](https://www.familysearch.org/developers/docs/guides/gedcom)
 - [Translation of ged2dot to JavaScript](https://gist.github.com/fetsorn/1d5f6cbc47989b32cb461528c1e253b4)
 
-== Download
+## Download
 
 From [GitHub](https://github.com/vmiklos/ged2dot).
