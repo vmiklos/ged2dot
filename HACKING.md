@@ -1,45 +1,45 @@
-= Development notes
+# Development notes
 
-== How to set up a virtual env
+## How to set up a virtual env
 
 Create it:
 
-----
+```
 python3.9 -m venv ged2dot-env
-----
+```
 
 Activate it:
 
-----
+```
 . ged2dot-env/bin/activate
-----
+```
 
 Install requirements:
 
-----
+```
 pip install -r requirements.txt
-----
+```
 
-== Development cycle
+## Development cycle
 
 A typical flow is:
 
-----
+```
 ... hack hack hack ...
 make check-mypy
 ged2dot --input test.ged --output test.dot && dot -Tsvg -o test.svg test.dot # test the changes
-----
+```
 
 Once you're happy with your change:
 
------
+```
 make check # run all tests
 ... write new tests if coverage regressed ...
------
+```
 
-== Maintenance
+## Maintenance
 
 Ideally CI checks everything before a commit hits master, but here are a few
 things which are not part of CI:
 
-- Run `pip list --outdated` from time to time and make sure Python dependencies are reasonably up to date.
+- Run `tools/requirements.py` once a month and make sure Python dependencies are reasonably up to date.
