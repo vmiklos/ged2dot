@@ -1,0 +1,6 @@
+[book]
+title = "ged2dot user guide"
+
+[output.html]
+edit-url-template = "https://github.com/vmiklos/ged2dot/edit/master/guide/{path}"
+additional-js = ["matomo.js"]
