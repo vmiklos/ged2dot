@@ -55,3 +55,6 @@ else
 	mkdir -p dist
 	cp libreoffice/*.oxt dist/
 endif
+
+run-guide:
+	cd guide && mdbook serve --hostname 127.0.0.1
