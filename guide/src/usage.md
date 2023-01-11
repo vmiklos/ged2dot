@@ -18,9 +18,7 @@ nodes around the root family.
 
 ## Layout
 
-The layout does a Breadth First Search (BFS) traversal on the graph, from the starting family:
-
-![screenshot](https://vmiklos.hu/ged2dot/tests/screenshot.png)
+The layout does a Breadth First Search (BFS) traversal on the graph, from the starting family.
 
 This has several benefits over explicitly trying to guess which family belongs to which generation.
 Some example more tricky cases, which are handled by `ged2dot`:

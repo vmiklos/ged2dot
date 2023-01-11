@@ -12,6 +12,10 @@ map individuals and families to graph nodes and connections between them to grap
 takes care of the rest. What's unique about `ged2dot` is that it allows more than showing ancestors
 and descendants of a single individual (what you can easily do with random family editor software).
 
+It looks like this:
+
+![screenshot](https://vmiklos.hu/ged2dot/tests/screenshot.png)
+
 ## Contributing
 
 ged2dot is free and open source. You can find the source code on
