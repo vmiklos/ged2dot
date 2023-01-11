@@ -5,3 +5,5 @@ pygraphviz==1.10
 pyinstaller==5.7.0
 pylint==2.15.9
 pyqt5==5.15.7
+# dependency of pylint, just avoid astroid-2.13.2
+astroid==2.12.13
