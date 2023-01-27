@@ -10,7 +10,8 @@ The latest version is v7.4, released on 2022-08-01.
 visualize it using [Graphviz](http://www.graphviz.org/)'s `dot` tool. The basic idea is that you can
 map individuals and families to graph nodes and connections between them to graph edges, then `dot`
 takes care of the rest. What's unique about `ged2dot` is that it allows more than showing ancestors
-and descendants of a single individual (what you can easily do with random family editor software).
+and descendants of a single individual (what you can easily do with other existing family editor
+software).
 
 It looks like this:
 
