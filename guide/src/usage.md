@@ -23,11 +23,11 @@ The layout does a Breadth First Search (BFS) traversal on the graph, from the st
 This has several benefits over explicitly trying to guess which family belongs to which generation.
 Some example more tricky cases, which are handled by `ged2dot`:
 
-- root family -> husband -> sister -> showing her kids
+- root family → husband → sister → showing her kids
 
-- root family -> wife -> cousin -> showing her kid
+- root family → wife → cousin → showing her kid
 
-- root family -> husband -> grand father -> showing both wives with the matching kids
+- root family → husband → grand father → showing both wives with the matching kids
 
 - marrying cousins
 
