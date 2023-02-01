@@ -1,6 +1,6 @@
 # Version descriptions
 
-## master
+## 7.5
 
 - new config option: direction (defaults to `both`, can be `child`)
 
