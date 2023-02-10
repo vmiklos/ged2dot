@@ -49,7 +49,7 @@ class GedcomImport(unohelper.Base, XFilter, XImporter, XExtendedFilterDetection,
                 dot_paths = glob.glob(pattern)
             if not dot_paths:
                 url = "<https://graphviz.gitlab.io/_pages/Download/Download_windows.html>"
-                raise Exception(f"No dot.exe found at '{pattern}', please download it from {url}.")
+                raise IOError(f"No dot.exe found at '{pattern}', please download it from {url}.")
             dot_path = dot_paths[-1]
         else:
             dot_path = "dot"

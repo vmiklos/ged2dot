@@ -1,9 +1,7 @@
-coverage==7.0.2
+coverage==7.1.0
 flake8==6.0.0
-mypy==0.991
+mypy==1.0.0
 pygraphviz==1.10
 pyinstaller==5.7.0
-pylint==2.15.9
+pylint==2.16.1
 pyqt5==5.15.7
-# dependency of pylint, just avoid astroid-2.13.2
-astroid==2.12.13
