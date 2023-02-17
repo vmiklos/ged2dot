@@ -37,6 +37,14 @@ make check # run all tests
 ... write new tests if coverage regressed ...
 ```
 
+## Python debugging
+
+To run a single test:
+
+```
+env PYTHONPATH=.:tests python3 -m unittest tests.test_ged2dot.TestMain.test_happy
+```
+
 ## Maintenance
 
 Ideally CI checks everything before a commit hits master, but here are a few
