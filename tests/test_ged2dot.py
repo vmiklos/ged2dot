@@ -141,7 +141,20 @@ class TestMain(unittest.TestCase):
         ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
         with open(config["output"], "r", encoding="utf-8") as stream:
-            self.assertIn("images/", stream.read())
+            graph = pygraphviz.AGraph(string=stream.read())
+        person = graph.get_node("P48")
+        stream = io.StringIO(person.attr.get("label"))
+        tree = ET.parse(stream)
+        root = tree.getroot()
+        row = root.find("tr")
+        assert row
+        cell = row.find("td")
+        assert cell
+        img = cell.find("img")
+        assert img is not None
+        actual_src = img.attrib.get("src")
+        expected_src = os.path.join(os.getcwd(), "tests", "images", "Richard Smith Y.jpg")
+        self.assertEqual(actual_src, expected_src)
 
     def test_image_abspath(self) -> None:
         """Tests the case when imagedir is an abs path already."""
