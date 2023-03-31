@@ -627,5 +627,19 @@ class TestGetAbspath(unittest.TestCase):
         self.assertEqual(ged2dot.get_abspath(abspath), abspath)
 
 
+class TestFuzz(unittest.TestCase):
+    """Tests fixed fuzz-generated input."""
+    def test_dir(self) -> None:
+        """Tests all files in the input directory."""
+        root = "tests/fuzz"
+        for file in os.listdir(root):
+            importer = ged2dot.GedcomImport()
+            path = os.path.join(root, file)
+            config = {
+                "input": path
+            }
+            importer.load(config)
+
+
 if __name__ == '__main__':
     unittest.main()

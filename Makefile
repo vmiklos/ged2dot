@@ -58,3 +58,6 @@ endif
 
 run-guide:
 	cd guide && mdbook serve --hostname 127.0.0.1
+
+fuzz:
+	env PYTHONPATH=. tools/fuzz.py
