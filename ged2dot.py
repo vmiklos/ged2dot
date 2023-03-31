@@ -488,7 +488,7 @@ class GedcomImport:
             if first_token.startswith("\ufeff"):
                 first_token = first_token[1:]
 
-            level = int(first_token)
+            level = safe_atoi(first_token)
             rest = " ".join(tokens[1:])
             if level == 0:
                 self.__handle_level0(rest)
@@ -530,6 +530,14 @@ def bfs(root: Node, config: Dict[str, str]) -> List[Node]:
                 queue.append(neighbour)
 
     return ret
+
+
+def safe_atoi(string: str) -> int:
+    """Converts str to an int, returns -1 on error."""
+    try:
+        return int(string)
+    except ValueError:
+        return -1
 
 
 class DotExport:
