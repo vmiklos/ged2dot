@@ -18,6 +18,10 @@ import os
 import sys
 
 
+class Ged2DotException(Exception):
+    """An exception that is intentionally raised by ged2dot."""
+
+
 class Config:
     """Stores options from a config file or from cmdline args."""
     def __init__(self) -> None:
@@ -536,8 +540,8 @@ def safe_atoi(string: str) -> int:
     """Converts str to an int, returns -1 on error."""
     try:
         return int(string)
-    except ValueError:
-        return -1
+    except ValueError as exc:
+        raise Ged2DotException() from exc
 
 
 class DotExport:
