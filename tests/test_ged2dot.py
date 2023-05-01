@@ -638,7 +638,10 @@ class TestFuzz(unittest.TestCase):
             config = {
                 "input": path
             }
-            importer.load(config)
+            try:
+                importer.load(config)
+            except ged2dot.Ged2DotException:
+                pass
 
 
 if __name__ == '__main__':

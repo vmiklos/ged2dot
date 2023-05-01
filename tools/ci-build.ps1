@@ -7,6 +7,7 @@
 #
 # Baseline: Windows 2019
 #
+Set-PSDebug -Trace 1
 
 choco install graphviz --version 2.48.0
 if (-not $?) { throw "error $?" }
@@ -28,7 +29,7 @@ cd ..
 
 # Allow both 'graphviz' and 'Graphviz <version>'.
 $GVPATH = Resolve-Path "C:/Program Files/Graphviz*" | Select -ExpandProperty Path
-pip install --global-option=build_ext --global-option="-I${GVPATH}/include" --global-option="-L${GVPATH}/lib/" pygraphviz==1.10
+python -m pip install --config-settings="--global-option=build_ext" --config-settings="--global-option=-I${GVPATH}/include" --config-settings="--global-option=-L${GVPATH}/lib/" pygraphviz==1.10
 if (-not $?) { throw "error $?" }
 python -m pip install -r requirements.txt
 if (-not $?) { throw "error $?" }

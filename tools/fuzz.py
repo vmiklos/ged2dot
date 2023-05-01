@@ -18,7 +18,10 @@ with atheris.instrument_imports():
 def test_one_input(data: bytes) -> None:
     """Tests one particular input."""
     importer = ged2dot.GedcomImport()
-    importer.tokenize_from_stream(io.BytesIO(data))
+    try:
+        importer.tokenize_from_stream(io.BytesIO(data))
+    except ged2dot.Ged2DotException:
+        pass
 
 
 atheris.Setup(sys.argv, test_one_input)
