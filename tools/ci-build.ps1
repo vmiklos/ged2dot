@@ -29,7 +29,7 @@ cd ..
 
 # Allow both 'graphviz' and 'Graphviz <version>'.
 $GVPATH = Resolve-Path "C:/Program Files/Graphviz*" | Select -ExpandProperty Path
-python -m pip install --config-settings="--global-option=build_ext" --config-settings="--global-option=-I${GVPATH}/include" --config-settings="--global-option=-L${GVPATH}/lib/" pygraphviz==1.10
+python -m pip install --config-settings="--global-option=build_ext" --config-settings="--global-option=-I${GVPATH}/include" --config-settings="--global-option=-L${GVPATH}/lib/" pygraphviz==1.11
 if (-not $?) { throw "error $?" }
 python -m pip install -r requirements.txt
 if (-not $?) { throw "error $?" }
