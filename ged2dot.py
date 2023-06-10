@@ -482,7 +482,7 @@ class GedcomImport:
         if b"\r" not in stream_buf:
             lines = stream_buf.split(b"\n")
         for line_bytes in lines:
-            line = line_bytes.strip().decode("utf-8")
+            line = safe_utf8_decode(line_bytes.strip())
             if not line:
                 continue
             tokens = line.split(" ")
@@ -537,10 +537,18 @@ def bfs(root: Node, config: Dict[str, str]) -> List[Node]:
 
 
 def safe_atoi(string: str) -> int:
-    """Converts str to an int, returns -1 on error."""
+    """Converts str to an int, raising an own exception on error."""
     try:
         return int(string)
     except ValueError as exc:
+        raise Ged2DotException() from exc
+
+
+def safe_utf8_decode(fro: bytes) -> str:
+    """Decodes bytes to a string, raising an own exception on error."""
+    try:
+        return fro.decode("utf-8")
+    except UnicodeDecodeError as exc:
         raise Ged2DotException() from exc
 
 

@@ -1,5 +1,10 @@
 # Version descriptions
 
+## master
+
+- Fix crash on non-int line start
+- Fix crash on invalid utf-8 lines
+
 ## 7.5
 
 - new config option: direction (defaults to `both`, can be `child`)
