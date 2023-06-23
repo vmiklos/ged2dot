@@ -544,10 +544,10 @@ def safe_atoi(string: str) -> int:
         raise Ged2DotException() from exc
 
 
-def safe_utf8_decode(fro: bytes) -> str:
+def safe_utf8_decode(source: bytes) -> str:
     """Decodes bytes to a string, raising an own exception on error."""
     try:
-        return fro.decode("utf-8")
+        return source.decode("utf-8")
     except UnicodeDecodeError as exc:
         raise Ged2DotException() from exc
 
