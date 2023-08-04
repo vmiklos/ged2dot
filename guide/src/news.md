@@ -1,6 +1,6 @@
 # Version descriptions
 
-## master
+## 7.6
 
 - Fix crash on non-int line start
 - Fix crash on invalid utf-8 lines
