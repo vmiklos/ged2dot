@@ -1,7 +1,7 @@
-coverage==7.2.7
-flake8==6.0.0
-mypy==1.4.1
+coverage==7.3.0
+flake8==6.1.0
+mypy==1.5.1
 pygraphviz==1.11
-pyinstaller==5.13.0
-pylint==2.17.4
+pyinstaller==5.13.2
+pylint==2.17.5
 pyqt5==5.15.7
