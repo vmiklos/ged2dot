@@ -649,7 +649,7 @@ def convert(config: Dict[str, str]) -> None:
         reason = f"Root family '{config['rootfamily']}' is not found."
         if family_id:
             reason += f" First valid family would be '{family_id}'."
-        raise ValueError(reason)
+        raise Ged2DotException(reason)
     subgraph = bfs(root_family, config)
     exporter = DotExport()
     exporter.store(subgraph, config)

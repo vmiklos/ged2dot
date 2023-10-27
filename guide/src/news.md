@@ -1,5 +1,9 @@
 # Version descriptions
 
+## master
+
+- Fix crash on non-existing root family
+
 ## 7.6
 
 - Fix crash on non-int line start
