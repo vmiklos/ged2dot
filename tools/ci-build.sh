@@ -10,6 +10,16 @@
 #
 
 if [ "$GITHUB_JOB" == "macos" ]; then
+    # See <https://github.com/actions/setup-python/issues/577>.
+    rm /usr/local/bin/2to3-3.*
+    rm /usr/local/bin/idle3.*
+    rm /usr/local/bin/pydoc3.*
+    rm /usr/local/bin/python3.*
+    rm /usr/local/bin/2to3
+    rm /usr/local/bin/idle3
+    rm /usr/local/bin/pydoc3
+    rm /usr/local/bin/python3-config
+
     brew install graphviz
 elif [ -n "$GITHUB_JOB" ]; then
     sudo apt-get install graphviz graphviz-dev
