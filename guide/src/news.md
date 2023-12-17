@@ -2,6 +2,7 @@
 
 ## master
 
+- Use ordering=out on family nodes to try to control the order of children nodes
 - Fix crash on non-existing root family
 
 ## 7.6
