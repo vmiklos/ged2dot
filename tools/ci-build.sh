@@ -19,8 +19,11 @@ if [ "$GITHUB_JOB" == "macos" ]; then
     rm /usr/local/bin/idle3
     rm /usr/local/bin/pydoc3
     rm /usr/local/bin/python3-config
+    rm /usr/local/bin/python3
 
     brew install graphviz
+
+    python3 -c 'import sys; assert sys.version_info.major == 3; assert sys.version_info.minor == 11'
 elif [ -n "$GITHUB_JOB" ]; then
     sudo apt-get install graphviz graphviz-dev
 fi

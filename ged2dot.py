@@ -592,7 +592,10 @@ class DotExport:
             label = table_start + "<tr><td><img src=\"" + image_path + "\"/></td></tr></table>"
             if node.get_marr():
                 label = node.get_marr()
-            stream.write(to_bytes(node.get_identifier() + " [shape=circle, margin=\"0,0\", label=<" + label + ">];\n"))
+            # Make sure family -> children edges appear left-to-right in the same order in which
+            # they are defined in the input.
+            attrs = "shape=circle, margin=\"0,0\", label=<" + label + ">, ordering=out"
+            stream.write(to_bytes(node.get_identifier() + " [" + attrs + "];\n"))
         stream.write(to_bytes("\n"))
 
     def __store_edges(self, stream: BinaryIO) -> None:
