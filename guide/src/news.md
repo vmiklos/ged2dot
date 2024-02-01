@@ -1,6 +1,6 @@
 # Version descriptions
 
-## master
+## 24.2
 
 - Use ordering=out on family nodes to try to control the order of children nodes
 - Fix crash on non-existing root family
