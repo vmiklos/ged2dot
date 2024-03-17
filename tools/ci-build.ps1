@@ -14,15 +14,17 @@ if (-not $?) { throw "error $?" }
 # Register plugins.
 dot -c
 if (-not $?) { throw "error $?" }
-choco install wixtoolset
+dotnet tool install --global wix
+if (-not $?) { throw "error $?" }
+wix extension add -g WixToolset.UI.wixext/4.0.4
 if (-not $?) { throw "error $?" }
 
 cd tools
 git clone https://github.com/jpakkane/msicreator
 if (-not $?) { throw "error $?" }
 cd msicreator
-# Allow to add extra attributes to MajorUpgrade node. (#7), 2018-09-08.
-git checkout 57c0d083ee8ce6d5c9b417d88aa80a1c8d3d6419
+#  Custom actions (#15), 2024-03-13
+git checkout 3942d6cbe41655b027f469c600b80ac021d05841
 if (-not $?) { throw "error $?" }
 cd ..
 cd ..
