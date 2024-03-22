@@ -17,4 +17,4 @@ min-public-methods=0
 max-attributes=14
 
 [MASTER]
-extension-pkg-whitelist=PyQt5
+extension-pkg-whitelist=PyQt6

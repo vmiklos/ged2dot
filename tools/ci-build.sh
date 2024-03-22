@@ -26,6 +26,8 @@ if [ "$GITHUB_JOB" == "macos" ]; then
     python3 -c 'import sys; assert sys.version_info.major == 3; assert sys.version_info.minor == 11'
 elif [ -n "$GITHUB_JOB" ]; then
     sudo apt-get install graphviz graphviz-dev
+    # for pylint and pyqt6
+    sudo apt-get install xorg libxkbcommon0
 fi
 
 cd tools

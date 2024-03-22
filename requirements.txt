@@ -4,4 +4,4 @@ mypy==1.8.0
 pygraphviz==1.12
 pyinstaller==6.3.0
 pylint==3.0.3
-pyqt5==5.15.7
+pyqt6==6.6.1
