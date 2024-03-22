@@ -7,29 +7,27 @@
 
 """Qt-based GUI for ged2dot."""
 
-from typing import cast
 import io
 import os
 import sys
 import traceback
 import webbrowser
 
-from PyQt5 import QtGui
-from PyQt5.QtCore import pyqtBoundSignal
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QCheckBox
-from PyQt5.QtWidgets import QComboBox
-from PyQt5.QtWidgets import QDialogButtonBox
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QGridLayout
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QLineEdit
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtWidgets import QPushButton
-from PyQt5.QtWidgets import QSpinBox
-from PyQt5.QtWidgets import QStatusBar
-from PyQt5.QtWidgets import QVBoxLayout
-from PyQt5.QtWidgets import QWidget
+from PyQt6 import QtGui
+from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QCheckBox
+from PyQt6.QtWidgets import QComboBox
+from PyQt6.QtWidgets import QDialogButtonBox
+from PyQt6.QtWidgets import QFileDialog
+from PyQt6.QtWidgets import QGridLayout
+from PyQt6.QtWidgets import QLabel
+from PyQt6.QtWidgets import QLineEdit
+from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QPushButton
+from PyQt6.QtWidgets import QSpinBox
+from PyQt6.QtWidgets import QStatusBar
+from PyQt6.QtWidgets import QVBoxLayout
+from PyQt6.QtWidgets import QWidget
 import pygraphviz  # type: ignore
 
 import ged2dot
@@ -186,8 +184,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.input_value, 0, 1)
         input_button = QPushButton(self.window)
         input_button.setText("Browse...")
-        # pylint: disable=no-value-for-parameter
-        cast(pyqtBoundSignal, input_button.clicked).connect(self.widgets.set_input)
+        input_button.clicked.connect(self.widgets.set_input)
         self.grid_layout.addWidget(input_button, 0, 2)
 
     def setup_output(self) -> None:
@@ -198,8 +195,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.output_value, 1, 1)
         output_button = QPushButton(self.window)
         output_button.setText("Browse...")
-        # pylint: disable=no-value-for-parameter
-        cast(pyqtBoundSignal, output_button.clicked).connect(self.widgets.set_output)
+        output_button.clicked.connect(self.widgets.set_output)
         self.grid_layout.addWidget(output_button, 1, 2)
 
     def setup_rootfamily(self) -> None:
@@ -225,8 +221,7 @@ class Application:
         self.grid_layout.addWidget(self.widgets.imagedir_value, 4, 1)
         imagedir_button = QPushButton(self.window)
         imagedir_button.setText("Browse...")
-        # pylint: disable=no-value-for-parameter
-        cast(pyqtBoundSignal, imagedir_button.clicked).connect(self.widgets.set_imagedir)
+        imagedir_button.clicked.connect(self.widgets.set_imagedir)
         self.grid_layout.addWidget(imagedir_button, 4, 2)
 
     def setup_nameorder(self) -> None:
@@ -261,20 +256,15 @@ def main() -> None:
     app.layout.addLayout(app.grid_layout)
 
     button_box = QDialogButtonBox()
-    standard_buttons = cast(
-        QDialogButtonBox.StandardButtons,
-        QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel  # pylint: disable=no-member
-    )
+    standard_buttons = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
     button_box.setStandardButtons(standard_buttons)
     app.layout.addWidget(button_box)
-    cast(
-        pyqtBoundSignal,
-        button_box.button(QDialogButtonBox.StandardButton.Cancel).clicked  # pylint: disable=no-member
-    ).connect(sys.exit)
-    cast(
-        pyqtBoundSignal,
-        button_box.button(QDialogButtonBox.StandardButton.Ok).clicked  # pylint: disable=no-member
-    ).connect(app.widgets.convert)
+    cancel_button = button_box.button(QDialogButtonBox.StandardButton.Cancel)
+    assert cancel_button
+    cancel_button.clicked.connect(sys.exit)
+    ok_button = button_box.button(QDialogButtonBox.StandardButton.Ok)
+    assert ok_button
+    ok_button.clicked.connect(app.widgets.convert)
     app.layout.addWidget(app.widgets.statusbar)
     app.widgets.update_status()
 
