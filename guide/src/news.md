@@ -1,5 +1,10 @@
 # Version descriptions
 
+## master
+
+- qget2dot is now ported to qt 6
+- the macOS port is now deprecated, CI & release binary will be removed in the next release
+
 ## 24.2
 
 - Use ordering=out on family nodes to try to control the order of children nodes
