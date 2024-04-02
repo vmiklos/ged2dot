@@ -4,6 +4,12 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 #
+#
+# Modified by Gregory Dudek, April 2, 2024.
+#  Spouses go in subgraph cluster.
+#  Handle surname suffixes like John Smith Jr.
+#  More image formats supported
+#
 
 """A version of ged2dot that uses breadth-first search to traverse the gedcom graph."""
 
