@@ -17,6 +17,10 @@ import configparser
 import os
 import sys
 
+import random # GD 
+
+verbose = 0 # debugging information
+
 
 class Ged2DotException(Exception):
     """An exception that is intentionally raised by ged2dot."""
@@ -263,12 +267,25 @@ class Individual(Node):
 
     def get_label(self, image_dir: str, name_order: str, birth_format: str, basepath: str) -> str:
         """Gets the graphviz label."""
-        image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname())
-        image_path += " " + self.get_config().get_birth() + ".jpg"
-        if not os.path.exists(to_bytes(image_path)):
-            image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname()) \
-                + ".jpg"
-        if not os.path.exists(to_bytes(image_path)):
+        # if self.get_forename().strip():
+        #     image_path = os.path.join(image_dir.strip(), self.get_forename().strip() + " " + self.get_surname()).strip()
+        # else:
+        #     image_path = os.path.join(image_dir.strip(), self.get_surname()).strip()
+        image_path = os.path.join(image_dir.strip(), self.get_forename().strip() + " " + self.get_surname()).strip()
+        image_path = image_path.strip()
+        if self.get_config().get_birth(): image_path += " " + self.get_config().get_birth().strip()
+        image_path = image_path.strip()
+        didfind = 0
+        for suffix in [".jpg", ".jpeg", ".png", ".JPG", ".PNG"]:
+            # print("Look for",image_path+suffix, file=sys.stderr )
+            if os.path.exists(to_bytes(image_path+suffix)):
+                image_path +=  suffix
+                print("FOUND ",image_path, file=sys.stderr )
+                didfind = 1
+                break
+
+        if (not didfind) or not os.path.exists(to_bytes(image_path)):
+            if verbose: print("Did not find image for ",image_path, file=sys.stderr )
             if self.get_sex():
                 sex = self.get_sex().lower()
             else:
@@ -303,7 +320,7 @@ class Individual(Node):
             sex = 'U'
         else:
             sex = self.get_sex().upper()
-        color = {'M': 'blue', 'F': 'pink', 'U': 'black'}[sex]
+        color = {'M': 'lightblue', 'F': 'pink', 'U': 'grey'}[sex]
         return color
 
 
@@ -432,6 +449,14 @@ class GedcomImport:
             self.individual.set_forename(tokens[0].strip())
             if len(tokens) > 1:
                 self.individual.set_surname(tokens[1].strip())
+        elif line_lead_token == "NSFX" and self.individual:
+            # Never used as NSFX is level 2 only
+            line = line[5:]
+            tokens = line.split('/')
+            # we make the ugly assumptio that NSFX always comes after SURN -- GD
+            if len(tokens) > 1:
+                self.individual.set_surname(self.individual.get_surname() +" "+tokens[1].strip())
+            print("Make name: "+self.individual.get_surname()+" by adding "+tokens[1].strip()+":"+str(tokens), file=sys.stderr)
         elif line_lead_token == "FAMC" and self.individual:
             # At least <https://www.ancestry.com> sometimes writes multiple FAMC, which doesn't
             # make sense. Import only the first one.
@@ -508,6 +533,14 @@ class GedcomImport:
                             self.individual.get_config().set_death(year)
                     elif self.family and self.in_marr:
                         self.family.set_marr(year)
+                if rest.startswith("NSFX"):
+                    if len(rest) > 1:
+                        self.individual.set_surname(self.individual.get_surname() +" "+rest.split()[1].strip())
+                        print("Made name: "+self.individual.get_surname()+" by adding "+str(rest.split()[1]), file=sys.stderr)
+                if rest.startswith("_MARNM"):
+                    if len(rest) > 1:
+                        self.individual.set_surname(self.individual.get_surname() +" "+rest.split()[1].strip())
+                        print("Made name: "+self.individual.get_surname()+" by adding "+str(rest.split()[1]), file=sys.stderr)
         return self.graph
 
 
@@ -603,12 +636,17 @@ class DotExport:
             if not isinstance(node, Family):
                 continue
             family = node
+            # cluster husband and wife GD
+            cname = "cluster_"+str(random.randint(10000000,20000000))
+            stream.write(to_bytes( "subgraph "+cname+" { style=invis; \n" ))
             if family.wife:
                 from_wife = family.wife.get_identifier() + " -> " + family.get_identifier() + " [dir=none];\n"
                 stream.write(to_bytes(from_wife))
             if family.husb:
                 from_husb = family.husb.get_identifier() + " -> " + family.get_identifier() + " [dir=none];\n"
                 stream.write(to_bytes(from_husb))
+            # close cluster husband and wife GD
+            stream.write(to_bytes( "}\n" ))
             for child in family.child_list:
                 stream.write(to_bytes(family.get_identifier() + " -> " + child.get_identifier() + " [dir=none];\n"))
 
