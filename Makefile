@@ -43,7 +43,7 @@ check-unit:
 	flake8 $< && touch $@
 
 %.pylint : %.py Makefile .pylintrc requirements.txt
-	env PYTHONPATH=. pylint $< && touch $@
+	env PYTHONPATH=. pylint -v $< && touch $@
 
 # If not macOS, assume Linux.
 pack:

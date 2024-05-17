@@ -14,7 +14,7 @@ if (-not $?) { throw "error $?" }
 # Register plugins.
 dot -c
 if (-not $?) { throw "error $?" }
-dotnet tool install --global wix
+dotnet tool install --global wix --version 4.0.5
 if (-not $?) { throw "error $?" }
 wix extension add -g WixToolset.UI.wixext/4.0.4
 if (-not $?) { throw "error $?" }
@@ -31,7 +31,7 @@ cd ..
 
 # Allow both 'graphviz' and 'Graphviz <version>'.
 $GVPATH = Resolve-Path "C:/Program Files/Graphviz*" | Select -ExpandProperty Path
-python -m pip install --config-settings="--global-option=build_ext" --config-settings="--global-option=-I${GVPATH}/include" --config-settings="--global-option=-L${GVPATH}/lib/" pygraphviz==1.12
+python -m pip install --config-settings="--global-option=build_ext" --config-settings="--global-option=-I${GVPATH}/include" --config-settings="--global-option=-L${GVPATH}/lib/" pygraphviz==1.13
 if (-not $?) { throw "error $?" }
 python -m pip install -r requirements.txt
 if (-not $?) { throw "error $?" }
