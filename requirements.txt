@@ -1,8 +1,8 @@
-coverage==7.5.1
+coverage==7.5.3
 flake8==7.0.0
 mypy==1.10.0
 pygraphviz==1.13
-pyinstaller==6.6.0
-pylint==3.1.0
+pyinstaller==6.7.0
+pylint==3.2.2
 # 6.6.1 fails `python3 -c 'from PyQt6 import QtGui'` with: undefined symbol: _ZN5QFont11tagToStringEj
 pyqt6==6.5.0
