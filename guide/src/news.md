@@ -4,6 +4,7 @@
 
 - qget2dot is now ported to qt 6
 - the macOS port is now deprecated, CI & release binary will be removed in the next release
+- Support a few more image types or file suffixes, notably jpg as well as png (Gregory Dudek)
 
 ## 24.2
 
