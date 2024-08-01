@@ -45,16 +45,11 @@ check-unit:
 %.pylint : %.py Makefile .pylintrc requirements.txt
 	env PYTHONPATH=. pylint -v $< && touch $@
 
-# If not macOS, assume Linux.
 pack:
 	rm -rf dist
-ifeq ($(OS),Darwin)
-	tools/pack.py
-else
 	make -C libreoffice VERSION=$(VERSION)
 	mkdir -p dist
 	cp libreoffice/*.oxt dist/
-endif
 
 run-guide:
 	cd guide && mdbook serve --hostname 127.0.0.1

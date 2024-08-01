@@ -48,8 +48,6 @@ def get_version() -> str:
                 break
 
     system = platform.system().lower()
-    if sys.platform == "darwin":
-        system = "macos"
     version += "-" + system
     machine = platform.machine().lower()
     if sys.platform.startswith("win") and machine == "amd64":

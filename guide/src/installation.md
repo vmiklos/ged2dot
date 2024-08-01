@@ -23,10 +23,7 @@ make check
 The `qged2dot.py` script is a Qt-based GUI for `ged2dot`, which can turn the `dot` output into PNG
 files.
 
-For macOS, the DMG is not signed digitally, so you need to allow its usage
-[explicitly](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac).
-
-The installer bundles Graphviz for macOS and Windows.
+The installer bundles Graphviz for Windows.
 
 The app icon is by [Appzgear](https://icon-icons.com/icon/family-tree/120659).
 
@@ -46,8 +43,6 @@ Its dependencies:
 
   - For Linux, use your package manager to install the `graphviz` package (2.28 is tested).
 
-  - For macOS, install it from [brew](https://brew.sh/) (2.36 is tested).
-
 - LibreOffice >= 7.2
 
 Features:
@@ -59,7 +54,7 @@ Features:
 - Internally reuses the excellent SVG import filter of LibreOffice, contributed
   by Fridrich Strba and Thorsten Behrens, so the result can be manually
   fine-tuned if necessary.
-- Runs on Windows and Linux and macOS.
+- Runs on Windows and Linux.
 
 You can grap a release binary at [the releases page](https://github.com/vmiklos/ged2dot/releases) --
 more on how to to install a LibreOffice extension
