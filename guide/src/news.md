@@ -1,6 +1,6 @@
 # Version descriptions
 
-## master
+## 24.8
 
 - qget2dot is now ported to qt 6
 - the macOS port is now deprecated, CI & release binary will be removed in the next release
