@@ -2,7 +2,7 @@
 
 ged2dot is a GEDCOM to Graphviz converter.
 
-The latest version is v24.2, released on 2024-02-01.
+The latest version is v24.8, released on 2024-08-01.
 
 ## Description
 
