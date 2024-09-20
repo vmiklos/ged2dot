@@ -5,10 +5,6 @@
 # SPDX-License-Identifier: MPL-2.0
 #
 
-#
-# Baseline: Ubuntu 22.04.
-#
-
 sudo apt-get update
 sudo apt-get install graphviz graphviz-dev
 # for pylint and pyqt6
