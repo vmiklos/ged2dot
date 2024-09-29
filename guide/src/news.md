@@ -1,5 +1,9 @@
 # Version descriptions
 
+## master
+
+- Put spouses into a subgraph cluster, so they are closer to each other (Gregory Dudek)
+
 ## 24.8
 
 - qget2dot is now ported to qt 6
