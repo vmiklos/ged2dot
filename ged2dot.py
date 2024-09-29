@@ -606,12 +606,21 @@ class DotExport:
             if not isinstance(node, Family):
                 continue
             family = node
+
+            # Open subgraph of the family.
+            cname = "cluster_" + family.get_identifier()
+            stream.write(to_bytes("subgraph " + cname + " { style=invis; \n"))
+
             if family.wife:
                 from_wife = family.wife.get_identifier() + " -> " + family.get_identifier() + " [dir=none];\n"
                 stream.write(to_bytes(from_wife))
             if family.husb:
                 from_husb = family.husb.get_identifier() + " -> " + family.get_identifier() + " [dir=none];\n"
                 stream.write(to_bytes(from_husb))
+
+            # Close subgraph of the family.
+            stream.write(to_bytes("}\n"))
+
             for child in family.child_list:
                 stream.write(to_bytes(family.get_identifier() + " -> " + child.get_identifier() + " [dir=none];\n"))
 
