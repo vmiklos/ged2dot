@@ -140,8 +140,8 @@ class TestMain(unittest.TestCase):
         self.assertFalse(os.path.exists(config["output"]))
         ged2dot.convert(config)
         self.assertTrue(os.path.exists(config["output"]))
-        with open(config["output"], "r", encoding="utf-8") as stream:
-            graph = pygraphviz.AGraph(string=stream.read())
+        with open(config["output"], "r", encoding="utf-8") as dot_stream:
+            graph = pygraphviz.AGraph(string=dot_stream.read())
         person = graph.get_node("P48")
         stream = io.StringIO(person.attr.get("label"))
         tree = ET.parse(stream)
@@ -547,8 +547,8 @@ class TestMain2(unittest.TestCase):
 
         # Then make sure that explicit width and height is specified for the table around the image,
         # required by the PNG output:
-        with open(config["output"], "r", encoding="utf-8") as stream:
-            graph = pygraphviz.AGraph(string=stream.read())
+        with open(config["output"], "r", encoding="utf-8") as dot_stream:
+            graph = pygraphviz.AGraph(string=dot_stream.read())
         family = graph.get_node("F1")
         stream = io.StringIO(family.attr.get("label"))
         tree = ET.parse(stream)
