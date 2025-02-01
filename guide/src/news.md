@@ -1,6 +1,6 @@
 # Version descriptions
 
-## master
+## 25.2
 
 - Put spouses into a subgraph cluster, so they are closer to each other (Gregory Dudek)
 
