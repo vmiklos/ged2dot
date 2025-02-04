@@ -3,5 +3,5 @@ flake8==7.1.1
 mypy==1.14.1
 pygraphviz==1.14
 pyinstaller==6.11.1
-pylint==3.3.3
+pylint==3.3.4
 pyqt6==6.7.1
