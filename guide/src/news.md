@@ -1,5 +1,9 @@
 # Version descriptions
 
+## master
+
+- For people whose names have a suffix (like Richard III, or Sam Jr) extract that and keep it as part of the name (Gregory Dudek)
+
 ## 25.2
 
 - Put spouses into a subgraph cluster, so they are closer to each other (Gregory Dudek)
