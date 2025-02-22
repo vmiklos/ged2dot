@@ -420,6 +420,19 @@ class GedcomImport:
             self.family = Family()
             self.family.set_identifier(line[1:-5])
 
+    def __handle_indi_name(self, line: str) -> None:
+        # Expected style: 'first /last/ suffix', suffix is optional.
+        tokens = line.split('/')
+        assert self.individual
+        self.individual.set_forename(tokens[0].strip())
+        if len(tokens) > 1:
+            self.individual.set_surname(tokens[1].strip())
+        if len(tokens) > 2 and tokens[2]:
+            # We have suffix, append that to the surname.
+            surname = self.individual.get_surname()
+            suffix = tokens[2].strip()
+            self.individual.set_surname(f"{surname} {suffix}")
+
     def __handle_level1(self, line: str) -> None:
         self.__reset_flags()
 
@@ -431,10 +444,7 @@ class GedcomImport:
                 self.individual.set_sex(tokens[1])
         elif line_lead_token == "NAME" and self.individual:
             line = line[5:]
-            tokens = line.split('/')
-            self.individual.set_forename(tokens[0].strip())
-            if len(tokens) > 1:
-                self.individual.set_surname(tokens[1].strip())
+            self.__handle_indi_name(line)
         elif line_lead_token == "FAMC" and self.individual:
             # At least <https://www.ancestry.com> sometimes writes multiple FAMC, which doesn't
             # make sense. Import only the first one.
