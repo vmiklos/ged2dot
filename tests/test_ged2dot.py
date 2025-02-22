@@ -49,6 +49,19 @@ class TestIndividual(unittest.TestCase):
         label = individual.get_label(image_dir="", name_order="big", birth_format="{}-", basepath="")
         self.assertIn("A<br/>Alice", label)
 
+    def test_name_suffix(self) -> None:
+        """Tests the case when the name has a suffix."""
+        config = {
+            "input": "tests/suffix.ged",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.tokenize(config)
+        individual = ged2dot.graph_find(graph, "P1")
+        assert individual
+        assert isinstance(individual, ged2dot.Individual)
+        label = individual.get_label(image_dir="", name_order="little", birth_format="{}-", basepath="")
+        self.assertIn("Alice<br/>A Suffix", label)
+
     def test_str(self) -> None:
         """Tests __str()__."""
         config = {
