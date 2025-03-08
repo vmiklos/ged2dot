@@ -51,3 +51,5 @@ Ideally CI checks everything before a commit hits master, but here are a few
 things which are not part of CI:
 
 - Run `tools/requirements.py` once a month and make sure Python dependencies are reasonably up to date.
+
+- Update `.github/workflows/tests.yml` based on `github-outdated`.
