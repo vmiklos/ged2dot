@@ -1,6 +1,6 @@
 # Version descriptions
 
-## master
+## 25.8
 
 - For people whose names have a suffix (like Richard III, or Sam Jr) extract that and keep it as part of the name (Gregory Dudek)
 
