@@ -16,11 +16,11 @@ jobs:
     - uses: actions/checkout@v5.0.0
     - uses: actions/setup-python@v6.0.0
       with:
-        python-version: 3.11
+        python-version: 3.13
     - name: Run make check
       run: |
         tools/ci-build.sh
-    - uses: softprops/action-gh-release@v2.3.2
+    - uses: softprops/action-gh-release@v2.4.1
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: dist/*.oxt
@@ -32,11 +32,11 @@ jobs:
       - uses: actions/checkout@v5.0.0
       - uses: actions/setup-python@v6.0.0
         with:
-          python-version: 3.11
+          python-version: 3.13
       - name: Run make pack
         run: |
           tools/ci-build.ps1
-      - uses: softprops/action-gh-release@v2.3.2
+      - uses: softprops/action-gh-release@v2.4.1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: dist/*.msi
