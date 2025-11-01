@@ -160,9 +160,9 @@ class TestMain(unittest.TestCase):
         tree = ET.parse(stream)
         root = tree.getroot()
         row = root.find("tr")
-        assert row
+        assert row is not None
         cell = row.find("td")
-        assert cell
+        assert cell is not None
         img = cell.find("img")
         assert img is not None
         actual_src = img.attrib.get("src")

@@ -5,7 +5,7 @@
 Create it:
 
 ```
-python3.11 -m venv ged2dot-env
+python3 -m venv ged2dot-env
 ```
 
 Activate it:
