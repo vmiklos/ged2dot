@@ -57,15 +57,6 @@ C:/Users/John/Application Data/LibreOffice/4/user/Scripts/python/log.txt
 - For Linux, start LibreOffice from a terminal, the log is printed to the
   standard error.
 
-- For Mac, start LibreOffice from Terminal:
-
-```
-cd /Applications/LibreOffice.app/Contents/program
-./soffice --nologo /path/to/test.ged
-```
-
-then the log is printed to the standard error as well.
-
 ## Icons
 
 Icons are from

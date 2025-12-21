@@ -149,6 +149,7 @@ class IndividualConfig:
         self.__note = ""
         self.__birth = ""
         self.__death = ""
+        self.__occupation = ""
 
     def set_note(self, note: str) -> None:
         """Sets a note."""
@@ -173,6 +174,14 @@ class IndividualConfig:
     def get_death(self) -> str:
         """Gets the death date."""
         return self.__death
+
+    def set_occupation(self, occupation: str) -> None:
+        """Sets the occupation."""
+        self.__occupation = occupation
+
+    def get_occupation(self) -> str:
+        """Gets the occupation."""
+        return self.__occupation
 
 
 class Individual(Node):
@@ -261,8 +270,8 @@ class Individual(Node):
         """Gets the child family ID."""
         return self.__dict["famc_id"]
 
-    def get_label(self, image_dir: str, name_order: str, birth_format: str, basepath: str) -> str:
-        """Gets the graphviz label."""
+    def __get_image_path(self, image_dir: str, basepath: str) -> str:
+        """Gets the path to the image."""
         image_path = os.path.join(image_dir, self.get_forename() + " " + self.get_surname())
         for suffix in [".jpg", ".jpeg", ".png", ".JPG", ".PNG"]:
             image_path += " " + self.get_config().get_birth() + suffix
@@ -279,6 +288,11 @@ class Individual(Node):
             image_path = get_abspath(f"placeholder-{sex}.svg")
         if basepath:
             image_path = os.path.relpath(image_path, basepath)
+        return image_path
+
+    def get_label(self, image_dir: str, name_order: str, birth_format: str, basepath: str) -> str:
+        """Gets the graphviz label."""
+        image_path = self.__get_image_path(image_dir, basepath)
         label = "<table border=\"0\" cellborder=\"0\"><tr><td>"
         label += "<img scale=\"true\" src=\"" + image_path + "\"/>"
         # State the font face explicitly to help correct centering.
@@ -297,6 +311,9 @@ class Individual(Node):
             label += "† " + self.get_config().get_death()
         else:
             label += self.get_config().get_birth() + "-" + self.get_config().get_death()
+        occupation = self.get_config().get_occupation()
+        if occupation:
+            label += "<br/>" + occupation
         label += "</font></td></tr></table>"
         return label
 
@@ -473,6 +490,8 @@ class GedcomImport:
             self.in_deat = True
         elif line_lead_token == "NOTE" and self.individual:
             self.individual.get_config().set_note(line[5:])
+        elif line_lead_token == "OCCU" and self.individual:
+            self.individual.get_config().set_occupation(line[5:])
 
     def load(self, config: Dict[str, str]) -> List[Node]:
         """Tokenizes and resolves a gedcom file into a graph."""

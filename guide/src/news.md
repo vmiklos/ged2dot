@@ -1,5 +1,9 @@
 # Version descriptions
 
+## master
+
+- If provided, occupation is listed after the birth and dead year
+
 ## 25.8
 
 - For people whose names have a suffix (like Richard III, or Sam Jr) extract that and keep it as part of the name (Gregory Dudek)
