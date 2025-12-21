@@ -62,6 +62,19 @@ class TestIndividual(unittest.TestCase):
         label = individual.get_label(image_dir="", name_order="little", birth_format="{}-", basepath="")
         self.assertIn("Alice<br/>A Suffix", label)
 
+    def test_occupation(self) -> None:
+        """Tests the case when the occupation is provided."""
+        config = {
+            "input": "tests/occupation.ged",
+        }
+        importer = ged2dot.GedcomImport()
+        graph = importer.tokenize(config)
+        individual = ged2dot.graph_find(graph, "P1")
+        assert individual
+        assert isinstance(individual, ged2dot.Individual)
+        label = individual.get_label(image_dir="", name_order="little", birth_format="{}-", basepath="")
+        self.assertIn("Alice<br/>A<br/>-<br/>myoccupation", label)
+
     def test_str(self) -> None:
         """Tests __str()__."""
         config = {
