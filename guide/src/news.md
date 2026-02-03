@@ -1,6 +1,6 @@
 # Version descriptions
 
-## master
+## 26.2
 
 - If provided, occupation is listed after the birth and dead year
 

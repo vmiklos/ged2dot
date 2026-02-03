@@ -1,5 +1,5 @@
 OS = $(shell uname)
-VERSION = 25.8
+VERSION = 26.2
 
 PYTHON_UNSAFE_OBJECTS = \
 	libreoffice/base.py \
