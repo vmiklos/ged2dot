@@ -15,7 +15,7 @@ def main() -> None:
     requirements = []
     with open("requirements.txt", encoding="utf-8") as sock:
         for line in sock.readlines():
-            requirements.append(line.split("==")[0])
+            requirements.append(line.split("==")[0].strip().lower())
     requirements = sorted(set(requirements))
 
     completed_process = subprocess.run(["pip", "list", "--outdated"], capture_output=True, check=True)
@@ -26,7 +26,7 @@ def main() -> None:
         if not line:
             continue
 
-        if lineno <= 2 or line.split(" ")[0] in requirements:
+        if lineno <= 2 or line.split(" ")[0].lower() in requirements:
             print(line)
 
 
