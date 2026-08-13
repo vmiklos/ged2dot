@@ -1,5 +1,9 @@
 # Version descriptions
 
+## 26.8
+
+- Maintenance release with up to date dependencies
+
 ## 26.2
 
 - If provided, occupation is listed after the birth and dead year
