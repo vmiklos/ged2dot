@@ -8,13 +8,22 @@
 """Turns linked graphics into inline graphics in an SVG file."""
 
 import base64
+import mimetypes
 import sys
-from xml.etree import ElementTree
-from typing import Union
 from typing import IO
+from typing import Union
+from xml.etree import ElementTree
 
 SVG_NS = 'http://www.w3.org/2000/svg'
 XLINK_NS = 'http://www.w3.org/1999/xlink'
+
+
+def get_mimetype(href: str) -> str:
+    """Returns the MIME type of the given path."""
+    mimetype = mimetypes.guess_type(href)[0]
+    if mimetype is None:
+        return 'application/octet-stream'
+    return mimetype
 
 
 def inlineize(from_path: Union[str, IO[bytes]], to_path: Union[str, IO[bytes]]) -> None:
@@ -30,7 +39,7 @@ def inlineize(from_path: Union[str, IO[bytes]], to_path: Union[str, IO[bytes]]) 
         href = image.attrib[xlinkhref]
         with open(href, 'rb') as stream:
             b64 = base64.b64encode(stream.read()).decode('ascii')
-            image.attrib[xlinkhref] = f"data:image/png;base64,{b64}"
+            image.attrib[xlinkhref] = f"data:{get_mimetype(href)};base64,{b64}"
     tree.write(to_path)
 
 
